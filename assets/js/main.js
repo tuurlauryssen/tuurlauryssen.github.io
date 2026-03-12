@@ -10,23 +10,27 @@ function initCursor() {
   const ring = document.getElementById('cursorRing');
   
   if (!dot || !ring) return;
+  if (window.matchMedia('(pointer: coarse)').matches) return;
   
   let mouseX = 0, mouseY = 0;
   let ringX = 0, ringY = 0;
+  let hasMoved = false;
   
   // Track mouse position
   document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
+    hasMoved = true;
+    ring.style.opacity = ring.classList.contains('hover') ? '0.9' : '0.55';
   });
   
   // Animate cursor
   function animateCursor() {
-    // Dot follows mouse directly
-    dot.style.left = mouseX + 'px';
-    dot.style.top = mouseY + 'px';
-    
-    // Ring follows with smooth easing
+    if (!hasMoved) {
+      requestAnimationFrame(animateCursor);
+      return;
+    }
+
     ringX += (mouseX - ringX) * 0.12;
     ringY += (mouseY - ringY) * 0.12;
     ring.style.left = ringX + 'px';
@@ -38,18 +42,28 @@ function initCursor() {
   animateCursor();
   
   // Hover effects
-  const hoverElements = document.querySelectorAll('a, button, .s-card, .contact-row, .format-card, .type-pill, .ftab, .nav-cta');
+  const hoverElements = document.querySelectorAll('a, button, .s-card, .contact-row, .format-card, .type-pill, .ftab, .nav-cta, .ih-ct-row, .ih-post-card');
   
   hoverElements.forEach(el => {
     el.addEventListener('mouseenter', () => {
-      dot.classList.add('hover');
       ring.classList.add('hover');
+      ring.style.opacity = '0.9';
     });
     
     el.addEventListener('mouseleave', () => {
-      dot.classList.remove('hover');
       ring.classList.remove('hover');
+      ring.style.opacity = hasMoved ? '0.55' : '0';
     });
+  });
+
+  document.addEventListener('mouseleave', () => {
+    ring.style.opacity = '0';
+  });
+
+  document.addEventListener('mouseenter', () => {
+    if (hasMoved) {
+      ring.style.opacity = ring.classList.contains('hover') ? '0.9' : '0.55';
+    }
   });
 }
 

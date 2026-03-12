@@ -39,47 +39,41 @@ body {
   background: var(--beige);
   color: var(--ink);
   overflow-x: hidden;
-  cursor: none;
+  cursor: auto;
 }
 
 /* ────────────────────────────
    CUSTOM CURSOR
 ──────────────────────────── */
 .cursor-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--navy);
-  border-radius: 50%;
-  position: fixed;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: width 0.3s, height 0.3s, opacity 0.3s, background 0.3s;
+  display: none;
 }
 
 .cursor-ring {
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--navy);
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(27,44,69,0.22);
   border-radius: 50%;
   position: fixed;
   pointer-events: none;
   z-index: 9998;
   transform: translate(-50%, -50%);
-  opacity: 0.35;
-  transition: width 0.4s ease, height 0.4s ease, opacity 0.4s, transform 0.12s ease;
+  opacity: 0;
+  background: rgba(27,44,69,0.03);
+  backdrop-filter: blur(2px);
+  transition: width 0.25s ease, height 0.25s ease, opacity 0.25s ease, transform 0.12s ease, border-color 0.25s ease, background 0.25s ease;
 }
 
 .cursor-dot.hover {
-  width: 12px;
-  height: 12px;
-  background: var(--navy2);
+  display: none;
 }
 
 .cursor-ring.hover {
-  width: 56px;
-  height: 56px;
-  opacity: 0.15;
+  width: 42px;
+  height: 42px;
+  opacity: 0.9;
+  border-color: rgba(27,44,69,0.34);
+  background: rgba(27,44,69,0.05);
 }
 
 /* ────────────────────────────
@@ -175,7 +169,7 @@ nav {
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  cursor: none;
+  cursor: pointer;
   transition: background 0.25s, transform 0.15s;
   font-weight: 500;
 }
@@ -392,7 +386,7 @@ nav {
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  cursor: none;
+  cursor: pointer;
   transition: background 0.2s;
   font-weight: 500;
   white-space: nowrap;
@@ -830,7 +824,7 @@ nav {
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  cursor: none;
+  cursor: pointer;
   font-weight: 400;
   transition: all 0.2s;
 }
@@ -853,7 +847,7 @@ nav {
 }
 
 .s-card {
-  cursor: none;
+  cursor: pointer;
 }
 
 .s-img-wrap {
@@ -1207,7 +1201,7 @@ nav {
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  cursor: none;
+  cursor: pointer;
   transition: background 0.25s;
   font-weight: 500;
 }
@@ -1312,7 +1306,7 @@ nav {
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  cursor: none;
+  cursor: pointer;
   transition: background 0.2s;
   font-weight: 500;
   white-space: nowrap;
