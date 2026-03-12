@@ -199,6 +199,25 @@ function Normalize-ArticleHtml {
   $cleaned = [regex]::Replace($cleaned, '(?is)<(section|div)\b[^>]*>\s*<h[2-4][^>]*>\s*Keep Reading\s*</h[2-4]>\s*.*?</\1>', '')
   $cleaned = [regex]::Replace($cleaned, '(?is)<(section|div)\b[^>]*(recommendedPosts|postComments|comments?)[^>]*>.*?</\1>', '')
   $cleaned = [regex]::Replace($cleaned, '(?is)<(section|div)\b[^>]*>\s*.*?(Add your comment|Load more|View more)\s*.*?</\1>', '')
+  foreach ($marker in @('>Keep Reading<', 'Keep Reading', 'Add your comment', 'Load more', 'View more')) {
+    $markerIndex = $cleaned.IndexOf($marker, [System.StringComparison]::OrdinalIgnoreCase)
+    if ($markerIndex -gt 0) {
+      $cutIndex = $cleaned.LastIndexOf('<div', $markerIndex, [System.StringComparison]::OrdinalIgnoreCase)
+      if ($cutIndex -lt 0) {
+        $cutIndex = $cleaned.LastIndexOf('<section', $markerIndex, [System.StringComparison]::OrdinalIgnoreCase)
+      }
+      if ($cutIndex -gt 0) {
+        $cleaned = $cleaned.Substring(0, $cutIndex)
+      }
+      else {
+        $cleaned = $cleaned.Substring(0, $markerIndex)
+      }
+    }
+  }
+  $genericRecommendedIndex = $cleaned.IndexOf('<div class="relative flex flex-col"', [System.StringComparison]::OrdinalIgnoreCase)
+  if ($genericRecommendedIndex -gt 0) {
+    $cleaned = $cleaned.Substring(0, $genericRecommendedIndex)
+  }
   $cleaned = [regex]::Replace($cleaned, '\n\s*\n+', "`n", 'Singleline')
   $cleaned = $cleaned.Trim()
 
@@ -286,8 +305,56 @@ function Extract-ArticleBody {
   return $body
 }
 
-function Extract-HtmlMetadata {
+function Get-UniqueNonEmptyValues {
+  param([string[]]$Values)
+
+  $seen = @{}
+  $result = @()
+
+  foreach ($value in $Values) {
+    $clean = Decode-Html $value
+    if ([string]::IsNullOrWhiteSpace($clean)) {
+      continue
+    }
+
+    $key = $clean.Trim().ToLowerInvariant()
+    if (-not $seen.ContainsKey($key)) {
+      $seen[$key] = $true
+      $result += $clean.Trim()
+    }
+  }
+
+  return @($result)
+}
+
+function Extract-IntervieweeName {
   param([string]$Html)
+
+  foreach ($pattern in @(
+    'Inspired by[^A-Za-z]+([^"<\r\n]+)',
+    '"text":"Inspired by[^A-Za-z]+([^"]+)"'
+  )) {
+    $name = Get-RegexValue -InputText $Html -Pattern $pattern
+    if (-not [string]::IsNullOrWhiteSpace($name)) {
+      $name = $name.Trim()
+      if ($name -match '^[A-Z][a-z]+$') {
+        $expandedName = Get-RegexValue -InputText $Html -Pattern ($name + '\s+([A-Z][a-z]+)\s+was\b')
+        if ($expandedName) {
+          return "$name $expandedName"
+        }
+      }
+      return $name
+    }
+  }
+
+  return ''
+}
+
+function Extract-HtmlMetadata {
+  param(
+    [string]$Html,
+    [string]$Type
+  )
 
   $metaTitle = Get-RegexValue -InputText $Html -Pattern '<meta[^>]+property="og:title"[^>]+content="([^"]+)"'
   if (-not $metaTitle) {
@@ -308,10 +375,14 @@ function Extract-HtmlMetadata {
   if (-not $metaAuthor) {
     $metaAuthor = $schemaAuthor
   }
-  $metaAuthors = @()
-  if ($metaAuthor) {
-    $metaAuthors = @($metaAuthor)
+  $metaAuthors = @($metaAuthor)
+  if ($Type -eq 'interview') {
+    $intervieweeName = Extract-IntervieweeName -Html $Html
+    if ($intervieweeName) {
+      $metaAuthors += $intervieweeName
+    }
   }
+  $metaAuthors = Get-UniqueNonEmptyValues -Values $metaAuthors
   $metaReadTime = Get-RegexValue -InputText $Html -Pattern '"estimated_reading_time_display":"([^"]+)"'
 
   if ($metaDate.Length -ge 10) {
@@ -324,7 +395,7 @@ function Extract-HtmlMetadata {
     Image = $metaImage
     SourceUrl = $metaCanonical
     Date = $metaDate
-    Author = $metaAuthor
+    Author = if ($metaAuthors.Count) { $metaAuthors[0] } else { '' }
     Authors = @($metaAuthors)
     ReadTime = $metaReadTime
   }
@@ -365,6 +436,7 @@ function Ensure-AuthorProfiles {
       $profiles += [PSCustomObject]@{
         name = $authorName
         slug = Convert-ToSlug $authorName
+        avatarUrl = ''
         profileUrl = ''
         email = ''
         linkedin = ''
@@ -445,11 +517,16 @@ function Get-AuthorsMarkup {
 
   $authorItems = @()
   $allSocials = @()
+  $avatarItems = @()
 
   foreach ($authorName in $Authors) {
     $profile = $Profiles | Where-Object { $_.name -eq $authorName } | Select-Object -First 1
     $primaryLink = if ($profile) { Get-PrimaryAuthorLink -Profile $profile } else { '' }
     $escapedName = [System.Security.SecurityElement]::Escape($authorName)
+    $avatarUrl = ''
+    if ($profile -and $profile.PSObject.Properties.Name -contains 'avatarUrl') {
+      $avatarUrl = $profile.avatarUrl
+    }
 
     if ($primaryLink) {
       $escapedLink = [System.Security.SecurityElement]::Escape($primaryLink)
@@ -463,9 +540,20 @@ function Get-AuthorsMarkup {
     if ($socialHtml) {
       $allSocials += '<span class="article-author-social-group"><span class="article-author-social-name">' + $escapedName + '</span>' + $socialHtml + '</span>'
     }
+
+    if (-not [string]::IsNullOrWhiteSpace($avatarUrl)) {
+      $escapedAvatarUrl = [System.Security.SecurityElement]::Escape($avatarUrl)
+      $avatarItems += '<span class="article-author-avatar"><img src="' + $escapedAvatarUrl + '" alt="' + $escapedName + '" loading="lazy"></span>'
+    }
+    else {
+      $initials = (($authorName -split '\s+') | Where-Object { $_ } | ForEach-Object { $_.Substring(0, 1).ToUpperInvariant() })
+      $initialsText = [System.Security.SecurityElement]::Escape((($initials | Select-Object -First 2) -join ''))
+      $avatarItems += '<span class="article-author-avatar article-author-avatar-fallback">' + $initialsText + '</span>'
+    }
   }
 
   return @{
+    AvatarsHtml = ($avatarItems -join '')
     NamesHtml = ($authorItems -join '<span class="article-meta-separator">, </span>')
     SocialsHtml = ($allSocials -join '')
   }
@@ -502,11 +590,12 @@ function Write-PostFile {
 
   $escapedTitle = [System.Security.SecurityElement]::Escape($Title)
   $escapedExcerpt = [System.Security.SecurityElement]::Escape($Excerpt)
-  $relativeStylesheet = '../../assets/css/style.css'
-  $relativeMainJs = '../../assets/js/main.js'
+  $relativeStylesheet = '../../../assets/css/style.css'
+  $relativeMainJs = '../../../assets/js/main.js'
   $displayDate = Format-DisplayDate -Value $Date
   $escapedDisplayDate = [System.Security.SecurityElement]::Escape($displayDate)
   $escapedReadTime = [System.Security.SecurityElement]::Escape($ReadTime)
+  $escapedSourceUrl = [System.Security.SecurityElement]::Escape($SourceUrl)
   $authorsMarkup = Get-AuthorsMarkup -Authors $Authors -Profiles $AuthorProfiles
 
   $coverHtml = ''
@@ -525,7 +614,7 @@ function Write-PostFile {
 
   $bylineParts = @()
   if ($authorsMarkup.NamesHtml) {
-    $bylineParts += '<span class="article-authors-line">' + $authorsMarkup.NamesHtml + '</span>'
+    $bylineParts += '<span class="article-authors-line"><span class="article-author-visuals">' + $authorsMarkup.AvatarsHtml + '</span><span class="article-author-names">' + $authorsMarkup.NamesHtml + '</span></span>'
   }
   if ($displayDate) {
     $bylineParts += '<time class="article-date-line" datetime="' + $Date + '">' + $escapedDisplayDate + '</time>'
@@ -533,9 +622,14 @@ function Write-PostFile {
   if (-not [string]::IsNullOrWhiteSpace($ReadTime)) {
     $bylineParts += '<span class="article-readtime-line">' + $escapedReadTime + '</span>'
   }
-  $bylineHtml = if ($bylineParts.Count) { ($bylineParts -join '<span class="article-meta-separator">·</span>') } else { '' }
-  $homeLink = '../../index.html'
-  $archiveLink = '../../blog.html'
+  $bylineHtml = if ($bylineParts.Count) { ($bylineParts -join '<span class="article-meta-separator">&middot;</span>') } else { '' }
+  $homeLink = '../../../index.html'
+  $archiveLink = '../../../blog.html'
+  $typeLabel = if ($Type -eq 'interview') { 'Interview' } else { 'Things I Learned' }
+  $sourceHtml = ''
+  if (-not [string]::IsNullOrWhiteSpace($SourceUrl)) {
+    $sourceHtml = '<a class="article-source-link" href="' + $escapedSourceUrl + '" target="_blank" rel="noopener noreferrer">Original source</a>'
+  }
 
   $html = @"
 <!DOCTYPE html>
@@ -554,26 +648,19 @@ $ImportedStyles
   <div class="cursor-dot" id="cursorDot"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
-  <nav>
-    <div class="nav-left">
-      <a href="../../index.html" class="nav-logo">Inspire</a>
-      <div class="nav-divider"></div>
-      <div class="nav-tagline">Finding People Worth Learning From</div>
-    </div>
-    <div class="nav-right">
-      <a class="nl-link" href="#" aria-disabled="true" title="Dutch site coming later">
-        <span class="nl-flag">NL</span>
-      </a>
-      <button class="nav-cta" onclick="window.location.href='../../index.html#subscribe'">Subscribe Free</button>
-    </div>
-  </nav>
-
-  <main id="main" class="article-shell">
-    <header class="article-header">
-      <div class="article-actions">
+  <div class="article-topbar">
+    <div class="article-topbar-inner">
+      <a href="$homeLink" class="article-brand">INSPIRE</a>
+      <div class="article-topbar-actions">
         <a class="article-action-link" href="$homeLink">Home</a>
         <a class="article-action-link" href="$archiveLink">All Editions</a>
       </div>
+    </div>
+  </div>
+
+  <main id="main" class="article-shell beehiiv-article-shell">
+    <header class="article-header">
+      <div class="article-type-label">$typeLabel</div>
       <h1 class="article-page-title">$escapedTitle</h1>
       <p class="article-page-excerpt">$escapedExcerpt</p>
       <div class="article-byline">
@@ -586,18 +673,18 @@ $coverHtml
 $BodyHtml
       </div>
     </article>
-  </main>
-
-  <footer>
-    <div class="footer-logo">INSPIRE</div>
-    <div class="footer-links">
-      <a href="../../index.html#about">About</a>
-      <a href="../../index.html#latest">Formats</a>
-      <a href="../../blog.html">All Editions</a>
-      <a href="../../index.html#contact">Contact</a>
+    <div class="article-endcap">
+      <div class="article-endcap-copy">
+        <div class="article-endcap-title">Continue reading on INSPIRE</div>
+        <div class="article-endcap-text">Go back to the homepage or browse all editions.</div>
+        $sourceHtml
+      </div>
+      <div class="article-endcap-actions">
+        <a class="article-action-link" href="$homeLink">Home</a>
+        <a class="article-action-link" href="$archiveLink">All Editions</a>
+      </div>
     </div>
-    <div class="footer-copy">&copy; 2026 Inspire by Tuur Lauryssen</div>
-  </footer>
+  </main>
 
   <script src="$relativeMainJs"></script>
 </body>
@@ -610,41 +697,14 @@ $BodyHtml
 function Write-RawPostFile {
   param(
     [string]$Path,
-    [string]$Language,
-    [string]$Title,
-    [string]$Excerpt,
-    [string]$BodyHtml,
-    [string]$ImportedStyles
+    [string]$RawHtml
   )
 
-  $escapedTitle = [System.Security.SecurityElement]::Escape($Title)
-  $escapedExcerpt = [System.Security.SecurityElement]::Escape($Excerpt)
-
-  if ([string]::IsNullOrWhiteSpace($BodyHtml)) {
-    $BodyHtml = '<p>No article body was extracted.</p>'
+  if ([string]::IsNullOrWhiteSpace($RawHtml)) {
+    throw 'Raw HTML is empty, so the raw reference file could not be written.'
   }
 
-  $html = @"
-<!DOCTYPE html>
-<html lang="$Language">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>$escapedTitle | Raw Import</title>
-  <meta name="description" content="$escapedExcerpt">
-$ImportedStyles
-</head>
-<body>
-  <main>
-    <div class="typedream content">
-$BodyHtml
-    </div>
-  </main>
-</body>
-</html>
-"@
-
-  $html | Set-Content -Path $Path -Encoding UTF8
+  $RawHtml | Set-Content -Path $Path -Encoding UTF8
 }
 
 function Update-PostsManifest {
@@ -711,7 +771,7 @@ if ([string]::IsNullOrWhiteSpace($RawHtml)) {
 }
 
 $rawHtml = $RawHtml
-$metadata = Extract-HtmlMetadata -Html $rawHtml
+$metadata = Extract-HtmlMetadata -Html $rawHtml -Type $Type
 $bodyHtml = Extract-ArticleBody -Html $rawHtml
 $importedStyles = Extract-EmbeddedStyles -Html $rawHtml
 $authorProfiles = Ensure-AuthorProfiles -Authors $metadata.Authors
@@ -768,7 +828,7 @@ if (-not (Test-Path $rawPostDirectory)) {
 }
 
 Write-PostFile -Path $postPath -Language $Language -Type $Type -Date $Date -Title $Title -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl -BodyHtml $bodyHtml -Authors $metadata.Authors -ReadTime $metadata.ReadTime -ImportedStyles $importedStyles -AuthorProfiles $authorProfiles
-Write-RawPostFile -Path $rawPostPath -Language $Language -Title $Title -Excerpt $Excerpt -BodyHtml $bodyHtml -ImportedStyles $importedStyles
+Write-RawPostFile -Path $rawPostPath -RawHtml $rawHtml
 Update-PostsManifest -Title $Title -Slug $slug -Language $Language -Type $Type -Date $Date -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl
 
 Write-Host "Created or updated post file: $postPath"

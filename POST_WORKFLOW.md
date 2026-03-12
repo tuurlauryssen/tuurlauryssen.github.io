@@ -17,7 +17,7 @@ powershell -ExecutionPolicy Bypass -File .\tuurlauryssen.github.io\scripts\impor
 
 5. Review:
 - site version in `posts/interviews/...` or `posts/ideas/...`
-- raw version in `posts/raw/...`
+- raw version in `posts/raw/...` (exact raw HTML you pasted)
 
 6. Fill in author links in `assets/data/authors.json` if needed.
 
