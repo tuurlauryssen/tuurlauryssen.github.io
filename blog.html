@@ -1,58 +1,125 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All Editions — INSPIRE</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Editions — INSPIRE</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+<!-- Stylesheet -->
+<link rel="stylesheet" href="assets/css/style.css">
+
+<!-- SEO Meta Tags -->
+<meta name="description" content="Browse all editions of Inspire — interviews with remarkable people and ideas worth understanding.">
+<meta property="og:title" content="All Editions — INSPIRE">
+<meta property="og:description" content="Every interview and insight, in one place.">
 </head>
 <body>
-  
-  <!-- Navigation (same as index.html) -->
-  <nav id="mainNav"></nav>
 
-  <!-- Blog Header -->
-  <section class="blog-header">
-    <div class="container">
-      <h1 class="blog-title">All Editions</h1>
-      <p class="blog-subtitle">Every interview and insight, in one place.</p>
-      
-      <!-- Filter Tabs -->
-      <div class="filter-tabs">
-        <button class="ftab active" data-filter="all">All</button>
-        <button class="ftab" data-filter="interview">Interviews</button>
-        <button class="ftab" data-filter="learned">Things I Learned</button>
-      </div>
+<!-- SCROLL PROGRESS -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-left">
+    <a href="index.html" class="nav-logo">Inspire</a>
+    <div class="nav-divider"></div>
+    <div class="nav-tagline">Finding People Worth Learning From</div>
+  </div>
+  <div class="nav-right">
+    <a class="nl-link" href="https://YOUR-DUTCH-BEEHIIV-SITE.beehiiv.com" target="_blank">
+      <span class="nl-flag">🇧🇪</span> NL
+    </a>
+    <button class="nav-cta" onclick="window.location.href='index.html#subscribe'">Subscribe Free</button>
+  </div>
+</nav>
+
+<!-- ── BLOG HEADER ── -->
+<section class="blog-header sr">
+  <div class="container">
+    <div class="eyebrow">Archive</div>
+    <h1 class="blog-title">All Editions</h1>
+    <p class="blog-subtitle">Every interview and insight, in one place. Filter by type or browse chronologically.</p>
+    
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button class="ftab active" data-filter="all">All</button>
+      <button class="ftab" data-filter="interview">🎙 Interviews</button>
+      <button class="ftab" data-filter="learned">📖 Things I Learned</button>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- All Posts Grid -->
-  <section class="all-posts-section">
-    <div class="container">
-      <div class="stories-grid" id="allPosts">
-        <div class="loading">Loading all editions...</div>
-      </div>
-      
-      <!-- Load More Button -->
-      <div class="load-more-wrap" style="display:none;">
-        <button class="load-more-btn" id="loadMoreBtn">Load More</button>
-      </div>
+<!-- ── ALL POSTS GRID ── -->
+<section class="all-posts-section">
+  <div class="container">
+    <div class="stories-grid" id="allPosts">
+      <div class="loading">Loading all editions...</div>
     </div>
-  </section>
+    
+    <!-- Load More Button -->
+    <div class="load-more-wrap" style="display:none;">
+      <button class="load-more-btn" id="loadMoreBtn">Load More Editions</button>
+    </div>
+  </div>
+</section>
 
-  <!-- Footer -->
-  <footer></footer>
+<!-- ── PULL QUOTE ── -->
+<div class="pull-quote sr">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <p class="pq-text">"Every edition is a deliberate choice. No filler. No noise. Just people and ideas worth your attention."</p>
+  <div class="pq-author">Tuur Lauryssen · Founder, Inspire</div>
+</div>
 
-  <!-- Scripts -->
-  <script src="assets/js/main.js"></script>
-  <script src="assets/js/beehiiv.js"></script>
-  <script>
-    // Initialize blog page
-    window.addEventListener('DOMContentLoaded', () => {
-      loadAllPosts();
-      setupFilters();
-    });
-  </script>
+<!-- ── SUBSCRIBE CTA ── -->
+<section class="subscribe-cta sr">
+  <div class="container">
+    <div class="cta-content">
+      <h2 class="cta-title">Never miss an edition</h2>
+      <p class="cta-desc">Join 1,200+ readers getting conversations and insights worth understanding, delivered weekly in English and Dutch.</p>
+      <div class="subscribe-row-inline">
+        <form action="https://YOUR-PUBLICATION.beehiiv.com/subscribe" method="post" target="_blank">
+          <input type="email" name="email" placeholder="Your email address" required>
+          <button type="submit">Subscribe Free</button>
+        </form>
+      </div>
+      <p class="cta-note">Free · No spam · Unsubscribe anytime</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">INSPIRE</div>
+  <div class="footer-links">
+    <a href="index.html#about">About</a>
+    <a href="index.html#formats">Formats</a>
+    <a href="blog.html">All Editions</a>
+    <a href="index.html#contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Inspire by Tuur Lauryssen</div>
+</footer>
+
+<!-- Scripts -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/beehiiv.js"></script>
+
+<script>
+  // Initialize blog page
+  window.addEventListener('DOMContentLoaded', () => {
+    loadAllPosts();
+    setupFilters();
+  });
+</script>
+
 </body>
 </html>

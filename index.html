@@ -1,81 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>INSPIRE — Finding People Worth Learning From</title>
-  
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
-  
-  <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="assets/css/style.css">
-  
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="A newsletter built on the belief that real wisdom lives in people, not algorithms. Two kinds of stories, published weekly in English and Dutch.">
-  <meta property="og:title" content="INSPIRE — Finding People Worth Learning From">
-  <meta property="og:description" content="Real people. Real insight. Conversations and ideas worth understanding.">
-  <meta property="og:type" content="website">
-  
-  <!-- Favicon (add your own) -->
-  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INSPIRE — Finding People Worth Learning From</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+<!-- Stylesheet -->
+<link rel="stylesheet" href="assets/css/style.css">
+
+<!-- SEO Meta Tags -->
+<meta name="description" content="A newsletter built on the belief that real wisdom lives in people, not algorithms. Two kinds of stories, published weekly in English and Dutch.">
+<meta property="og:title" content="INSPIRE — Finding People Worth Learning From">
+<meta property="og:description" content="Real people. Real insight. Conversations and ideas worth understanding.">
+<meta property="og:type" content="website">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="assets/images/favicon.png">
 </head>
 <body>
-  
-  <!-- Navigation -->
-  <nav id="mainNav">
-    <!-- Nav content from your design -->
-  </nav>
 
-  <!-- Hero Section -->
-  <section class="hero" id="home">
-    <!-- Hero content from your design -->
-  </section>
+<!-- SCROLL PROGRESS -->
+<div class="progress-bar" id="progressBar"></div>
 
-  <!-- Ticker -->
-  <div class="ticker">
-    <!-- Ticker content -->
+<!-- CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-left">
+    <a href="index.html" class="nav-logo">Inspire</a>
+    <div class="nav-divider"></div>
+    <div class="nav-tagline">Finding People Worth Learning From</div>
   </div>
-
-  <!-- About Section -->
-  <section id="about">
-    <!-- Will load from components/about.html -->
-  </section>
-
-  <!-- Story Formats Section -->
-  <section id="formats">
-    <!-- Will load from components/formats.html -->
-  </section>
-
-  <!-- Latest Posts (Beehiiv Integration) -->
-  <section class="stories-section" id="latest">
-    <div class="stories-header">
-      <h2 class="stories-title">Latest Editions</h2>
-      <a href="blog.html" class="view-all-link">View all →</a>
-    </div>
-    <div class="stories-grid" id="latestPosts">
-      <!-- Posts will be loaded dynamically via JavaScript -->
-      <div class="loading">Loading latest editions...</div>
-    </div>
-  </section>
-
-  <!-- Pull Quote -->
-  <div class="pull-quote">
-    <!-- Pull quote content -->
+  <div class="nav-right">
+    <a class="nl-link" href="https://YOUR-DUTCH-BEEHIIV-SITE.beehiiv.com" target="_blank">
+      <span class="nl-flag">🇧🇪</span> NL
+    </a>
+    <button class="nav-cta" onclick="window.location.href='#subscribe'">Subscribe Free</button>
   </div>
+</nav>
 
-  <!-- Contact Section -->
-  <section id="contact">
-    <!-- Will load from components/contact.html -->
-  </section>
+<!-- ── HERO ── -->
+<section class="hero" id="home">
+  <div class="hero-left">
+    <div class="hero-issue">
+      <div class="hero-issue-dot"></div>
+      <div class="hero-issue-label">Newsletter · Est. 2025</div>
+    </div>
+    <div class="hero-center">
+      <h1 class="hero-title">
+        <span><span>Real</span></span>
+        <span><span class="italic">people.</span></span>
+        <span><span>Real</span></span>
+        <span><span class="italic">insight.</span></span>
+      </h1>
+      <p class="hero-desc">Two kinds of stories — conversations with remarkable people, and ideas worth understanding. Published in English and Dutch.</p>
+      <div class="article-types">
+        <div class="type-pill"><div class="type-dot dot-i"></div>Interviews</div>
+        <div class="type-pill"><div class="type-dot dot-l"></div>Things I Learned</div>
+      </div>
+      <div class="subscribe-row" id="subscribe">
+        <!-- Replace this action with your Beehiiv embed code -->
+        <form action="https://YOUR-PUBLICATION.beehiiv.com/subscribe" method="post" target="_blank">
+          <input type="email" name="email" placeholder="Your email address" required>
+          <button type="submit">Subscribe Free</button>
+        </form>
+      </div>
+      <p class="hero-note">Free · No spam · EN & NL editions</p>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">1,200+</div><div class="stat-label">Subscribers</div></div>
+      <div><div class="stat-num">12</div><div class="stat-label">Editions</div></div>
+      <div><div class="stat-num">2</div><div class="stat-label">Languages</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <img src="https://media.beehiiv.com/cdn-cgi/image/format=auto,fit=scale-down,onerror=redirect/uploads/asset/file/6dfff91d-3f8f-42a8-86a2-f7b6b69656c2/CLOSE_Kick_Off_MIMS_20250902_-_050__1_.jpg" alt="Tuur Lauryssen">
+    <div class="hero-floats">
+      <div class="float-pill">🎙 Interview</div>
+      <div class="float-pill">📖 Things I Learned</div>
+      <div class="float-pill">🌍 EN · NL</div>
+    </div>
+    <div class="hero-photo-caption">
+      <div class="hero-name">Tuur<br>Lauryssen</div>
+      <div class="hero-role">Founder · Host · Curator</div>
+    </div>
+  </div>
+</section>
 
-  <!-- Footer -->
-  <footer>
-    <!-- Footer content -->
-  </footer>
+<!-- ── TICKER ── -->
+<div class="ticker">
+  <div class="ticker-track">
+    <div class="ticker-item hi"><div class="ticker-sep"></div>Interview</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>Real conversations</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>Things I Learned</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>No algorithms</div>
+    <div class="ticker-item hi"><div class="ticker-sep"></div>Gesprek</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>Menselijke wijsheid</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>Wat ik leerde</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>EN · NL</div>
+    <div class="ticker-item hi"><div class="ticker-sep"></div>Interview</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>Real conversations</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>Things I Learned</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>No algorithms</div>
+    <div class="ticker-item hi"><div class="ticker-sep"></div>Gesprek</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>Menselijke wijsheid</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>Wat ik leerde</div>
+    <div class="ticker-item"><div class="ticker-sep"></div>EN · NL</div>
+  </div>
+</div>
 
-  <!-- Scripts -->
-  <script src="assets/js/main.js"></script>
-  <script src="assets/js/beehiiv.js"></script>
+<!-- ── MANIFESTO ── -->
+<section class="manifesto sr" id="about">
+  <div class="manifesto-left">
+    <div>
+      <div class="eyebrow">About Inspire</div>
+      <p class="manifesto-desc">The story behind the newsletter and why it exists.</p>
+    </div>
+    <div class="big-num">01</div>
+  </div>
+  <div class="manifesto-right">
+    <div>
+      <div class="m-item-label">What</div>
+      <p class="m-item-text">"Deep conversations and ideas worth understanding."</p>
+    </div>
+    <div>
+      <div class="m-item-label">Why</div>
+      <p class="m-item-text">"Real wisdom lives in people, not algorithms."</p>
+    </div>
+    <div>
+      <div class="m-item-label">Who</div>
+      <p class="m-item-text">"For those tired of shallow content — human insight, earned."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FORMAT CARDS ── -->
+<section class="formats sr" id="formats">
+  <div class="format-card">
+    <div class="format-circle"></div>
+    <div class="format-num">01</div>
+    <div class="format-badge badge-i">🎙 Interview</div>
+    <h3 class="format-title">Conversations with remarkable people</h3>
+    <p class="format-desc">Every edition I sit down with someone doing something worth knowing about. The lessons, the mindset, the things they wish they knew earlier.</p>
+  </div>
+  <div class="format-card">
+    <div class="format-circle"></div>
+    <div class="format-num">02</div>
+    <div class="format-badge badge-l">📖 Things I Learned</div>
+    <h3 class="format-title">Ideas and things worth understanding</h3>
+    <p class="format-desc">Concepts, mechanisms, and ideas I found fascinating — explained clearly. How things actually work, and why it matters.</p>
+  </div>
+</section>
+
+<!-- ── LATEST EDITIONS (Beehiiv Integration) ── -->
+<section class="stories-section sr" id="latest">
+  <div class="stories-header">
+    <h2 class="stories-title">Latest Editions</h2>
+    <a href="blog.html" class="view-all-link">View all editions →</a>
+  </div>
+  <div class="stories-grid" id="latestPosts">
+    <div class="loading">Loading latest editions...</div>
+  </div>
+</section>
+
+<!-- ── PULL QUOTE ── -->
+<div class="pull-quote sr">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <p class="pq-text">"The best insights don't come from books or podcasts. They come from sitting down with someone who has actually done the work."</p>
+  <div class="pq-author">Tuur Lauryssen · Founder, Inspire</div>
+</div>
+
+<!-- ── CONTACT ── -->
+<section class="contact-section sr" id="contact">
+  <div class="contact-left">
+    <div class="eyebrow">Get in touch</div>
+    <h2 class="contact-title">Know someone<br><em>remarkable?</em></h2>
+    <p class="contact-desc">Got a tip, a topic, or someone you think I should sit down with? I read every message personally.</p>
+    <div class="contact-rows">
+      <div class="contact-row">
+        <div class="crow-icon">🎙</div>
+        <div class="crow-text">
+          <strong>Suggest an interview guest</strong>
+          <span>Someone doing something worth knowing about</span>
+        </div>
+      </div>
+      <div class="contact-row">
+        <div class="crow-icon">💡</div>
+        <div class="crow-text">
+          <strong>Share a topic or idea</strong>
+          <span>Something you'd like me to explore</span>
+        </div>
+      </div>
+      <div class="contact-row">
+        <div class="crow-icon">✉️</div>
+        <div class="crow-text">
+          <strong>Just say hello</strong>
+          <span>Feedback, thoughts, or a good conversation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="contact-right">
+    <div class="tally-label">Send a message</div>
+    
+    <!-- Tally.so Embed - Replace with your actual Tally form -->
+    <iframe 
+      data-tally-src="https://tally.so/embed/YOUR_FORM_ID?hideTitle=1&transparentBackground=1&dynamicHeight=1"
+      loading="lazy" 
+      width="100%" 
+      height="472" 
+      frameborder="0" 
+      marginheight="0" 
+      marginwidth="0"
+      title="Contact Form">
+    </iframe>
+    <script>
+      var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if("undefined"!=typeof Tally)v();else if(d.querySelector('script[src="'+w+'"]')==null){var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s);}
+    </script>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">INSPIRE</div>
+  <div class="footer-links">
+    <a href="#about">About</a>
+    <a href="#formats">Formats</a>
+    <a href="blog.html">All Editions</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Inspire by Tuur Lauryssen</div>
+</footer>
+
+<!-- Scripts -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/beehiiv.js"></script>
+
 </body>
 </html>
