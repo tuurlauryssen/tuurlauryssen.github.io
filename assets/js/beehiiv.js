@@ -85,6 +85,13 @@ async function fetchPostsWithFallbacks() {
 }
 
 async function fetchLocalPosts() {
+  if (Array.isArray(window.INSPIRE_LOCAL_POSTS)) {
+    return window.INSPIRE_LOCAL_POSTS
+      .map(mapLocalPost)
+      .filter(Boolean)
+      .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+  }
+
   const response = await fetch(BEEHIIV_CONFIG.localPostsUrl, {
     headers: {
       'Accept': 'application/json'
@@ -381,7 +388,7 @@ function createPostCard(post) {
     : { class: 's-badge-l', label: 'Things I Learned' };
 
   return `
-    <article class="s-card" data-type="${type}" data-date="${post.pubDate}">
+    <a class="s-card" data-type="${type}" data-date="${post.pubDate}" href="${post.link}">
       <div class="s-img-wrap">
         <div class="s-badge ${badge.class}">${badge.label}</div>
         <img class="s-img" src="${image}" alt="${post.title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
@@ -392,10 +399,10 @@ function createPostCard(post) {
       </div>
       <h3 class="s-title">${post.title}</h3>
       <p class="s-excerpt">${cleanExcerpt}</p>
-      <a class="s-read" href="${post.link}" target="_blank" rel="noopener noreferrer">
+      <div class="s-read">
         Read edition &rarr;
-      </a>
-    </article>
+      </div>
+    </a>
   `;
 }
 
@@ -413,7 +420,7 @@ function createHomepageSplitCard(post, variant = 'featured') {
   const badgeLabel = type === 'interview' ? 'Interview' : 'Things I Learned';
 
   return `
-    <a class="ih-post-card ${variant}" href="${post.link}" target="_blank" rel="noopener noreferrer">
+    <a class="ih-post-card ${variant}" href="${post.link}">
       <div class="ih-post-media">
         <img src="${image}" alt="${post.title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
       </div>

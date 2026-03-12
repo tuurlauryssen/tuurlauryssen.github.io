@@ -16,6 +16,7 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $postsDataPath = Join-Path $repoRoot 'assets\data\posts.json'
+$postsDataJsPath = Join-Path $repoRoot 'assets\data\posts-data.js'
 $authorsDataPath = Join-Path $repoRoot 'assets\data\authors.json'
 
 function Get-TypeDirectoryName {
@@ -674,6 +675,8 @@ function Update-PostsManifest {
 
   $updatedPosts = @($filtered + $entry) | Sort-Object -Property pubDate -Descending
   ConvertTo-Json -InputObject @($updatedPosts) -Depth 5 | Set-Content -Path $postsDataPath -Encoding UTF8
+  $jsContent = 'window.INSPIRE_LOCAL_POSTS = ' + (ConvertTo-Json -InputObject @($updatedPosts) -Depth 5) + ';'
+  Set-Content -Path $postsDataJsPath -Value $jsContent -Encoding UTF8
 }
 
 if ([string]::IsNullOrWhiteSpace($Type)) {
@@ -764,4 +767,5 @@ Write-Host "Created or updated post file: $postPath"
 Write-Host "Created or updated raw import: $rawPostPath"
 Write-Host "Updated author data: $authorsDataPath"
 Write-Host "Updated manifest: $postsDataPath"
+Write-Host "Updated browser data: $postsDataJsPath"
 Write-Host "Next: review the generated HTML, adjust any formatting, then commit and push."
