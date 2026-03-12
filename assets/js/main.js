@@ -42,7 +42,7 @@ function initCursor() {
   animateCursor();
   
   // Hover effects
-  const hoverElements = document.querySelectorAll('a, button, .s-card, .contact-row, .format-card, .type-pill, .ftab, .nav-cta, .ih-ct-row, .ih-post-card');
+  const hoverElements = document.querySelectorAll('a, button, .s-card, .ftab, .ih-pill, .ih-ct-row, .ih-post-card, .ih-latest-column, .ih-about-header, .ih-m-item, .ih-subscribe-card, .ih-ct-card');
   
   hoverElements.forEach(el => {
     el.addEventListener('mouseenter', () => {
@@ -160,8 +160,6 @@ function initNavbarScroll() {
   
   if (!nav) return;
   
-  let lastScroll = 0;
-  
   window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
     
@@ -170,22 +168,7 @@ function initNavbarScroll() {
     } else {
       nav.classList.remove('scrolled');
     }
-    
-    lastScroll = currentScroll;
   });
-}
-
-// =========================================
-// TICKER ANIMATION
-// =========================================
-function initTicker() {
-  const ticker = document.querySelector('.ticker-track');
-  
-  if (!ticker) return;
-  
-  // Clone ticker items for seamless loop
-  const tickerContent = ticker.innerHTML;
-  ticker.innerHTML = tickerContent + tickerContent;
 }
 
 // =========================================
@@ -387,7 +370,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initParallax();
   initSmoothScroll();
   initNavbarScroll();
-  initTicker();
   
   // Enhanced features
   initLazyLoad();

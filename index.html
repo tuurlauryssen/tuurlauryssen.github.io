@@ -116,6 +116,11 @@
       border-color: #1B2C45;
     }
 
+    .nl-link[aria-disabled="true"] {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
     .ih-pill-dot-s {
       width: 5px;
       height: 5px;
@@ -452,10 +457,49 @@
       gap: 64px;
       transition: background 0.35s;
       cursor: default;
+      overflow: hidden;
     }
 
     .ih-about-header:hover {
       background: #EAE3D5;
+    }
+
+    .ih-about-header::before {
+      content: '';
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 260px;
+      height: 260px;
+      border: 1px solid rgba(27, 44, 69, 0.08);
+      transform: rotate(45deg);
+      transition: transform 0.6s ease, opacity 0.4s ease;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .ih-about-header::after {
+      content: '';
+      position: absolute;
+      left: 44%;
+      bottom: -54px;
+      width: 120px;
+      height: 120px;
+      border: 1px solid rgba(27, 44, 69, 0.06);
+      transform: rotate(18deg);
+      transition: transform 0.6s ease, opacity 0.4s ease;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .ih-about-header:hover::before {
+      transform: rotate(45deg) translate(-18px, 18px) scale(1.08);
+      opacity: 0.85;
+    }
+
+    .ih-about-header:hover::after {
+      transform: rotate(0deg) translate(-12px, -8px) scale(1.04);
+      opacity: 1;
     }
 
     .ih-about-header-left {
@@ -572,6 +616,24 @@
       background: #EAE3D5;
     }
 
+    .ih-m-item::before {
+      content: '';
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(27, 44, 69, 0.06);
+      transform: rotate(45deg);
+      transition: transform 0.45s ease, opacity 0.35s ease;
+      opacity: 0.65;
+    }
+
+    .ih-m-item:hover::before {
+      transform: rotate(0deg) scale(1.18);
+      opacity: 1;
+    }
+
     .ih-m-circle {
       position: absolute;
       right: -60px;
@@ -682,180 +744,6 @@
       }
     }
 
-    .ih-s3b-wrap {
-      position: relative;
-      left: 50%;
-      margin-left: -50vw;
-      width: 100vw;
-      max-width: 100vw;
-      overflow: hidden;
-      background: #F5F0E8;
-      box-sizing: border-box;
-      border-top: 1px solid rgba(27, 44, 69, 0.12);
-    }
-
-    .ih-formats-header {
-      padding: 56px 64px 0;
-    }
-
-    .ih-formats-eyebrow {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 10px;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: #1B2C45;
-      font-weight: 500;
-      margin-bottom: 12px;
-    }
-
-    .ih-formats-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 42px;
-      font-weight: 700;
-      color: #1B2C45;
-      line-height: 1.1;
-      margin-bottom: 0;
-    }
-
-    .ih-formats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      width: 100%;
-      margin-top: 48px;
-      border-top: 1px solid rgba(27, 44, 69, 0.12);
-    }
-
-    .ih-format-card {
-      padding: 64px;
-      position: relative;
-      overflow: hidden;
-      border-right: 1px solid rgba(27, 44, 69, 0.12);
-      transition: background 0.4s;
-    }
-
-    .ih-format-card:last-child {
-      border-right: none;
-    }
-
-    .ih-format-card:hover {
-      background: #EAE3D5;
-    }
-
-    .ih-format-circle {
-      position: absolute;
-      right: -80px;
-      bottom: -80px;
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      border: 1px solid rgba(27, 44, 69, 0.1);
-      transition: transform 0.6s ease, opacity 0.4s;
-      opacity: 0.35;
-    }
-
-    .ih-format-card:hover .ih-format-circle {
-      transform: scale(1.2) translate(-20px, -20px);
-      opacity: 1;
-    }
-
-    .ih-format-circle::after {
-      content: '';
-      position: absolute;
-      inset: 28px;
-      border-radius: 50%;
-      border: 1px solid rgba(27, 44, 69, 0.07);
-      animation: ih-rotateSlow2 16s linear infinite;
-    }
-
-    .ih-format-circle::before {
-      content: '';
-      position: absolute;
-      inset: 60px;
-      border-radius: 50%;
-      border: 1px solid rgba(27, 44, 69, 0.05);
-      animation: ih-rotateSlow2 10s linear infinite reverse;
-    }
-
-    @keyframes ih-rotateSlow2 {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    .ih-format-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      margin-bottom: 24px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      font-weight: 500;
-      position: relative;
-      z-index: 1;
-    }
-
-    .ih-badge-i {
-      background: #1B2C45;
-      color: #F5F0E8;
-    }
-
-    .ih-badge-l {
-      background: transparent;
-      color: #1B2C45;
-      border: 1px solid rgba(27, 44, 69, 0.2);
-    }
-
-    .ih-format-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 32px;
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 16px;
-      color: #1B2C45;
-      position: relative;
-      z-index: 1;
-    }
-
-    .ih-format-desc {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      line-height: 1.8;
-      color: #6B7280;
-      font-weight: 300;
-      max-width: 380px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .ih-srb {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-
-    .ih-srb.ih-in {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @media (max-width: 768px) {
-      .ih-formats-header {
-        padding: 40px 24px 0;
-      }
-
-      .ih-formats {
-        grid-template-columns: 1fr;
-      }
-
-      .ih-format-card {
-        padding: 48px 24px;
-        border-right: none !important;
-        border-bottom: 1px solid rgba(27, 44, 69, 0.12);
-      }
-    }
-
     .ih-latest-wrap {
       position: relative;
       left: 50%;
@@ -942,6 +830,27 @@
       min-width: 0;
       border: 1px solid rgba(27, 44, 69, 0.12);
       background: rgba(255, 255, 255, 0.36);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ih-latest-column::before {
+      content: '';
+      position: absolute;
+      top: -34px;
+      right: -34px;
+      width: 96px;
+      height: 96px;
+      border: 1px solid rgba(27, 44, 69, 0.06);
+      border-radius: 50%;
+      transition: transform 0.45s ease, opacity 0.35s ease;
+      opacity: 0.75;
+      pointer-events: none;
+    }
+
+    .ih-latest-column:hover::before {
+      transform: scale(1.14);
+      opacity: 1;
     }
 
     .ih-latest-column-head {
@@ -1271,9 +1180,9 @@
 
     .ih-ct-row {
       display: grid;
-      grid-template-columns: 48px 1fr auto;
+      grid-template-columns: 1fr;
       align-items: center;
-      gap: 18px;
+      gap: 10px;
       padding: 22px 22px;
       border: 1px solid rgba(27, 44, 69, 0.12);
       background: rgba(255, 253, 249, 0.55);
@@ -1287,33 +1196,22 @@
       transform: translateY(-2px);
     }
 
-    .ih-ct-icon {
-      width: 48px;
-      height: 48px;
-      border: 1px solid rgba(27, 44, 69, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .ih-ct-kicker {
       font-family: 'DM Sans', sans-serif;
-      font-size: 11px;
-      letter-spacing: 0.14em;
+      font-size: 10px;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       color: #1B2C45;
-      flex-shrink: 0;
-      background: #F5F0E8;
-    }
-
-    .ih-ct-copy {
-      min-width: 0;
+      opacity: 0.7;
     }
 
     .ih-ct-row-title {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
       font-weight: 500;
       color: #1B2C45;
-      margin-bottom: 4px;
       display: block;
+      line-height: 1.05;
     }
 
     .ih-ct-row-sub {
@@ -1323,16 +1221,6 @@
       font-weight: 300;
       display: block;
       line-height: 1.6;
-    }
-
-    .ih-ct-row-arrow {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 11px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #1B2C45;
-      font-weight: 500;
-      white-space: nowrap;
     }
 
     .ih-ct-right {
@@ -1347,6 +1235,27 @@
       border: 1px solid rgba(27, 44, 69, 0.12);
       background: rgba(255, 255, 255, 0.4);
       padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ih-ct-card::before {
+      content: '';
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      width: 52px;
+      height: 52px;
+      border: 1px solid rgba(27, 44, 69, 0.08);
+      transform: rotate(45deg);
+      transition: transform 0.45s ease, opacity 0.35s ease;
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .ih-ct-card:hover::before {
+      transform: rotate(0deg) scale(1.14);
+      opacity: 0.95;
     }
 
     .ih-tally-label {
@@ -1364,11 +1273,11 @@
       display: inline-block;
       margin: 0 0 20px;
       font-family: 'Cormorant Garamond', serif;
-      font-size: 32px;
+      font-size: 30px;
       line-height: 1.1;
       color: #1B2C45;
       text-decoration: none;
-      word-break: break-word;
+      white-space: nowrap;
     }
 
     .ih-ct-email:hover {
@@ -1377,9 +1286,7 @@
 
     .ih-ct-actions {
       display: flex;
-      flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 18px;
     }
 
     .ih-ct-button {
@@ -1419,16 +1326,6 @@
       background: #EAE3D5;
     }
 
-    .ih-ct-note {
-      margin: 0;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      line-height: 1.8;
-      color: #6B7280;
-      font-weight: 300;
-      max-width: 420px;
-    }
-
     .ih-sr6 {
       opacity: 0;
       transform: translateY(28px);
@@ -1456,11 +1353,7 @@
       }
 
       .ih-ct-row {
-        grid-template-columns: 48px 1fr;
-      }
-
-      .ih-ct-row-arrow {
-        display: none;
+        padding: 18px;
       }
     }
 
@@ -1483,7 +1376,6 @@
         padding-right: 24px;
       }
 
-      .ih-formats-header,
       .ih-latest-wrap {
         padding-left: 24px;
         padding-right: 24px;
@@ -1496,10 +1388,6 @@
       .ih-about-photo {
         width: 170px;
         height: 220px;
-      }
-
-      .ih-format-card {
-        padding: 48px 32px;
       }
 
       .ih-latest-column-head,
@@ -1549,7 +1437,6 @@
       .ih-subscribe-label,
       .ih-latest-eyebrow,
       .ih-ct-eyebrow,
-      .ih-formats-eyebrow,
       .ih-eyebrow {
         letter-spacing: 0.14em;
       }
@@ -1571,7 +1458,6 @@
       }
 
       .ih-about-title,
-      .ih-formats-title,
       .ih-latest-title,
       .ih-ct-title {
         word-break: normal;
@@ -1677,11 +1563,10 @@
       .ih-desc,
       .ih-subscribe-text,
       .ih-about-desc,
-      .ih-format-desc,
       .ih-latest-desc,
       .ih-post-excerpt,
       .ih-ct-desc,
-      .ih-ct-note {
+      .ih-ct-row-sub {
         font-size: 13px;
         line-height: 1.65;
       }
@@ -1718,7 +1603,6 @@
 
       .ih-subscribe-title,
       .ih-about-title,
-      .ih-formats-title,
       .ih-latest-title,
       .ih-ct-title {
         font-size: 32px;
@@ -1748,8 +1632,7 @@
         gap: 10px;
       }
 
-      .ih-m-item,
-      .ih-format-card {
+      .ih-m-item {
         padding: 28px 14px;
       }
 
@@ -1758,11 +1641,6 @@
         line-height: 1.4;
       }
 
-      .ih-format-title {
-        font-size: 28px;
-      }
-
-      .ih-format-badge,
       .ih-post-badge,
       .ih-latest-column-tag {
         font-size: 9px;
@@ -1846,19 +1724,11 @@
       }
 
       .ih-ct-row {
-        grid-template-columns: 38px 1fr;
-        gap: 12px;
         padding: 14px;
       }
 
-      .ih-ct-icon {
-        width: 38px;
-        height: 38px;
-        font-size: 9px;
-      }
-
       .ih-ct-row-title {
-        font-size: 13px;
+        font-size: 24px;
       }
 
       .ih-ct-row-sub {
@@ -1867,12 +1737,13 @@
       }
 
       .ih-ct-email {
-        font-size: 22px;
+        font-size: 19px;
         margin-bottom: 16px;
+        white-space: normal;
       }
 
       .ih-ct-actions {
-        flex-direction: column;
+        width: 100%;
       }
 
       .pull-quote {
@@ -1941,8 +1812,8 @@
     </div>
 
     <div class="nav-right">
-      <!-- Link to Dutch version of the newsletter -->
-      <a class="nl-link" href="https://YOUR-DUTCH-BEEHIIV-SITE.beehiiv.com" target="_blank">
+      <!-- Dutch site placeholder; point this to the future Dutch homepage when ready -->
+      <a class="nl-link" href="#" aria-disabled="true" title="Dutch site coming later">
         <span class="nl-flag">NL</span>
       </a>
 
@@ -1950,6 +1821,8 @@
       <button class="nav-cta" onclick="window.location.href='#subscribe'">Subscribe Free</button>
     </div>
   </nav>
+
+  <main id="main">
 
   <!-- =========================================================
        HERO
@@ -1964,13 +1837,12 @@
         <div class="ih-toprow">
           <div class="ih-dot-row">
             <div class="ih-dot"></div>
-            <span class="ih-est">Newsletter &middot; Est. 2025</span>
+            <span class="ih-est">Newsletter &middot; Est. 2026</span>
           </div>
 
           <div class="ih-pills">
             <div class="ih-pill"><div class="ih-pill-dot-s"></div>Interviews</div>
             <div class="ih-pill"><div class="ih-pill-dot-o"></div>Things I Learned</div>
-            <div class="ih-pill">EN &middot; NL</div>
           </div>
         </div>
 
@@ -2051,14 +1923,14 @@
       <div class="ih-subscribe-copy">
         <div class="ih-subscribe-label">Subscribe</div>
         <h2 class="ih-subscribe-title">Get the next edition in your inbox.</h2>
-        <p class="ih-subscribe-text">Join readers getting interviews and ideas worth understanding. The form below can send the email to your Beehiiv signup endpoint, and it can include a name field if Beehiiv is configured to accept it.</p>
+        <p class="ih-subscribe-text">Join readers getting interviews and ideas worth understanding. This form sends subscribers directly to your Beehiiv signup flow.</p>
       </div>
 
-      <form class="ih-subscribe-form" action="https://YOUR-PUBLICATION.beehiiv.com/subscribe" method="post" target="_blank">
+      <form class="ih-subscribe-form" action="https://tuurlauryssen.beehiiv.com/subscribe" method="post" target="_blank">
         <input type="text" name="name" placeholder="Your name">
         <input type="email" name="email" placeholder="Your email address" required>
         <button type="submit">Subscribe Free</button>
-        <p class="ih-subscribe-note">Replace the Beehiiv URL with your real publication URL. If your Beehiiv form does not store names, the extra name field will simply be ignored.</p>
+        <p class="ih-subscribe-note">If Beehiiv accepts the extra name field, it will be saved. If not, Beehiiv will ignore it and still process the email signup.</p>
       </form>
     </div>
   </section>
@@ -2133,32 +2005,6 @@
   </div>
 
   <!-- =========================================================
-       FORMATS
-       Full-width section explaining the two content formats.
-  ========================================================== -->
-  <div class="ih-s3b-wrap" id="formats">
-    <div class="ih-formats-header ih-srb">
-      <div class="ih-formats-eyebrow">What you'll find here</div>
-      <h2 class="ih-formats-title">Two kinds of stories</h2>
-    </div>
-
-    <div class="ih-formats ih-srb">
-      <div class="ih-format-card">
-        <div class="ih-format-circle"></div>
-        <div class="ih-format-badge ih-badge-i">Interview</div>
-        <h3 class="ih-format-title">Conversations with remarkable people</h3>
-        <p class="ih-format-desc">Every edition I sit down with someone doing something worth knowing about. The lessons, the mindset, the things they wish they knew earlier.</p>
-      </div>
-      <div class="ih-format-card">
-        <div class="ih-format-circle"></div>
-        <div class="ih-format-badge ih-badge-l">Things I Learned</div>
-        <h3 class="ih-format-title">Ideas and things worth understanding</h3>
-        <p class="ih-format-desc">Concepts, mechanisms, and ideas I found fascinating &mdash; explained clearly. How things actually work, and why it matters.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- =========================================================
        LATEST POSTS
        Homepage split view: Interviews on one side, Things I Learned
        on the other, both populated by beehiiv.js.
@@ -2166,9 +2012,9 @@
   <section class="ih-latest-wrap" id="latest">
     <div class="ih-latest-top">
       <div class="ih-latest-top-left">
-        <div class="ih-latest-eyebrow">Latest editions</div>
+        <div class="ih-latest-eyebrow">Two formats</div>
         <h2 class="ih-latest-title">Catch up by format.</h2>
-        <p class="ih-latest-desc">A cleaner split between conversations with people worth learning from and essays about ideas worth understanding.</p>
+        <p class="ih-latest-desc">Interviews with remarkable people, and short essays on ideas worth understanding.</p>
       </div>
       <a href="blog.html" class="ih-latest-link">View full archive</a>
     </div>
@@ -2228,30 +2074,21 @@
 
         <div class="ih-ct-rows">
           <a class="ih-ct-row" href="mailto:tuurlauryssen@gmail.com?subject=Interview%20Guest%20Suggestion&body=Hi%20Tuur%2C%0A%0AI%20want%20to%20suggest%20this%20person%20for%20an%20interview%3A%0A%0AName%3A%0AWhy%20they%20are%20worth%20learning%20from%3A%0ARelevant%20links%3A%0A%0AThanks%2C">
-            <div class="ih-ct-icon">INT</div>
-            <div class="ih-ct-copy">
-              <strong class="ih-ct-row-title">Suggest an interview guest</strong>
-              <span class="ih-ct-row-sub">Someone doing something worth knowing about</span>
-            </div>
-            <div class="ih-ct-row-arrow">Email</div>
+            <div class="ih-ct-kicker">Interview</div>
+            <strong class="ih-ct-row-title">Suggest an interview guest</strong>
+            <span class="ih-ct-row-sub">Someone doing something worth knowing about</span>
           </a>
 
           <a class="ih-ct-row" href="mailto:tuurlauryssen@gmail.com?subject=Topic%20or%20Idea%20Suggestion&body=Hi%20Tuur%2C%0A%0AI%20want%20to%20share%20this%20topic%20or%20idea%3A%0A%0ATopic%3A%0AWhy%20it%20matters%3A%0AUseful%20links%20or%20context%3A%0A%0AThanks%2C">
-            <div class="ih-ct-icon">IDEA</div>
-            <div class="ih-ct-copy">
-              <strong class="ih-ct-row-title">Share a topic or idea</strong>
-              <span class="ih-ct-row-sub">Something you'd like me to explore or explain clearly</span>
-            </div>
-            <div class="ih-ct-row-arrow">Email</div>
+            <div class="ih-ct-kicker">Idea</div>
+            <strong class="ih-ct-row-title">Share a topic or idea</strong>
+            <span class="ih-ct-row-sub">Something you'd like me to explore or explain clearly</span>
           </a>
 
           <a class="ih-ct-row" href="mailto:tuurlauryssen@gmail.com?subject=Hello%20Tuur&body=Hi%20Tuur%2C%0A%0A">
-            <div class="ih-ct-icon">MAIL</div>
-            <div class="ih-ct-copy">
-              <strong class="ih-ct-row-title">Just say hello</strong>
-              <span class="ih-ct-row-sub">Feedback, thoughts, or the start of a good conversation</span>
-            </div>
-            <div class="ih-ct-row-arrow">Email</div>
+            <div class="ih-ct-kicker">Message</div>
+            <strong class="ih-ct-row-title">Just say hello</strong>
+            <span class="ih-ct-row-sub">Feedback, thoughts, or the start of a good conversation</span>
           </a>
         </div>
       </div>
@@ -2264,14 +2101,13 @@
 
           <div class="ih-ct-actions">
             <a class="ih-ct-button primary" href="mailto:tuurlauryssen@gmail.com?subject=Hello%20Tuur&body=Hi%20Tuur%2C%0A%0A">Open email</a>
-            <a class="ih-ct-button secondary" href="mailto:tuurlauryssen@gmail.com?subject=Interview%20Guest%20Suggestion&body=Hi%20Tuur%2C%0A%0AI%20want%20to%20suggest%20this%20person%20for%20an%20interview%3A%0A%0AName%3A%0AWhy%20they%20are%20worth%20learning%20from%3A%0ARelevant%20links%3A%0A%0AThanks%2C">Suggest a guest</a>
           </div>
-
-          <p class="ih-ct-note">This is the simplest possible contact flow: it opens the visitor's default email app with the subject line already prepared, so there is no extra form, login, or external tool required.</p>
         </div>
       </div>
     </div>
   </section>
+
+  </main>
 
   <!-- =========================================================
        FOOTER
@@ -2281,7 +2117,7 @@
     <div class="footer-logo">INSPIRE</div>
     <div class="footer-links">
       <a href="#about">About</a>
-      <a href="#formats">Formats</a>
+      <a href="#latest">Formats</a>
       <a href="blog.html">All Editions</a>
       <a href="#contact">Contact</a>
     </div>
@@ -2336,14 +2172,6 @@
 
     // Reveal the About section blocks as they enter the viewport.
     document.querySelectorAll('.ih-sr').forEach((el) => {
-      new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('ih-in');
-        }
-      }, { threshold: 0.08 }).observe(el);
-    });
-
-    document.querySelectorAll('.ih-srb').forEach((el) => {
       new IntersectionObserver(([entry]) => {
         if (entry.isIntersecting) {
           entry.target.classList.add('ih-in');

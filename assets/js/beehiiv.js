@@ -3,16 +3,18 @@
 // =========================================
 
 const BEEHIIV_CONFIG = {
-  // IMPORTANT: Replace 'tuurlauryssen' with your actual Beehiiv publication name
+  // Replace feedUrl with the exact RSS URL from Beehiiv Settings > RSS if it differs.
   publicationName: 'tuurlauryssen',
-
-  get feedUrl() {
-    return `https://${this.publicationName}.beehiiv.com/feed`;
+  feedUrl: 'https://tuurlauryssen.beehiiv.com/feed',
+  siteLanguage: 'en',
+  languageCategoryMap: {
+    en: ['en', 'english'],
+    nl: ['nl', 'dutch', 'nederlands']
   },
 
-  // RSS to JSON proxy
-  get apiUrl() {
-    return `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(this.feedUrl)}&api_key=YOUR_API_KEY_HERE`;
+  // Fallback RSS-to-JSON proxy. No API key is hardcoded client-side.
+  get rssToJsonUrl() {
+    return `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(this.feedUrl)}`;
   }
 };
 
@@ -36,19 +38,7 @@ async function fetchBeehiivPosts(limit = null) {
 
   try {
     console.log('Fetching posts from Beehiiv...');
-    const response = await fetch(BEEHIIV_CONFIG.apiUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (data.status !== 'ok') {
-      throw new Error(`RSS feed error: ${data.message || 'Unknown error'}`);
-    }
-
-    const posts = data.items || [];
+    const posts = await fetchPostsWithFallbacks();
     console.log(`Fetched ${posts.length} posts`);
 
     cachedPosts = posts;
@@ -67,30 +57,152 @@ async function fetchBeehiivPosts(limit = null) {
   }
 }
 
+async function fetchPostsWithFallbacks() {
+  try {
+    return await fetchDirectRssPosts();
+  } catch (error) {
+    console.warn('Direct RSS fetch failed, falling back to rss2json:', error);
+  }
+
+  try {
+    return await fetchRss2JsonPosts();
+  } catch (error) {
+    console.warn('rss2json fallback failed:', error);
+  }
+
+  throw new Error('All Beehiiv feed sources failed');
+}
+
+async function fetchDirectRssPosts() {
+  const response = await fetch(BEEHIIV_CONFIG.feedUrl, {
+    headers: {
+      'Accept': 'application/rss+xml, application/xml, text/xml'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Direct RSS HTTP error: ${response.status}`);
+  }
+
+  const xmlText = await response.text();
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(xmlText, 'application/xml');
+  const parserError = xml.querySelector('parsererror');
+
+  if (parserError) {
+    throw new Error('RSS XML parse error');
+  }
+
+  const items = Array.from(xml.querySelectorAll('item'));
+  return items.map(parseRssItem);
+}
+
+function parseRssItem(item) {
+  const getText = (selector) => item.querySelector(selector)?.textContent?.trim() || '';
+  const enclosure = item.querySelector('enclosure');
+  const thumbnail = item.querySelector('media\\:thumbnail, thumbnail');
+  const categories = Array.from(item.querySelectorAll('category')).map((el) => el.textContent.trim()).filter(Boolean);
+
+  return {
+    title: getText('title'),
+    link: getText('link'),
+    pubDate: getText('pubDate'),
+    description: getText('description'),
+    content: getText('content\\:encoded'),
+    categories,
+    thumbnail: thumbnail?.getAttribute('url') || '',
+    enclosure: enclosure ? { link: enclosure.getAttribute('url') || '' } : null
+  };
+}
+
+async function fetchRss2JsonPosts() {
+  const response = await fetch(BEEHIIV_CONFIG.rssToJsonUrl);
+
+  if (!response.ok) {
+    throw new Error(`rss2json HTTP error: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (data.status !== 'ok') {
+    throw new Error(`rss2json error: ${data.message || 'Unknown error'}`);
+  }
+
+  return data.items || [];
+}
+
 // =========================================
 // DETERMINE POST TYPE (Interview vs Learned)
 // =========================================
 
 function getPostType(post) {
-  const title = (post.title || '').toLowerCase();
-  const description = (post.description || '').toLowerCase();
-  const content = `${title} ${description}`;
+  const title = (post.title || '').trim();
 
-  const interviewKeywords = [
-    'interview',
-    'conversation',
-    'gesprek',
-    'sit down with',
-    'talking with'
-  ];
-
-  for (const keyword of interviewKeywords) {
-    if (content.includes(keyword)) {
-      return 'interview';
-    }
+  if (/^\d+\.\s*/.test(title)) {
+    return 'interview';
   }
 
   return 'learned';
+}
+
+function detectPostLanguage(post) {
+  const explicitLanguage = getExplicitPostLanguage(post);
+
+  if (explicitLanguage) {
+    return explicitLanguage;
+  }
+
+  const categoryText = (post.categories || []).join(' ').toLowerCase();
+  const title = (post.title || '').toLowerCase();
+  const description = cleanHTML(post.description || '').toLowerCase();
+  const content = `${categoryText} ${title} ${description}`;
+
+  const dutchSignals = [
+    ' de ', ' het ', ' een ', ' van ', ' voor ', ' met ', ' niet ', ' wel ',
+    ' zijn ', ' haar ', ' hoe ', ' waarom ', ' wat ', ' dit ', ' deze ',
+    ' gesprek ', ' interview met ', ' ik ', ' je ', ' we '
+  ];
+
+  const englishSignals = [
+    ' the ', ' and ', ' with ', ' from ', ' about ', ' this ', ' that ',
+    ' how ', ' why ', ' what ', ' interview ', ' conversation ', ' i ', ' you '
+  ];
+
+  let dutchScore = 0;
+  let englishScore = 0;
+
+  dutchSignals.forEach((signal) => {
+    if (content.includes(signal)) dutchScore += 1;
+  });
+
+  englishSignals.forEach((signal) => {
+    if (content.includes(signal)) englishScore += 1;
+  });
+
+  return dutchScore > englishScore ? 'nl' : 'en';
+}
+
+function getExplicitPostLanguage(post) {
+  const categories = (post.categories || []).map((category) => normalizeCategory(category));
+
+  for (const [language, acceptedCategories] of Object.entries(BEEHIIV_CONFIG.languageCategoryMap)) {
+    if (acceptedCategories.some((category) => categories.includes(category))) {
+      return language;
+    }
+  }
+
+  return null;
+}
+
+function normalizeCategory(category) {
+  return String(category || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-');
+}
+
+function filterPostsForSiteLanguage(posts) {
+  return posts.filter((post) => detectPostLanguage(post) === BEEHIIV_CONFIG.siteLanguage);
 }
 
 // =========================================
@@ -171,7 +283,14 @@ function formatDate(dateString) {
 
 function extractTags(post) {
   if (post.categories && post.categories.length > 0) {
-    return post.categories.join(' · ');
+    const visibleCategories = post.categories.filter((category) => {
+      const normalized = normalizeCategory(category);
+      return !Object.values(BEEHIIV_CONFIG.languageCategoryMap).flat().includes(normalized);
+    });
+
+    if (visibleCategories.length > 0) {
+      return visibleCategories.join(' · ');
+    }
   }
 
   return getPostType(post) === 'interview' ? 'Interview' : 'Things I Learned';
@@ -311,7 +430,7 @@ function renderPosts(posts, containerId) {
 
 async function loadLatestPosts(limit = null) {
   console.log('Loading latest posts...');
-  const posts = await fetchBeehiivPosts(limit);
+  const posts = filterPostsForSiteLanguage(await fetchBeehiivPosts(limit));
 
   if (!renderHomepageSplitPosts(posts)) {
     renderPosts(limit ? posts.slice(0, limit) : posts.slice(0, 3), 'latestPosts');
@@ -328,7 +447,7 @@ let currentFilter = 'all';
 
 async function loadAllPosts() {
   console.log('Loading all posts...');
-  allPostsCache = await fetchBeehiivPosts();
+  allPostsCache = filterPostsForSiteLanguage(await fetchBeehiivPosts());
   displayPostsWithPagination();
 }
 
