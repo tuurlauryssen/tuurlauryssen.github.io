@@ -3,6 +3,7 @@
 // =========================================
 
 const BEEHIIV_CONFIG = {
+  localPostsUrl: 'assets/data/posts.json',
   // Replace feedUrl with the exact RSS URL from Beehiiv Settings > RSS if it differs.
   publicationName: 'tuurlauryssen',
   feedUrl: 'https://tuurlauryssen.beehiiv.com/feed',
@@ -59,6 +60,16 @@ async function fetchBeehiivPosts(limit = null) {
 
 async function fetchPostsWithFallbacks() {
   try {
+    const localPosts = await fetchLocalPosts();
+    if (localPosts.length > 0) {
+      console.log(`Loaded ${localPosts.length} local posts`);
+      return localPosts;
+    }
+  } catch (error) {
+    console.warn('Local posts fetch failed, falling back to Beehiiv:', error);
+  }
+
+  try {
     return await fetchDirectRssPosts();
   } catch (error) {
     console.warn('Direct RSS fetch failed, falling back to rss2json:', error);
@@ -71,6 +82,56 @@ async function fetchPostsWithFallbacks() {
   }
 
   throw new Error('All Beehiiv feed sources failed');
+}
+
+async function fetchLocalPosts() {
+  const response = await fetch(BEEHIIV_CONFIG.localPostsUrl, {
+    headers: {
+      'Accept': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Local posts HTTP error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (!Array.isArray(data)) {
+    throw new Error('Local posts file must contain an array');
+  }
+
+  return data
+    .map(mapLocalPost)
+    .filter(Boolean)
+    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+}
+
+function mapLocalPost(entry) {
+  if (!entry || !entry.title || !entry.slug || !entry.language || !entry.type || !entry.pubDate) {
+    return null;
+  }
+
+  const typeDirectory = entry.type === 'interview' ? 'interviews' : 'ideas';
+  const path = entry.path || `posts/${typeDirectory}/${entry.language}/${entry.slug}.html`;
+  const categories = Array.isArray(entry.categories) ? entry.categories : [];
+  const normalizedCategories = [...new Set([entry.language, ...categories])];
+  const excerpt = entry.excerpt || entry.description || '';
+  const image = entry.image || '';
+
+  return {
+    title: entry.title,
+    link: path,
+    pubDate: entry.pubDate,
+    description: excerpt,
+    content: excerpt,
+    categories: normalizedCategories,
+    thumbnail: image,
+    enclosure: image ? { link: image } : null,
+    type: entry.type,
+    language: entry.language,
+    author: entry.author || '',
+    sourceUrl: entry.sourceUrl || ''
+  };
 }
 
 async function fetchDirectRssPosts() {
@@ -136,6 +197,10 @@ async function fetchRss2JsonPosts() {
 // =========================================
 
 function getPostType(post) {
+  if (post.type === 'interview' || post.type === 'learned') {
+    return post.type;
+  }
+
   const title = (post.title || '').trim();
 
   if (/^\d+\.\s*/.test(title)) {
@@ -146,6 +211,10 @@ function getPostType(post) {
 }
 
 function detectPostLanguage(post) {
+  if (post.language === 'en' || post.language === 'nl') {
+    return post.language;
+  }
+
   const explicitLanguage = getExplicitPostLanguage(post);
 
   if (explicitLanguage) {
