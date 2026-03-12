@@ -1,21 +1,19 @@
+/*
+  File role: Loads local post data and renders posts on the homepage and archive page.
+  Project relation: Reads posts-data.js or posts.json, fills index.html and blog.html,
+  and links those cards to the processed article files inside /posts.
+*/
+
 // =========================================
-// BEEHIIV RSS FEED INTEGRATION
+// LOCAL POST DATA INTEGRATION
 // =========================================
 
 const BEEHIIV_CONFIG = {
   localPostsUrl: 'assets/data/posts.json',
-  // Replace feedUrl with the exact RSS URL from Beehiiv Settings > RSS if it differs.
-  publicationName: 'tuurlauryssen',
-  feedUrl: 'https://tuurlauryssen.beehiiv.com/feed',
   siteLanguage: 'en',
   languageCategoryMap: {
     en: ['en', 'english'],
     nl: ['nl', 'dutch', 'nederlands']
-  },
-
-  // Fallback RSS-to-JSON proxy. No API key is hardcoded client-side.
-  get rssToJsonUrl() {
-    return `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(this.feedUrl)}`;
   }
 };
 
@@ -28,60 +26,29 @@ let cachedPosts = null;
 let cacheTime = null;
 
 // =========================================
-// FETCH POSTS FROM BEEHIIV RSS
+// FETCH POSTS FROM LOCAL DATA
 // =========================================
 
 async function fetchBeehiivPosts(limit = null) {
   if (cachedPosts && cacheTime && (Date.now() - cacheTime < CACHE_DURATION)) {
-    console.log('Using cached posts');
     return limit ? cachedPosts.slice(0, limit) : cachedPosts;
   }
 
   try {
-    console.log('Fetching posts from Beehiiv...');
-    const posts = await fetchPostsWithFallbacks();
-    console.log(`Fetched ${posts.length} posts`);
-
+    const posts = await fetchLocalPosts();
     cachedPosts = posts;
     cacheTime = Date.now();
 
     return limit ? posts.slice(0, limit) : posts;
   } catch (error) {
-    console.error('Error fetching Beehiiv posts:', error);
+    console.error('Error fetching local posts:', error);
 
     if (cachedPosts) {
-      console.log('Using stale cache due to error');
       return limit ? cachedPosts.slice(0, limit) : cachedPosts;
     }
 
     return [];
   }
-}
-
-async function fetchPostsWithFallbacks() {
-  try {
-    const localPosts = await fetchLocalPosts();
-    if (localPosts.length > 0) {
-      console.log(`Loaded ${localPosts.length} local posts`);
-      return localPosts;
-    }
-  } catch (error) {
-    console.warn('Local posts fetch failed, falling back to Beehiiv:', error);
-  }
-
-  try {
-    return await fetchDirectRssPosts();
-  } catch (error) {
-    console.warn('Direct RSS fetch failed, falling back to rss2json:', error);
-  }
-
-  try {
-    return await fetchRss2JsonPosts();
-  } catch (error) {
-    console.warn('rss2json fallback failed:', error);
-  }
-
-  throw new Error('All Beehiiv feed sources failed');
 }
 
 async function fetchLocalPosts() {
@@ -141,63 +108,6 @@ function mapLocalPost(entry) {
   };
 }
 
-async function fetchDirectRssPosts() {
-  const response = await fetch(BEEHIIV_CONFIG.feedUrl, {
-    headers: {
-      'Accept': 'application/rss+xml, application/xml, text/xml'
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error(`Direct RSS HTTP error: ${response.status}`);
-  }
-
-  const xmlText = await response.text();
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(xmlText, 'application/xml');
-  const parserError = xml.querySelector('parsererror');
-
-  if (parserError) {
-    throw new Error('RSS XML parse error');
-  }
-
-  const items = Array.from(xml.querySelectorAll('item'));
-  return items.map(parseRssItem);
-}
-
-function parseRssItem(item) {
-  const getText = (selector) => item.querySelector(selector)?.textContent?.trim() || '';
-  const enclosure = item.querySelector('enclosure');
-  const thumbnail = item.querySelector('media\\:thumbnail, thumbnail');
-  const categories = Array.from(item.querySelectorAll('category')).map((el) => el.textContent.trim()).filter(Boolean);
-
-  return {
-    title: getText('title'),
-    link: getText('link'),
-    pubDate: getText('pubDate'),
-    description: getText('description'),
-    content: getText('content\\:encoded'),
-    categories,
-    thumbnail: thumbnail?.getAttribute('url') || '',
-    enclosure: enclosure ? { link: enclosure.getAttribute('url') || '' } : null
-  };
-}
-
-async function fetchRss2JsonPosts() {
-  const response = await fetch(BEEHIIV_CONFIG.rssToJsonUrl);
-
-  if (!response.ok) {
-    throw new Error(`rss2json HTTP error: ${response.status}`);
-  }
-
-  const data = await response.json();
-
-  if (data.status !== 'ok') {
-    throw new Error(`rss2json error: ${data.message || 'Unknown error'}`);
-  }
-
-  return data.items || [];
-}
 
 // =========================================
 // DETERMINE POST TYPE (Interview vs Learned)
@@ -590,22 +500,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // =========================================
 
 if (document.getElementById('latestPosts') || document.getElementById('latestInterviews')) {
-  console.log('Homepage detected - loading latest posts');
   document.addEventListener('DOMContentLoaded', () => {
     loadLatestPosts();
   });
 }
 
-document.addEventListener('components:loaded', () => {
-  if (document.getElementById('latestPosts') || document.getElementById('latestInterviews')) {
-    loadLatestPosts();
-  }
-
-  if (document.getElementById('allPosts')) {
+if (document.getElementById('allPosts')) {
+  document.addEventListener('DOMContentLoaded', () => {
     loadAllPosts();
     setupFilters();
-  }
-});
+  });
+}
 
 // =========================================
 // SEARCH FUNCTIONALITY (Optional Enhancement)
@@ -641,8 +546,8 @@ window.addEventListener('error', (e) => {
   console.error('JavaScript Error:', e.message);
 });
 
-console.log('Beehiiv Configuration:', {
-  publication: BEEHIIV_CONFIG.publicationName,
-  feedUrl: BEEHIIV_CONFIG.feedUrl,
-  cacheDuration: `${CACHE_DURATION / 1000 / 60} minutes`
+console.log('Local post configuration:', {
+  localPostsUrl: BEEHIIV_CONFIG.localPostsUrl,
+  cacheDuration: `${CACHE_DURATION / 1000 / 60} minutes`,
+  siteLanguage: BEEHIIV_CONFIG.siteLanguage
 });

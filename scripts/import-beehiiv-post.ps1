@@ -1,3 +1,9 @@
+<#
+  File role: Imports raw Beehiiv article HTML into local site files.
+  Project relation: Creates processed article pages in /posts, raw reference copies in
+  /posts/raw, and updates the post data files used by index.html and blog.html.
+#>
+
 param(
   [string]$HtmlPath,
   [string]$RawHtml,

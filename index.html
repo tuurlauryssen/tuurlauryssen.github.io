@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!--
+    File role: Main homepage shell for the INSPIRE site.
+    Project relation: Uses style.css for styling, main.js for shared UI behavior,
+    home-content.js for editable homepage copy, and beehiiv.js to render local posts.
+  -->
   <!-- Core document metadata -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1790,26 +1795,322 @@
   <div class="cursor-dot" id="cursorDot"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
-  <div data-component="nav"></div>
+  <nav>
+    <div class="nav-left">
+      <a href="index.html" class="nav-logo">Inspire</a>
+      <div class="nav-divider"></div>
+      <div class="nav-tagline">Finding People Worth Learning From</div>
+    </div>
+
+    <div class="nav-right">
+      <a class="nl-link" href="#" aria-disabled="true" title="Dutch site coming later">
+        <span class="nl-flag">NL</span>
+      </a>
+      <button class="nav-cta" onclick="window.location.href='#subscribe'">Subscribe Free</button>
+    </div>
+  </nav>
 
   <main id="main">
-    <div data-component="hero"></div>
-    <div data-component="about"></div>
-    <div data-component="formats"></div>
-    <div data-component="quote"></div>
-    <div data-component="contact"></div>
+    <div class="ih-wrap" id="home">
+      <div class="ih-inner">
+        <div class="ih-grid"></div>
+
+        <div class="ih-content">
+          <div class="ih-toprow">
+            <div class="ih-dot-row">
+              <div class="ih-dot"></div>
+              <span class="ih-est" data-copy-html="hero.est">Newsletter &middot; Est. 2026</span>
+            </div>
+
+            <div class="ih-pills">
+              <div class="ih-pill"><div class="ih-pill-dot-s"></div>Interviews</div>
+              <div class="ih-pill"><div class="ih-pill-dot-o"></div>Things I Learned</div>
+            </div>
+          </div>
+
+          <div class="ih-inspire-wrap">
+            <div class="ih-inspire" id="ihInspire">
+              <span class="ih-letter">I</span>
+              <span class="ih-letter">N</span>
+              <span class="ih-letter it">S</span>
+              <span class="ih-letter">P</span>
+              <span class="ih-letter">I</span>
+              <span class="ih-letter it">R</span>
+              <span class="ih-letter">E</span>
+            </div>
+          </div>
+
+          <div class="ih-bottom">
+            <div class="ih-tagline" data-copy-html="hero.taglineHtml">
+              Finding people<br>worth learning from.
+            </div>
+            <div class="ih-desc" data-copy-html="hero.description">
+              Two kinds of stories &mdash; conversations with remarkable people, and ideas worth understanding. In English and Dutch.
+            </div>
+          </div>
+
+          <div class="ih-stats">
+            <div>
+              <div class="ih-stat-num" data-copy="hero.subscribers">1,200+</div>
+              <div class="ih-stat-label">Subscribers</div>
+            </div>
+            <div>
+              <div class="ih-stat-num" data-copy="hero.editions">12</div>
+              <div class="ih-stat-label">Editions</div>
+            </div>
+            <div>
+              <div class="ih-stat-num" data-copy="hero.languages">2</div>
+              <div class="ih-stat-label">Languages</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ih-ticker-wrap">
+      <div class="ih-ticker-track">
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Interview</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Real conversations</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Things I Learned</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>No algorithms</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Human wisdom</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Finding people worth learning from</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Free &middot; Weekly</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Real insight</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>People worth learning from</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Ideas worth keeping</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Interview</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Real conversations</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Things I Learned</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>No algorithms</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Human wisdom</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Finding people worth learning from</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Free &middot; Weekly</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Real insight</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>People worth learning from</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Ideas worth keeping</div>
+      </div>
+    </div>
+
+    <section class="ih-subscribe-section" id="subscribe">
+      <div class="ih-subscribe-card">
+        <div class="ih-subscribe-copy">
+          <div class="ih-subscribe-label">Subscribe</div>
+          <h2 class="ih-subscribe-title" data-copy="subscribe.title">Get the next edition in your inbox.</h2>
+          <p class="ih-subscribe-text" data-copy-html="subscribe.text">Join readers getting interviews and ideas worth understanding. This form sends subscribers directly to your Beehiiv signup flow.</p>
+        </div>
+
+        <form class="ih-subscribe-form" action="https://tuurlauryssen.beehiiv.com/subscribe" method="post" target="_blank">
+          <input type="text" name="name" placeholder="Your name">
+          <input type="email" name="email" placeholder="Your email address" required>
+          <button type="submit">Subscribe Free</button>
+          <p class="ih-subscribe-note" data-copy-html="subscribe.note">If Beehiiv accepts the extra name field, it will be saved. If not, Beehiiv will ignore it and still process the email signup.</p>
+        </form>
+      </div>
+    </section>
+
+    <div class="ih-ticker-wrap">
+      <div class="ih-ticker-track">
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Interview</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Real conversations</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Things I Learned</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>No algorithms</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Human wisdom</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Finding people worth learning from</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Free &middot; Weekly</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Real insight</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>People worth learning from</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Ideas worth keeping</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Interview</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Real conversations</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Things I Learned</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>No algorithms</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Human wisdom</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Finding people worth learning from</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Free &middot; Weekly</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Real insight</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>People worth learning from</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Ideas worth keeping</div>
+      </div>
+    </div>
+
+    <div class="ih-s3a-wrap" id="about">
+      <div class="ih-about-header ih-sr">
+        <div class="ih-about-header-left">
+          <div class="ih-eyebrow">About Inspire</div>
+          <h2 class="ih-about-title">Finding people<br><em>worth learning from.</em></h2>
+        </div>
+
+        <div class="ih-about-photo-wrap">
+          <img
+            class="ih-about-photo"
+            src="https://media.beehiiv.com/cdn-cgi/image/format=auto,fit=scale-down,onerror=redirect/uploads/asset/file/6dfff91d-3f8f-42a8-86a2-f7b6b69656c2/CLOSE_Kick_Off_MIMS_20250902_-_050__1_.jpg"
+            alt="Tuur Lauryssen">
+          <div class="ih-about-photo-name">Tuur Lauryssen</div>
+          <div class="ih-about-photo-role">Founder &middot; Host &middot; Curator</div>
+        </div>
+
+        <div class="ih-about-header-right">
+          <p class="ih-about-desc" data-copy-html="about.description">A newsletter built on the belief that real wisdom lives in people, not algorithms. Two kinds of stories, published weekly in English and Dutch.</p>
+        </div>
+      </div>
+
+      <div class="ih-wwww ih-sr">
+        <div class="ih-m-item">
+          <div class="ih-m-circle"></div>
+          <div class="ih-m-label">What</div>
+          <p class="ih-m-text" data-copy-html="about.what">"Deep conversations and ideas worth understanding."</p>
+        </div>
+        <div class="ih-m-item">
+          <div class="ih-m-circle"></div>
+          <div class="ih-m-label">Why</div>
+          <p class="ih-m-text" data-copy-html="about.why">"Real wisdom lives in people, not algorithms."</p>
+        </div>
+        <div class="ih-m-item">
+          <div class="ih-m-circle"></div>
+          <div class="ih-m-label">Who</div>
+          <p class="ih-m-text" data-copy-html="about.who">"For those tired of shallow content &mdash; human insight, earned."</p>
+        </div>
+      </div>
+    </div>
+
+    <section class="ih-latest-wrap" id="latest">
+      <div class="ih-latest-top">
+        <div class="ih-latest-top-left">
+          <div class="ih-latest-eyebrow">Two formats</div>
+          <h2 class="ih-latest-title">Catch up by format.</h2>
+          <p class="ih-latest-desc" data-copy-html="formats.description">Interviews with remarkable people, and short essays on ideas worth understanding.</p>
+        </div>
+        <a href="blog.html" class="ih-latest-link">View full archive</a>
+      </div>
+
+      <div class="ih-latest-grid">
+        <div class="ih-latest-column">
+          <div class="ih-latest-column-head">
+            <h3 class="ih-latest-column-title">Interviews</h3>
+            <div class="ih-latest-column-tag interview">Conversations</div>
+          </div>
+          <div class="ih-latest-stack" id="latestInterviews">
+            <div class="ih-latest-loading">Loading interviews...</div>
+          </div>
+          <div class="ih-latest-column-foot">
+            <a href="blog.html" class="ih-latest-more">Read more interviews</a>
+          </div>
+        </div>
+
+        <div class="ih-latest-column">
+          <div class="ih-latest-column-head">
+            <h3 class="ih-latest-column-title">Things I Learned</h3>
+            <div class="ih-latest-column-tag learned">Ideas</div>
+          </div>
+          <div class="ih-latest-stack" id="latestLearned">
+            <div class="ih-latest-loading">Loading essays...</div>
+          </div>
+          <div class="ih-latest-column-foot">
+            <a href="blog.html" class="ih-latest-more">Read more essays</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="pull-quote sr">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+      <div class="orb orb3"></div>
+      <p class="pq-text" data-copy="quote.text">"The best insights don't come from books or podcasts. They come from sitting down with someone who has actually done the work."</p>
+      <div class="pq-author" data-copy-html="quote.author">Tuur Lauryssen &middot; Founder, Inspire</div>
+    </div>
+
+    <section class="ih-ct-wrap" id="contact">
+      <div class="ih-ct-grid">
+        <div class="ih-ct-left ih-sr6">
+          <div class="ih-ct-eyebrow">Get in touch</div>
+          <h2 class="ih-ct-title">Know someone<br><em>remarkable?</em></h2>
+          <p class="ih-ct-desc" data-copy-html="contact.description">Got a tip, a topic, or someone you think I should sit down with? The quickest way to reach me is email, and each path below opens a ready-made message.</p>
+
+          <div class="ih-ct-rows">
+            <a class="ih-ct-row" href="mailto:tuurlauryssen@gmail.com?subject=Interview%20Guest%20Suggestion&body=Hi%20Tuur%2C%0A%0AI%20want%20to%20suggest%20this%20person%20for%20an%20interview%3A%0A%0AName%3A%0AWhy%20they%20are%20worth%20learning%20from%3A%0ARelevant%20links%3A%0A%0AThanks%2C">
+              <div class="ih-ct-kicker">Interview</div>
+              <strong class="ih-ct-row-title">Suggest an interview guest</strong>
+              <span class="ih-ct-row-sub">Someone doing something worth knowing about</span>
+            </a>
+
+            <a class="ih-ct-row" href="mailto:tuurlauryssen@gmail.com?subject=Topic%20or%20Idea%20Suggestion&body=Hi%20Tuur%2C%0A%0AI%20want%20to%20share%20this%20topic%20or%20idea%3A%0A%0ATopic%3A%0AWhy%20it%20matters%3A%0AUseful%20links%20or%20context%3A%0A%0AThanks%2C">
+              <div class="ih-ct-kicker">Idea</div>
+              <strong class="ih-ct-row-title">Share a topic or idea</strong>
+              <span class="ih-ct-row-sub">Something you'd like me to explore or explain clearly</span>
+            </a>
+
+            <a class="ih-ct-row" href="mailto:tuurlauryssen@gmail.com?subject=Hello%20Tuur&body=Hi%20Tuur%2C%0A%0A">
+              <div class="ih-ct-kicker">Message</div>
+              <strong class="ih-ct-row-title">Just say hello</strong>
+              <span class="ih-ct-row-sub">Feedback, thoughts, or the start of a good conversation</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="ih-ct-right ih-sr6">
+          <div class="ih-ct-card">
+            <div class="ih-tally-label">Send a message</div>
+            <h2 class="ih-ct-title">Write me an<br><em>email</em></h2>
+            <a class="ih-ct-email" href="mailto:tuurlauryssen@gmail.com" data-copy="contact.email">tuurlauryssen@gmail.com</a>
+
+            <div class="ih-ct-actions">
+              <a class="ih-ct-button primary" href="mailto:tuurlauryssen@gmail.com?subject=Hello%20Tuur&body=Hi%20Tuur%2C%0A%0A">Open email</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
-  <div data-component="footer"></div>
+  <footer>
+    <div class="footer-logo">INSPIRE</div>
+    <div class="footer-links">
+      <a href="#about">About</a>
+      <a href="#latest">Formats</a>
+      <a href="blog.html">All Editions</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="footer-copy">&copy; 2026 Inspire by Tuur Lauryssen</div>
+  </footer>
 
   <!-- Global scripts:
        main.js handles general site interactions.
        beehiiv.js fetches and renders newsletter posts. -->
-  <script src="assets/js/component-loader.js"></script>
+  <script src="components/home-content.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/data/posts-data.js"></script>
   <script src="assets/js/beehiiv.js"></script>
   <script>
+    function getHomeContentValue(path) {
+      return path.split('.').reduce((value, key) => {
+        if (value && Object.prototype.hasOwnProperty.call(value, key)) {
+          return value[key];
+        }
+
+        return null;
+      }, window.INSPIRE_HOME_CONTENT || {});
+    }
+
+    function applyHomeContent() {
+      document.querySelectorAll('[data-copy]').forEach((element) => {
+        const value = getHomeContentValue(element.dataset.copy);
+        if (typeof value === 'string') {
+          element.textContent = value;
+        }
+      });
+
+      document.querySelectorAll('[data-copy-html]').forEach((element) => {
+        const value = getHomeContentValue(element.dataset.copyHtml);
+        if (typeof value === 'string') {
+          element.innerHTML = value;
+        }
+      });
+    }
+
     function initIndexPage() {
+      applyHomeContent();
+
       document.querySelectorAll('.ih-letter').forEach((el, i) => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(-60px)';
@@ -1866,7 +2167,11 @@
       });
     }
 
-    document.addEventListener('components:loaded', initIndexPage);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initIndexPage, { once: true });
+    } else {
+      initIndexPage();
+    }
   </script>
 
 </body>

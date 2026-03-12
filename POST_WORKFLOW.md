@@ -1,5 +1,7 @@
 # Post Workflow
 
+This file is the short operating guide for turning a raw article into local site content. It relates directly to `scripts/import-beehiiv-post.ps1`, `assets/data/posts.json`, and the article files inside `posts/`.
+
 1. Run:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\tuurlauryssen.github.io\scripts\import-beehiiv-post.ps1

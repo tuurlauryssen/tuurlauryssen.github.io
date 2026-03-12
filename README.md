@@ -1,5 +1,7 @@
 # INSPIRE Newsletter Website
 
+This file explains the overall project setup. It sits above the page files, scripts, and data files and is the best starting point if you want to understand how the site is organized.
+
 A professional GitHub Pages blog that automatically integrates with your Beehiiv newsletter.
 
 ## 🚀 Quick Start

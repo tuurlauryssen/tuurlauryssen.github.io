@@ -1,3 +1,9 @@
+/*
+  File role: Browser-ready list of processed posts for the site.
+  Project relation: Loaded before beehiiv.js so the homepage and archive can render
+  local interviews and ideas without waiting for external services.
+*/
+
 window.INSPIRE_LOCAL_POSTS = [
   {
     "title": "2. AI might get you noticed, but people skills get you hired",

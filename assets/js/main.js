@@ -1,3 +1,10 @@
+/*
+  File role: Handles shared site interactions like cursor behavior, scroll effects,
+  nav behavior, and small UI enhancements.
+  Project relation: Used by both index.html and blog.html, and complements the
+  content rendering done in beehiiv.js.
+*/
+
 // =========================================
 // MAIN.JS - General Site Functionality
 // =========================================
