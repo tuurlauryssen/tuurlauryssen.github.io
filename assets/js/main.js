@@ -403,6 +403,19 @@ window.addEventListener('error', (e) => {
 // =========================================
 // EXPORT FOR USE IN OTHER SCRIPTS
 // =========================================
+document.addEventListener('components:loaded', () => {
+  initCursor();
+  initScrollProgress();
+  initScrollReveal();
+  initParallax();
+  initSmoothScroll();
+  initNavbarScroll();
+  initLazyLoad();
+  initFormValidation();
+  initStatsCounter();
+  initExternalLinks();
+});
+
 window.siteUtils = {
   isMobile,
   isTablet,

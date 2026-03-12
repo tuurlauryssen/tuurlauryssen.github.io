@@ -446,8 +446,12 @@ function renderHomepageSplitPosts(posts) {
     return false;
   }
 
-  const interviews = posts.filter((post) => getPostType(post) === 'interview');
-  const learned = posts.filter((post) => getPostType(post) === 'learned');
+  const sortNewestFirst = (items) => items
+    .slice()
+    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+  const interviews = sortNewestFirst(posts.filter((post) => getPostType(post) === 'interview'));
+  const learned = sortNewestFirst(posts.filter((post) => getPostType(post) === 'learned'));
 
   const interviewPreview = interviews.slice(0, 3);
   const learnedPreview = learned.slice(0, 3);
@@ -591,6 +595,17 @@ if (document.getElementById('latestPosts') || document.getElementById('latestInt
     loadLatestPosts();
   });
 }
+
+document.addEventListener('components:loaded', () => {
+  if (document.getElementById('latestPosts') || document.getElementById('latestInterviews')) {
+    loadLatestPosts();
+  }
+
+  if (document.getElementById('allPosts')) {
+    loadAllPosts();
+    setupFilters();
+  }
+});
 
 // =========================================
 // SEARCH FUNCTIONALITY (Optional Enhancement)

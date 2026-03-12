@@ -297,13 +297,13 @@ function Extract-HtmlMetadata {
   if (-not $metaDate) {
     $metaDate = Get-RegexValue -InputText $Html -Pattern '"datePublished":"([^"]+)"'
   }
-  $metaAuthor = Get-RegexValue -InputText $Html -Pattern '"author":\{"@type":"Person","name":"([^"]+)"'
-  $authorsBlock = Get-RegexValue -InputText $Html -Pattern '"authors":\[(.*?)\],"audience"'
-  $metaAuthors = @()
-  if ($authorsBlock) {
-    $metaAuthors = @(Get-RegexValues -InputText $authorsBlock -Pattern '"name":"([^"]+)"' | Select-Object -Unique)
+  $schemaAuthor = Get-RegexValue -InputText $Html -Pattern '"author":\{"@type":"Person","name":"([^"]+)"'
+  $metaAuthor = Get-RegexValue -InputText $Html -Pattern '<meta[^>]+name="author"[^>]+content="([^"]+)"'
+  if (-not $metaAuthor) {
+    $metaAuthor = $schemaAuthor
   }
-  if (-not $metaAuthors.Count -and $metaAuthor) {
+  $metaAuthors = @()
+  if ($metaAuthor) {
     $metaAuthors = @($metaAuthor)
   }
   $metaReadTime = Get-RegexValue -InputText $Html -Pattern '"estimated_reading_time_display":"([^"]+)"'
@@ -494,7 +494,6 @@ function Write-PostFile {
     [array]$AuthorProfiles
   )
 
-  $typeLabel = if ($Type -eq 'interview') { 'Interview' } else { 'Things I Learned' }
   $escapedTitle = [System.Security.SecurityElement]::Escape($Title)
   $escapedExcerpt = [System.Security.SecurityElement]::Escape($Excerpt)
   $relativeStylesheet = '../../assets/css/style.css'
@@ -529,7 +528,8 @@ function Write-PostFile {
     $bylineParts += '<span class="article-readtime-line">' + $escapedReadTime + '</span>'
   }
   $bylineHtml = if ($bylineParts.Count) { ($bylineParts -join '<span class="article-meta-separator">·</span>') } else { '' }
-  $socialsHtml = if ($authorsMarkup.SocialsHtml) { '<div class="article-social-row">' + $authorsMarkup.SocialsHtml + '</div>' } else { '' }
+  $homeLink = '../../index.html'
+  $archiveLink = '../../blog.html'
 
   $html = @"
 <!DOCTYPE html>
@@ -555,22 +555,24 @@ $ImportedStyles
       <div class="nav-tagline">Finding People Worth Learning From</div>
     </div>
     <div class="nav-right">
+      <a class="nl-link" href="#" aria-disabled="true" title="Dutch site coming later">
+        <span class="nl-flag">NL</span>
+      </a>
       <button class="nav-cta" onclick="window.location.href='../../index.html#subscribe'">Subscribe Free</button>
     </div>
   </nav>
 
   <main id="main" class="article-shell">
     <header class="article-header">
-      <a class="article-back" href="../../blog.html">&larr; Back to archive</a>
-      <div class="article-meta">
-        <span class="article-pill $Type">$typeLabel</span>
+      <div class="article-actions">
+        <a class="article-action-link" href="$homeLink">Home</a>
+        <a class="article-action-link" href="$archiveLink">All Editions</a>
       </div>
       <h1 class="article-page-title">$escapedTitle</h1>
+      <p class="article-page-excerpt">$escapedExcerpt</p>
       <div class="article-byline">
         $bylineHtml
       </div>
-$socialsHtml
-      <p class="article-page-excerpt">$escapedExcerpt</p>
     </header>
 $coverHtml
     <article class="article-body">
