@@ -1716,6 +1716,14 @@ footer {
   font-size: 11px;
   color: rgba(245,240,232,0.28);
   letter-spacing: 0.06em;
+  line-height: 1.5;
+}
+
+.footer-updated,
+.article-updated {
+  display: block;
+  margin-top: 4px;
+  opacity: 0.9;
 }
 
 /* ────────────────────────────

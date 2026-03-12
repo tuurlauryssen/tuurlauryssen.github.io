@@ -676,7 +676,7 @@ $BodyHtml
     <div class="article-endcap">
       <div class="article-endcap-copy">
         <div class="article-endcap-title">Continue reading on INSPIRE</div>
-        <div class="article-endcap-text">Go back to the homepage or browse all editions.</div>
+        <div class="article-endcap-text">Go back to the homepage or browse all editions.<span class="article-updated" data-last-updated></span></div>
         $sourceHtml
       </div>
       <div class="article-endcap-actions">

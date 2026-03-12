@@ -365,6 +365,30 @@ function initKeyboardNav() {
 }
 
 // =========================================
+// LAST UPDATED TIMESTAMP
+// =========================================
+function initLastUpdated() {
+  const targets = document.querySelectorAll('[data-last-updated]');
+
+  if (targets.length === 0) return;
+
+  const rawLastModified = document.lastModified;
+  const parsed = rawLastModified ? new Date(rawLastModified) : new Date();
+  const lastUpdated = Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+  const formatted = lastUpdated.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  targets.forEach((target) => {
+    target.textContent = `Last updated at ${formatted}`;
+  });
+}
+
+// =========================================
 // INITIALIZE ALL FUNCTIONS
 // =========================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -385,6 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initStatsCounter();
   initExternalLinks();
   initKeyboardNav();
+  initLastUpdated();
   
   console.log('✅ Site initialized successfully');
 });
@@ -421,6 +446,7 @@ document.addEventListener('components:loaded', () => {
   initFormValidation();
   initStatsCounter();
   initExternalLinks();
+  initLastUpdated();
 });
 
 window.siteUtils = {
