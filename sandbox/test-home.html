@@ -10,7 +10,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <base href="../">
-  <title>INSPIRE &mdash; Finding People Worth Learning From</title>
+  <title>INSPIRE Sandbox &mdash; Test Homepage</title>
   <link rel="canonical" href="https://tuurlauryssen.com/">
   <link rel="alternate" hreflang="en" href="https://tuurlauryssen.com/">
   <link rel="alternate" hreflang="nl" href="https://tuurlauryssen.com/nl/">
@@ -26,6 +26,97 @@
 
   <!-- Hero-specific styles for the INSPIRE wordmark section -->
   <style>
+    body.sandbox-preview {
+      background:
+        radial-gradient(circle at 15% 20%, rgba(36, 54, 85, 0.14), transparent 28%),
+        radial-gradient(circle at 85% 18%, rgba(221, 212, 192, 0.45), transparent 24%),
+        linear-gradient(180deg, #f7f2eb 0%, #f1e9de 100%);
+    }
+
+    .sandbox-ambient,
+    .sandbox-mesh,
+    .sandbox-spotlight {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .sandbox-ambient {
+      overflow: hidden;
+    }
+
+    .sandbox-ambient::before,
+    .sandbox-ambient::after {
+      content: '';
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(18px);
+      opacity: 0.7;
+      mix-blend-mode: multiply;
+    }
+
+    .sandbox-ambient::before {
+      width: 420px;
+      height: 420px;
+      left: -80px;
+      top: 80px;
+      background: radial-gradient(circle, rgba(36, 54, 85, 0.28) 0%, rgba(36, 54, 85, 0) 68%);
+      animation: sandboxFloatOne 16s ease-in-out infinite;
+    }
+
+    .sandbox-ambient::after {
+      width: 380px;
+      height: 380px;
+      right: -60px;
+      top: 120px;
+      background: radial-gradient(circle, rgba(221, 212, 192, 0.95) 0%, rgba(221, 212, 192, 0) 72%);
+      animation: sandboxFloatTwo 18s ease-in-out infinite;
+    }
+
+    .sandbox-mesh {
+      background-image:
+        linear-gradient(rgba(27, 44, 69, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(27, 44, 69, 0.04) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.15));
+      opacity: 0.5;
+      animation: sandboxMeshDrift 22s linear infinite;
+    }
+
+    .sandbox-spotlight {
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      left: 0;
+      top: 0;
+      opacity: 0.35;
+      background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 68%);
+      transform: translate(-50%, -50%);
+      transition: transform 0.14s ease-out;
+      mix-blend-mode: screen;
+    }
+
+    @keyframes sandboxFloatOne {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(40px, -28px, 0) scale(1.08); }
+    }
+
+    @keyframes sandboxFloatTwo {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(-34px, 32px, 0) scale(1.12); }
+    }
+
+    @keyframes sandboxMeshDrift {
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(42px, 42px, 0); }
+    }
+
+    @keyframes sandboxPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.55); opacity: 0.65; }
+    }
+
     .ih-wrap {
       position: relative;
       left: 50%;
@@ -67,6 +158,19 @@
     .ih-content {
       position: relative;
       z-index: 1;
+    }
+
+    .ih-content::before {
+      content: '';
+      position: absolute;
+      inset: -28px -24px auto auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 72%);
+      pointer-events: none;
+      opacity: 0.75;
+      transform: translate3d(0, 0, 0);
     }
 
     .ih-toprow {
@@ -171,7 +275,9 @@
       transition:
         transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
         color 0.3s ease,
-        letter-spacing 0.3s ease;
+        letter-spacing 0.3s ease,
+        text-shadow 0.35s ease,
+        filter 0.35s ease;
       cursor: default;
     }
 
@@ -185,6 +291,8 @@
 
     .ih-inspire:hover .ih-letter {
       letter-spacing: 0.04em;
+      text-shadow: 0 22px 34px rgba(27, 44, 69, 0.14);
+      filter: saturate(1.08);
     }
 
     .ih-letter.it {
@@ -223,6 +331,29 @@
       font-weight: 300;
       max-width: 320px;
       text-align: right;
+    }
+
+    .ih-sandbox-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 18px;
+      border: 1px solid #1B2C45;
+      background: #1B2C45;
+      color: #F5F0E8;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .ih-sandbox-link:hover {
+      background: #243655;
+      border-color: #243655;
+      transform: translateY(-2px);
     }
 
     .ih-stats {
@@ -341,10 +472,19 @@
       padding: 28px;
       border: 1px solid rgba(27, 44, 69, 0.12);
       background: rgba(255, 255, 255, 0.45);
+      box-shadow: 0 18px 50px rgba(27, 44, 69, 0.08);
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 24px;
+      transform: translateZ(0);
+      transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+    }
+
+    .ih-subscribe-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(27, 44, 69, 0.2);
+      box-shadow: 0 24px 60px rgba(27, 44, 69, 0.12);
     }
 
     .ih-subscribe-copy {
@@ -842,6 +982,14 @@
       background: rgba(255, 255, 255, 0.36);
       position: relative;
       overflow: hidden;
+      box-shadow: 0 20px 44px rgba(27, 44, 69, 0.08);
+      transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+    }
+
+    .ih-latest-column:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 26px 58px rgba(27, 44, 69, 0.12);
+      border-color: rgba(27, 44, 69, 0.18);
     }
 
     .ih-latest-column::before {
@@ -1243,6 +1391,14 @@
       padding: 28px;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 20px 44px rgba(27, 44, 69, 0.08);
+      transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+    }
+
+    .ih-ct-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 26px 58px rgba(27, 44, 69, 0.12);
+      border-color: rgba(27, 44, 69, 0.18);
     }
 
     .ih-ct-card::before {
@@ -1636,6 +1792,10 @@
         line-height: 1.65;
       }
 
+      .ih-sandbox-link {
+        flex: 1 1 0;
+      }
+
       .ih-stats {
         gap: 18px 28px;
         margin-top: 26px;
@@ -1853,7 +2013,11 @@
   <!-- Browser tab icon -->
   <link rel="icon" type="image/png" href="assets/images/favicon.png">
 </head>
-<body>
+<body class="sandbox-preview">
+
+  <div class="sandbox-ambient"></div>
+  <div class="sandbox-mesh"></div>
+  <div class="sandbox-spotlight" id="sandboxSpotlight"></div>
 
   <!-- =========================================================
        GLOBAL DECORATIVE / INTERACTIVE UI
@@ -1876,12 +2040,18 @@
     </div>
 
     <div class="nav-right">
-      <a class="nl-link" href="nl/index.html" title="Bekijk de Nederlandse site">
-        <span class="nl-flag">NL</span>
+      <a class="nl-link" href="index.html" title="Return to the live homepage">
+        <span class="nl-flag">Live</span>
       </a>
+      <a class="ih-sandbox-link" href="index.html">Back to Live</a>
       <button class="nav-cta" onclick="window.location.href='#subscribe'">Subscribe Free</button>
     </div>
   </nav>
+
+  <div class="sandbox-ribbon" style="position:sticky;top:78px;z-index:50;padding:12px 20px;background:linear-gradient(90deg,#8c1d18,#b42318 38%,#7d2138 100%);color:#fff;text-align:center;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;box-shadow:0 12px 28px rgba(122,17,17,0.22);display:flex;justify-content:center;align-items:center;gap:12px;">
+    <span class="sandbox-ribbon-dot" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.94);box-shadow:0 0 0 8px rgba(255,255,255,0.14);animation:sandboxPulse 2.1s ease-in-out infinite;"></span>
+    Sandbox Preview
+  </div>
 
   <main id="main">
     <div class="ih-wrap" id="home">
@@ -2256,6 +2426,24 @@
       document.addEventListener('DOMContentLoaded', initIndexPage, { once: true });
     } else {
       initIndexPage();
+    }
+
+    const sandboxSpotlight = document.getElementById('sandboxSpotlight');
+    if (sandboxSpotlight) {
+      let spotlightX = window.innerWidth * 0.5;
+      let spotlightY = window.innerHeight * 0.24;
+
+      const moveSpotlight = (x, y) => {
+        spotlightX += (x - spotlightX) * 0.18;
+        spotlightY += (y - spotlightY) * 0.18;
+        sandboxSpotlight.style.transform = `translate(${spotlightX - 210}px, ${spotlightY - 210}px)`;
+      };
+
+      moveSpotlight(spotlightX, spotlightY);
+
+      document.addEventListener('mousemove', (event) => {
+        moveSpotlight(event.clientX, event.clientY);
+      });
     }
   </script>
 
