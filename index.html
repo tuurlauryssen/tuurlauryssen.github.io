@@ -1327,6 +1327,124 @@
       background: #EAE3D5;
     }
 
+    .ih-contact-trigger {
+      appearance: none;
+      width: 100%;
+      border: 0;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    body.contact-modal-open {
+      overflow: hidden;
+    }
+
+    .ih-contact-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 18, 16, 0.48);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      z-index: 140;
+    }
+
+    .ih-contact-modal[hidden] {
+      display: none;
+    }
+
+    .ih-contact-modal-card {
+      width: min(100%, 640px);
+      background: #F5F0E8;
+      border: 1px solid rgba(27, 44, 69, 0.14);
+      box-shadow: 0 24px 80px rgba(20, 18, 16, 0.18);
+      padding: 28px;
+      position: relative;
+    }
+
+    .ih-contact-modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      border: 0;
+      background: transparent;
+      color: #1B2C45;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .ih-contact-modal-copy {
+      margin-bottom: 18px;
+    }
+
+    .ih-contact-modal-copy h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 40px;
+      line-height: 0.98;
+      color: #1B2C45;
+      margin-bottom: 8px;
+    }
+
+    .ih-contact-modal-copy p {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #6B7280;
+      font-weight: 300;
+      max-width: 46ch;
+    }
+
+    .ih-contact-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .ih-contact-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .ih-contact-form input,
+    .ih-contact-form textarea {
+      width: 100%;
+      border: 1px solid rgba(27, 44, 69, 0.16);
+      background: rgba(255, 255, 255, 0.6);
+      color: #141210;
+      padding: 14px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .ih-contact-form textarea {
+      min-height: 160px;
+      resize: vertical;
+    }
+
+    .ih-contact-form input:focus,
+    .ih-contact-form textarea:focus {
+      border-color: #1B2C45;
+      background: #FFFFFF;
+    }
+
+    .ih-contact-form-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    .ih-contact-form-note,
+    .ih-contact-form-feedback {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      color: #6B7280;
+      line-height: 1.5;
+      min-height: 18px;
+    }
+
     .ih-sr6 {
       opacity: 0;
       transform: translateY(28px);
@@ -1747,6 +1865,15 @@
         width: 100%;
       }
 
+      .ih-contact-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ih-contact-form-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
       .pull-quote {
         padding: 56px 16px;
       }
@@ -2029,23 +2156,23 @@
           <p class="ih-ct-desc" data-copy-html="contact.description">Got a tip, a topic, or someone you think I should sit down with? The quickest way to reach me is email, and each path below opens a ready-made message.</p>
 
           <div class="ih-ct-rows">
-            <a class="ih-ct-row" href="mailto:tuurlauryssen@gmail.com?subject=Interview%20Guest%20Suggestion&body=Hi%20Tuur%2C%0A%0AI%20want%20to%20suggest%20this%20person%20for%20an%20interview%3A%0A%0AName%3A%0AWhy%20they%20are%20worth%20learning%20from%3A%0ARelevant%20links%3A%0A%0AThanks%2C">
+            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="Interview guest suggestion" data-contact-prompt="Hi Tuur,%0A%0AI want to suggest this person for an interview:%0A%0AName:%0AWhy they are worth learning from:%0ARelevant links:%0A">
               <div class="ih-ct-kicker">Interview</div>
               <strong class="ih-ct-row-title">Suggest an interview guest</strong>
               <span class="ih-ct-row-sub">Someone doing something worth knowing about</span>
-            </a>
+            </button>
 
-            <a class="ih-ct-row" href="mailto:tuurlauryssen@gmail.com?subject=Topic%20or%20Idea%20Suggestion&body=Hi%20Tuur%2C%0A%0AI%20want%20to%20share%20this%20topic%20or%20idea%3A%0A%0ATopic%3A%0AWhy%20it%20matters%3A%0AUseful%20links%20or%20context%3A%0A%0AThanks%2C">
+            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="Topic or idea suggestion" data-contact-prompt="Hi Tuur,%0A%0AI want to share this topic or idea:%0A%0ATopic:%0AWhy it matters:%0AUseful links or context:%0A">
               <div class="ih-ct-kicker">Idea</div>
               <strong class="ih-ct-row-title">Share a topic or idea</strong>
               <span class="ih-ct-row-sub">Something you'd like me to explore or explain clearly</span>
-            </a>
+            </button>
 
-            <a class="ih-ct-row" href="mailto:tuurlauryssen@gmail.com?subject=Hello%20Tuur&body=Hi%20Tuur%2C%0A%0A">
+            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="Hello Tuur" data-contact-prompt="Hi Tuur,%0A%0A">
               <div class="ih-ct-kicker">Message</div>
               <strong class="ih-ct-row-title">Just say hello</strong>
               <span class="ih-ct-row-sub">Feedback, thoughts, or the start of a good conversation</span>
-            </a>
+            </button>
           </div>
         </div>
 
@@ -2056,12 +2183,37 @@
             <a class="ih-ct-email" href="mailto:tuurlauryssen@gmail.com" data-copy="contact.email">tuurlauryssen@gmail.com</a>
 
             <div class="ih-ct-actions">
-              <a class="ih-ct-button primary" href="mailto:tuurlauryssen@gmail.com?subject=Hello%20Tuur&body=Hi%20Tuur%2C%0A%0A">Open email</a>
+              <button class="ih-ct-button primary" type="button" data-contact-trigger data-contact-subject="Hello Tuur" data-contact-prompt="Hi Tuur,%0A%0A">Send message</button>
             </div>
           </div>
         </div>
       </div>
     </section>
+    <div class="ih-contact-modal" data-contact-modal hidden>
+      <div class="ih-contact-modal-card">
+        <button class="ih-contact-modal-close" type="button" data-contact-close aria-label="Close contact form">&times;</button>
+        <div class="ih-contact-modal-copy">
+          <div class="ih-tally-label">Send a message</div>
+          <h3>Write directly,<br><em>no email app</em></h3>
+          <p>Leave your name, email, and message here. I will receive it directly through the site backend.</p>
+        </div>
+        <form class="ih-contact-form" data-contact-form>
+          <div class="ih-contact-form-grid">
+            <input type="text" name="name" placeholder="Your name" required>
+            <input type="email" name="email" placeholder="Your email address" required>
+          </div>
+          <input type="text" name="subject" placeholder="Subject" required>
+          <textarea name="message" placeholder="Your message" required></textarea>
+          <div class="ih-contact-form-actions">
+            <div>
+              <div class="ih-contact-form-note">This sends directly through the website backend.</div>
+              <div class="ih-contact-form-feedback" data-contact-feedback aria-live="polite"></div>
+            </div>
+            <button class="ih-ct-button primary" type="submit">Send message</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </main>
   <footer>
     <div class="footer-logo">INSPIRE</div>

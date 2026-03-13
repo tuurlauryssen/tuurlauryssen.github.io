@@ -384,6 +384,9 @@ function initSubscribeForms() {
     : '';
 
   forms.forEach((form) => {
+    if (form.dataset.subscribeBound === 'true') return;
+    form.dataset.subscribeBound = 'true';
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -469,6 +472,185 @@ function initSubscribeForms() {
   });
 }
 
+function setContactFeedback(form, message, isError = false) {
+  const feedback = form.querySelector('[data-contact-feedback]');
+
+  if (!feedback) return;
+
+  feedback.textContent = message || '';
+  feedback.style.color = isError ? '#b42318' : '';
+}
+
+function closeContactModal(modal) {
+  if (!modal) return;
+
+  modal.hidden = true;
+  document.body.classList.remove('contact-modal-open');
+}
+
+function openContactModal(modal, subject = '', prompt = '') {
+  if (!modal) return;
+
+  const subjectInput = modal.querySelector('input[name="subject"]');
+  const messageInput = modal.querySelector('textarea[name="message"]');
+
+  if (subjectInput && subject) {
+    subjectInput.value = subject;
+  }
+
+  if (messageInput && prompt && !messageInput.value) {
+    messageInput.value = prompt.replace(/%0A/g, '\n');
+  }
+
+  modal.hidden = false;
+  document.body.classList.add('contact-modal-open');
+
+  const firstInput = modal.querySelector('input[name="name"]');
+  if (firstInput) firstInput.focus();
+}
+
+function initContactModal() {
+  const modal = document.querySelector('[data-contact-modal]');
+
+  if (!modal) return;
+  if (modal.dataset.contactModalBound === 'true') return;
+  modal.dataset.contactModalBound = 'true';
+
+  const config = window.INSPIRE_SITE_CONFIG || {};
+  const endpoint = typeof config.contactEndpoint === 'string'
+    ? config.contactEndpoint.trim()
+    : '';
+  const form = modal.querySelector('[data-contact-form]');
+  const closeButtons = modal.querySelectorAll('[data-contact-close]');
+  const triggers = document.querySelectorAll('[data-contact-trigger]');
+
+  triggers.forEach((trigger) => {
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      openContactModal(
+        modal,
+        trigger.dataset.contactSubject || '',
+        trigger.dataset.contactPrompt || ''
+      );
+    });
+  });
+
+  closeButtons.forEach((button) => {
+    button.addEventListener('click', () => closeContactModal(modal));
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeContactModal(modal);
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.hidden) {
+      closeContactModal(modal);
+    }
+  });
+
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const nameInput = form.querySelector('input[name="name"]');
+    const emailInput = form.querySelector('input[name="email"]');
+    const subjectInput = form.querySelector('input[name="subject"]');
+    const messageInput = form.querySelector('textarea[name="message"]');
+    const submitButton = form.querySelector('button[type="submit"]');
+    const name = nameInput ? nameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const subject = subjectInput ? subjectInput.value.trim() : '';
+    const message = messageInput ? messageInput.value.trim() : '';
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (name.length < 2) {
+      setContactFeedback(form, 'Please enter your name.', true);
+      if (nameInput) nameInput.focus();
+      return;
+    }
+
+    if (!emailPattern.test(email)) {
+      setContactFeedback(form, 'Please enter a valid email address.', true);
+      if (emailInput) emailInput.focus();
+      return;
+    }
+
+    if (message.length < 10) {
+      setContactFeedback(form, 'Please enter a message with a bit more detail.', true);
+      if (messageInput) messageInput.focus();
+      return;
+    }
+
+    if (!endpoint) {
+      setContactFeedback(form, 'Contact endpoint is not configured yet.', true);
+      return;
+    }
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Sending...';
+    }
+
+    setContactFeedback(form, 'Sending your message...');
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          subject: subject || 'Website message',
+          message,
+          source: config.contactSource || 'website-contact',
+          metadata: {
+            page: window.location.pathname
+          }
+        })
+      });
+
+      let payload = {};
+
+      try {
+        payload = await response.json();
+      } catch (parseError) {
+        payload = {};
+      }
+
+      if (!response.ok) {
+        const errorMessage = payload && payload.error
+          ? payload.error
+          : 'Message failed to send. Please try again.';
+        throw new Error(errorMessage);
+      }
+
+      form.reset();
+      setContactFeedback(
+        form,
+        payload && payload.message ? payload.message : 'Your message is on its way.'
+      );
+    } catch (error) {
+      setContactFeedback(
+        form,
+        error && error.message ? error.message : 'Message failed to send. Please try again.',
+        true
+      );
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Send message';
+      }
+    }
+  });
+}
+
 // =========================================
 // LAST UPDATED TIMESTAMP
 // =========================================
@@ -512,6 +694,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initFormValidation();
   initSubscribeForms();
+  initContactModal();
   initStatsCounter();
   initExternalLinks();
   initKeyboardNav();
@@ -551,6 +734,7 @@ document.addEventListener('components:loaded', () => {
   initLazyLoad();
   initFormValidation();
   initSubscribeForms();
+  initContactModal();
   initStatsCounter();
   initExternalLinks();
   initLastUpdated();

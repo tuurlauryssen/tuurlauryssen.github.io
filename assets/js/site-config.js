@@ -7,6 +7,7 @@
 window.INSPIRE_SITE_CONFIG = {
   subscribeEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/subscribe",
   subscribeSource: "website",
-  subscribeLanguage: "en"
+  subscribeLanguage: "en",
+  contactEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/contact-message",
+  contactSource: "website-contact"
 };
-
