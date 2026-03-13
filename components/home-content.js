@@ -15,8 +15,8 @@ window.INSPIRE_HOME_CONTENT = {
   },
   subscribe: {
     title: 'Get the next edition in your inbox.',
-    text: 'Join readers getting interviews and ideas worth understanding. This form sends subscribers directly to your Beehiiv signup flow.',
-    note: 'If Beehiiv accepts the extra name field, it will be saved. If not, Beehiiv will ignore it and still process the email signup.'
+    text: 'Join readers getting interviews and ideas worth understanding.',
+    note: 'Your email stays in a private subscriber system, separate from this public site.'
   },
   about: {
     description: 'A newsletter built on the belief that real wisdom lives in people, not algorithms. Two kinds of stories, published weekly in English and Dutch.',

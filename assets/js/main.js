@@ -226,7 +226,7 @@ function initMobileMenu() {
 // FORM VALIDATION (for email subscription)
 // =========================================
 function initFormValidation() {
-  const forms = document.querySelectorAll('form');
+  const forms = document.querySelectorAll('form:not([data-subscribe-form])');
   
   forms.forEach(form => {
     form.addEventListener('submit', (e) => {
@@ -364,6 +364,111 @@ function initKeyboardNav() {
   });
 }
 
+function setSubscribeFeedback(form, message, isError = false) {
+  const feedback = form.querySelector('[data-subscribe-feedback]');
+
+  if (!feedback) return;
+
+  feedback.textContent = message || '';
+  feedback.style.color = isError ? '#b42318' : '';
+}
+
+function initSubscribeForms() {
+  const forms = document.querySelectorAll('[data-subscribe-form]');
+
+  if (forms.length === 0) return;
+
+  const config = window.INSPIRE_SITE_CONFIG || {};
+  const endpoint = typeof config.subscribeEndpoint === 'string'
+    ? config.subscribeEndpoint.trim()
+    : '';
+
+  forms.forEach((form) => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const emailInput = form.querySelector('input[type="email"]');
+      const submitButton = form.querySelector('button[type="submit"]');
+      const email = emailInput ? emailInput.value.trim() : '';
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!email) {
+        setSubscribeFeedback(form, 'Please enter your email address.', true);
+        if (emailInput) emailInput.focus();
+        return;
+      }
+
+      if (!emailPattern.test(email)) {
+        setSubscribeFeedback(form, 'Please enter a valid email address.', true);
+        if (emailInput) emailInput.focus();
+        return;
+      }
+
+      if (!endpoint) {
+        setSubscribeFeedback(form, 'Subscription endpoint is not configured yet.', true);
+        return;
+      }
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Submitting...';
+      }
+
+      setSubscribeFeedback(form, 'Saving your subscription...');
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            source: config.subscribeSource || 'website',
+            language: config.subscribeLanguage || document.documentElement.lang || 'en',
+            metadata: {
+              page: window.location.pathname
+            }
+          })
+        });
+
+        let payload = {};
+
+        try {
+          payload = await response.json();
+        } catch (parseError) {
+          payload = {};
+        }
+
+        if (!response.ok) {
+          const message = payload && payload.error
+            ? payload.error
+            : 'Subscription failed. Please try again.';
+          throw new Error(message);
+        }
+
+        form.reset();
+        setSubscribeFeedback(
+          form,
+          payload && payload.message ? payload.message : 'Subscription received.'
+        );
+      } catch (error) {
+        setSubscribeFeedback(
+          form,
+          error && error.message ? error.message : 'Subscription failed. Please try again.',
+          true
+        );
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = 'Subscribe Free';
+        }
+      }
+    });
+  });
+}
+
 // =========================================
 // LAST UPDATED TIMESTAMP
 // =========================================
@@ -406,6 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLazyLoad();
   initMobileMenu();
   initFormValidation();
+  initSubscribeForms();
   initStatsCounter();
   initExternalLinks();
   initKeyboardNav();
@@ -444,6 +550,7 @@ document.addEventListener('components:loaded', () => {
   initNavbarScroll();
   initLazyLoad();
   initFormValidation();
+  initSubscribeForms();
   initStatsCounter();
   initExternalLinks();
   initLastUpdated();

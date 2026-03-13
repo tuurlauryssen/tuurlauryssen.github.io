@@ -92,9 +92,10 @@
       <h2 class="cta-title">Never miss an edition</h2>
       <p class="cta-desc">Join 1,200+ readers getting conversations and insights worth understanding, delivered weekly in English and Dutch.</p>
       <div class="subscribe-row-inline">
-        <form action="https://tuurlauryssen.beehiiv.com/subscribe" method="post" target="_blank">
+        <form action="#" method="post" data-subscribe-form>
           <input type="email" name="email" placeholder="Your email address" required>
           <button type="submit">Subscribe Free</button>
+          <p class="cta-note" data-subscribe-feedback aria-live="polite"></p>
         </form>
       </div>
       <p class="cta-note">Free · No spam · Unsubscribe anytime</p>
@@ -115,6 +116,7 @@
 </footer>
 
 <!-- Scripts -->
+<script src="assets/js/site-config.js"></script>
 <script src="assets/js/main.js"></script>
 <script src="assets/data/posts-data.js"></script>
 <script src="assets/js/beehiiv.js"></script>
