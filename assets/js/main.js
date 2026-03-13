@@ -481,77 +481,37 @@ function setContactFeedback(form, message, isError = false) {
   feedback.style.color = isError ? '#b42318' : '';
 }
 
-function closeContactModal(modal) {
-  if (!modal) return;
-
-  modal.hidden = true;
-  document.body.classList.remove('contact-modal-open');
-}
-
-function openContactModal(modal, subject = '', prompt = '') {
-  if (!modal) return;
-
-  const subjectInput = modal.querySelector('input[name="subject"]');
-  const messageInput = modal.querySelector('textarea[name="message"]');
-
-  if (subjectInput && subject) {
-    subjectInput.value = subject;
-  }
-
-  if (messageInput && prompt && !messageInput.value) {
-    messageInput.value = prompt.replace(/%0A/g, '\n');
-  }
-
-  modal.hidden = false;
-  document.body.classList.add('contact-modal-open');
-
-  const firstInput = modal.querySelector('input[name="name"]');
-  if (firstInput) firstInput.focus();
-}
-
-function initContactModal() {
-  const modal = document.querySelector('[data-contact-modal]');
-
-  if (!modal) return;
-  if (modal.dataset.contactModalBound === 'true') return;
-  modal.dataset.contactModalBound = 'true';
-
+function initContactForm() {
   const config = window.INSPIRE_SITE_CONFIG || {};
   const endpoint = typeof config.contactEndpoint === 'string'
     ? config.contactEndpoint.trim()
     : '';
-  const form = modal.querySelector('[data-contact-form]');
-  const closeButtons = modal.querySelectorAll('[data-contact-close]');
+  const form = document.querySelector('[data-contact-form]');
+  if (!form) return;
+  if (form.dataset.contactBound === 'true') return;
+  form.dataset.contactBound = 'true';
+
   const triggers = document.querySelectorAll('[data-contact-trigger]');
+  const subjectInput = form.querySelector('input[name="subject"]');
+  const messageInput = form.querySelector('textarea[name="message"]');
+  const nameInput = form.querySelector('input[name="name"]');
 
   triggers.forEach((trigger) => {
     trigger.addEventListener('click', (e) => {
       e.preventDefault();
-      openContactModal(
-        modal,
-        trigger.dataset.contactSubject || '',
-        trigger.dataset.contactPrompt || ''
-      );
+
+      if (subjectInput && trigger.dataset.contactSubject) {
+        subjectInput.value = trigger.dataset.contactSubject;
+      }
+
+      if (messageInput && trigger.dataset.contactPrompt && !messageInput.value.trim()) {
+        messageInput.value = trigger.dataset.contactPrompt.replace(/%0A/g, '\n');
+      }
+
+      form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (nameInput) nameInput.focus();
     });
   });
-
-  closeButtons.forEach((button) => {
-    button.addEventListener('click', () => closeContactModal(modal));
-  });
-
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      closeContactModal(modal);
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !modal.hidden) {
-      closeContactModal(modal);
-    }
-  });
-
-  if (!form) return;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -694,7 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initFormValidation();
   initSubscribeForms();
-  initContactModal();
+  initContactForm();
   initStatsCounter();
   initExternalLinks();
   initKeyboardNav();
@@ -734,7 +694,7 @@ document.addEventListener('components:loaded', () => {
   initLazyLoad();
   initFormValidation();
   initSubscribeForms();
-  initContactModal();
+  initContactForm();
   initStatsCounter();
   initExternalLinks();
   initLastUpdated();

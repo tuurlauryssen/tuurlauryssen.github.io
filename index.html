@@ -1335,65 +1335,6 @@
       cursor: pointer;
     }
 
-    body.contact-modal-open {
-      overflow: hidden;
-    }
-
-    .ih-contact-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(20, 18, 16, 0.48);
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      z-index: 140;
-    }
-
-    .ih-contact-modal[hidden] {
-      display: none;
-    }
-
-    .ih-contact-modal-card {
-      width: min(100%, 640px);
-      background: #F5F0E8;
-      border: 1px solid rgba(27, 44, 69, 0.14);
-      box-shadow: 0 24px 80px rgba(20, 18, 16, 0.18);
-      padding: 28px;
-      position: relative;
-    }
-
-    .ih-contact-modal-close {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      border: 0;
-      background: transparent;
-      color: #1B2C45;
-      font-size: 24px;
-      cursor: pointer;
-    }
-
-    .ih-contact-modal-copy {
-      margin-bottom: 18px;
-    }
-
-    .ih-contact-modal-copy h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 40px;
-      line-height: 0.98;
-      color: #1B2C45;
-      margin-bottom: 8px;
-    }
-
-    .ih-contact-modal-copy p {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      line-height: 1.6;
-      color: #6B7280;
-      font-weight: 300;
-      max-width: 46ch;
-    }
-
     .ih-contact-form {
       display: grid;
       gap: 14px;
@@ -2179,41 +2120,27 @@
         <div class="ih-ct-right ih-sr6">
           <div class="ih-ct-card">
             <div class="ih-tally-label">Send a message</div>
-            <h2 class="ih-ct-title">Write me an<br><em>email</em></h2>
+            <h2 class="ih-ct-title">Write directly,<br><em>no email app</em></h2>
             <a class="ih-ct-email" href="mailto:tuurlauryssen@gmail.com" data-copy="contact.email">tuurlauryssen@gmail.com</a>
-
-            <div class="ih-ct-actions">
-              <button class="ih-ct-button primary" type="button" data-contact-trigger data-contact-subject="Hello Tuur" data-contact-prompt="Hi Tuur,%0A%0A">Send message</button>
-            </div>
+            <form class="ih-contact-form" data-contact-form>
+              <div class="ih-contact-form-grid">
+                <input type="text" name="name" placeholder="Your name" required>
+                <input type="email" name="email" placeholder="Your email address" required>
+              </div>
+              <input type="text" name="subject" placeholder="Subject" required>
+              <textarea name="message" placeholder="Your message" required></textarea>
+              <div class="ih-contact-form-actions">
+                <div>
+                  <div class="ih-contact-form-note">This sends directly through the website backend.</div>
+                  <div class="ih-contact-form-feedback" data-contact-feedback aria-live="polite"></div>
+                </div>
+                <button class="ih-ct-button primary" type="submit">Send message</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
     </section>
-    <div class="ih-contact-modal" data-contact-modal hidden>
-      <div class="ih-contact-modal-card">
-        <button class="ih-contact-modal-close" type="button" data-contact-close aria-label="Close contact form">&times;</button>
-        <div class="ih-contact-modal-copy">
-          <div class="ih-tally-label">Send a message</div>
-          <h3>Write directly,<br><em>no email app</em></h3>
-          <p>Leave your name, email, and message here. I will receive it directly through the site backend.</p>
-        </div>
-        <form class="ih-contact-form" data-contact-form>
-          <div class="ih-contact-form-grid">
-            <input type="text" name="name" placeholder="Your name" required>
-            <input type="email" name="email" placeholder="Your email address" required>
-          </div>
-          <input type="text" name="subject" placeholder="Subject" required>
-          <textarea name="message" placeholder="Your message" required></textarea>
-          <div class="ih-contact-form-actions">
-            <div>
-              <div class="ih-contact-form-note">This sends directly through the website backend.</div>
-              <div class="ih-contact-form-feedback" data-contact-feedback aria-live="polite"></div>
-            </div>
-            <button class="ih-ct-button primary" type="submit">Send message</button>
-          </div>
-        </form>
-      </div>
-    </div>
   </main>
   <footer>
     <div class="footer-logo">INSPIRE</div>
