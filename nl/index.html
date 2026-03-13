@@ -93,6 +93,31 @@
       </div>
     </section>
 
+    <div class="ih-ticker-wrap">
+      <div class="ih-ticker-track">
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Interview</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Echte gesprekken</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Dingen die ik leerde</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Geen algoritmes</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Menselijke wijsheid</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Finding people worth learning from</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Gratis &middot; Wekelijks</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Echte inzichten</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Mensen om van te leren</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Ideeen die blijven hangen</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Interview</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Echte gesprekken</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Dingen die ik leerde</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Geen algoritmes</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Menselijke wijsheid</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Finding people worth learning from</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Gratis &middot; Wekelijks</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Echte inzichten</div>
+        <div class="ih-ticker-item ih-hi"><div class="ih-ticker-sep"></div>Mensen om van te leren</div>
+        <div class="ih-ticker-item"><div class="ih-ticker-sep"></div>Ideeen die blijven hangen</div>
+      </div>
+    </div>
+
     <div class="ih-s3a-wrap" id="about">
       <div class="ih-about-header ih-sr">
         <div class="ih-about-header-left">
@@ -239,18 +264,68 @@
 
     function initIndexPage() {
       applyHomeContent();
+
       document.querySelectorAll('.ih-letter').forEach((el, i) => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(-60px)';
         el.style.transition = 'transform 0.6s cubic-bezier(0.34,1.4,0.64,1), color 0.3s, opacity 0.4s';
+
         setTimeout(() => {
           el.style.opacity = '1';
           el.style.transform = 'translateY(0)';
         }, 200 + i * 80);
       });
+
+      const inspire = document.getElementById('ihInspire');
+
+      if (inspire && !inspire.dataset.magneticReady) {
+        inspire.dataset.magneticReady = 'true';
+        inspire.addEventListener('mousemove', (e) => {
+          const letters = inspire.querySelectorAll('.ih-letter');
+          const rect = inspire.getBoundingClientRect();
+          const cx = e.clientX - rect.left;
+          const cy = e.clientY - rect.top;
+
+          letters.forEach((letter) => {
+            const lRect = letter.getBoundingClientRect();
+            const lx = lRect.left + lRect.width / 2 - rect.left;
+            const ly = lRect.top + lRect.height / 2 - rect.top;
+            const dx = (cx - lx) * 0.12;
+            const dy = (cy - ly) * 0.12;
+
+            letter.style.transform = `translate(${dx}px, ${dy}px)`;
+          });
+        });
+
+        inspire.addEventListener('mouseleave', () => {
+          inspire.querySelectorAll('.ih-letter').forEach((letter) => {
+            letter.style.transform = 'translate(0,0)';
+          });
+        });
+      }
+
+      document.querySelectorAll('.ih-sr').forEach((el) => {
+        new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('ih-in');
+          }
+        }, { threshold: 0.08 }).observe(el);
+      });
+
+      document.querySelectorAll('.ih-sr6').forEach((el) => {
+        new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('ih-in');
+          }
+        }, { threshold: 0.08 }).observe(el);
+      });
     }
 
-    window.addEventListener('DOMContentLoaded', initIndexPage);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initIndexPage, { once: true });
+    } else {
+      initIndexPage();
+    }
   </script>
 </body>
 </html>
