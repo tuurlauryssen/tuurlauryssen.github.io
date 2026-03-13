@@ -185,8 +185,8 @@
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(27, 44, 69, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(27, 44, 69, 0.04) 1px, transparent 1px);
+        linear-gradient(rgba(27, 44, 69, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(27, 44, 69, 0.08) 1px, transparent 1px);
       background-size: 64px 64px;
       animation: ih-gridMove 24s linear infinite;
       pointer-events: none;
@@ -300,6 +300,12 @@
       animation: ih-fadeUp 0.7s 0.2s ease both;
     }
 
+    .ih-wordplay-row {
+      display: flex;
+      align-items: center;
+      gap: 68px;
+    }
+
     .ih-inspire {
       display: flex;
       align-items: baseline;
@@ -344,6 +350,43 @@
       font-style: italic;
       font-weight: 300;
       opacity: 0.55;
+    }
+
+    .ih-wordflip-wrap {
+      opacity: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: clamp(220px, 20vw, 300px);
+      padding-left: 18px;
+      flex: 0 0 auto;
+      transition: opacity 0.5s ease;
+    }
+
+    .ih-wordflip-line {
+      width: 1px;
+      height: 24px;
+      margin-left: 6px;
+      background: rgba(27, 44, 69, 0.18);
+    }
+
+    .ih-wordflip-window {
+      display: flex;
+      align-items: center;
+      height: clamp(60px, 9vw, 108px);
+      overflow: hidden;
+    }
+
+    .ih-flipword {
+      display: block;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(52px, 8vw, 96px);
+      font-weight: 700;
+      font-style: italic;
+      color: #1B2C45;
+      opacity: 0.6;
+      white-space: nowrap;
+      transform: translateY(0);
     }
 
     .ih-bottom {
@@ -443,6 +486,14 @@
       .ih-bottom { flex-direction: column; gap: 20px; }
       .ih-desc { text-align: left; }
       .ih-letter { font-size: clamp(72px, 18vw, 120px); }
+      .ih-wordplay-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .ih-wordflip-line {
+        display: none;
+      }
     }
 
     .ih-ticker-wrap {
@@ -2324,14 +2375,24 @@
           </div>
 
           <div class="ih-inspire-wrap">
-            <div class="ih-inspire" id="ihInspire">
-              <span class="ih-letter">I</span>
-              <span class="ih-letter">N</span>
-              <span class="ih-letter it">S</span>
-              <span class="ih-letter">P</span>
-              <span class="ih-letter">I</span>
-              <span class="ih-letter it">R</span>
-              <span class="ih-letter">E</span>
+            <div class="ih-wordplay-row">
+              <div class="ih-inspire" id="ihInspire">
+                <span class="ih-letter">I</span>
+                <span class="ih-letter">N</span>
+                <span class="ih-letter it">S</span>
+                <span class="ih-letter">P</span>
+                <span class="ih-letter">I</span>
+                <span class="ih-letter it">R</span>
+                <span class="ih-letter">E</span>
+              </div>
+
+              <div class="ih-wordflip-wrap" id="ihWordflipWrap" aria-live="polite">
+                <div class="ih-wordflip-line"></div>
+                <div class="ih-wordflip-window">
+                  <span class="ih-flipword" id="ihFlipword">leaders.</span>
+                </div>
+                <div class="ih-wordflip-line"></div>
+              </div>
             </div>
           </div>
 
@@ -2618,43 +2679,56 @@
     function initIndexPage() {
       applyHomeContent();
 
-      document.querySelectorAll('.ih-letter').forEach((el, i) => {
+      const letters = document.querySelectorAll('#ihInspire .ih-letter');
+      const wordflipWrap = document.getElementById('ihWordflipWrap');
+      const flipword = document.getElementById('ihFlipword');
+      const wordplayWords = ['leaders.', 'creators.', 'builders.', 'thinkers.', 'founders.', 'teachers.', 'you.'];
+      let wordplayIndex = 0;
+
+      letters.forEach((el, i) => {
         el.style.opacity = '0';
-        el.style.transform = 'translateY(-60px)';
-        el.style.transition = 'transform 0.6s cubic-bezier(0.34,1.4,0.64,1), color 0.3s, opacity 0.4s';
+        const verticalOffset = i % 2 === 0 ? -88 : 74;
+        const rotationOffset = i % 2 === 0 ? -7 : 6;
+        el.style.transform = `translateY(${verticalOffset}px) rotate(${rotationOffset}deg) scale(0.94)`;
+        el.style.transition = 'transform 0.84s cubic-bezier(0.22,1,0.36,1), color 0.3s, opacity 0.5s';
 
         setTimeout(() => {
           el.style.opacity = '1';
           el.style.transform = 'translateY(0)';
-        }, 200 + i * 80);
+          if (i === letters.length - 1 && wordflipWrap && flipword) {
+            setTimeout(() => {
+              wordflipWrap.style.opacity = '1';
+              startWordplayFlip();
+            }, 620);
+          }
+        }, 260 + i * 140);
       });
 
-      const inspire = document.getElementById('ihInspire');
+      function startWordplayFlip() {
+        if (!flipword || flipword.dataset.flipReady === 'true') {
+          return;
+        }
 
-      if (inspire && !inspire.dataset.magneticReady) {
-        inspire.dataset.magneticReady = 'true';
-        inspire.addEventListener('mousemove', (e) => {
-          const letters = inspire.querySelectorAll('.ih-letter');
-          const rect = inspire.getBoundingClientRect();
-          const cx = e.clientX - rect.left;
-          const cy = e.clientY - rect.top;
+        flipword.dataset.flipReady = 'true';
 
-          letters.forEach((letter) => {
-            const lRect = letter.getBoundingClientRect();
-            const lx = lRect.left + lRect.width / 2 - rect.left;
-            const ly = lRect.top + lRect.height / 2 - rect.top;
-            const dx = (cx - lx) * 0.12;
-            const dy = (cy - ly) * 0.12;
+        window.setInterval(() => {
+          flipword.style.transition = 'transform 0.3s cubic-bezier(.4,0,.2,1), opacity 0.3s';
+          flipword.style.transform = 'translateY(-110%)';
+          flipword.style.opacity = '0';
 
-            letter.style.transform = `translate(${dx}px, ${dy}px)`;
-          });
-        });
+          window.setTimeout(() => {
+            wordplayIndex = (wordplayIndex + 1) % wordplayWords.length;
+            flipword.textContent = wordplayWords[wordplayIndex];
+            flipword.style.transition = 'none';
+            flipword.style.transform = 'translateY(110%)';
 
-        inspire.addEventListener('mouseleave', () => {
-          inspire.querySelectorAll('.ih-letter').forEach((letter) => {
-            letter.style.transform = 'translate(0,0)';
-          });
-        });
+            window.setTimeout(() => {
+              flipword.style.transition = 'transform 0.38s cubic-bezier(.34,1.2,.64,1), opacity 0.38s';
+              flipword.style.transform = 'translateY(0)';
+              flipword.style.opacity = '0.6';
+            }, 20);
+          }, 310);
+        }, 2600);
       }
 
       document.querySelectorAll('.ih-sr').forEach((el) => {
