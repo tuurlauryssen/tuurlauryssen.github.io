@@ -8,9 +8,28 @@
 // LOCAL POST DATA INTEGRATION
 // =========================================
 
+const PAGE_CONFIG = window.INSPIRE_PAGE_CONFIG || {};
+const PAGE_STRINGS = {
+  siteLocale: PAGE_CONFIG.locale || 'en-US',
+  today: 'Today',
+  yesterday: 'Yesterday',
+  daysAgo: '{count} days ago',
+  interview: 'Interview',
+  thingsILearned: 'Things I Learned',
+  readEdition: 'Read edition',
+  noInterviewsTitle: 'No interviews found yet.',
+  noInterviewsDesc: 'Check back soon for the next conversation.',
+  noEssaysTitle: 'No essays found yet.',
+  noEssaysDesc: 'Check back soon for the next idea worth understanding.',
+  noPostsTitle: 'No posts found',
+  noPostsDesc: 'Check back soon for new editions!'
+};
+Object.assign(PAGE_STRINGS, PAGE_CONFIG.beehiivStrings || {});
+
 const BEEHIIV_CONFIG = {
-  localPostsUrl: 'assets/data/posts.json',
-  siteLanguage: 'en',
+  localPostsUrl: PAGE_CONFIG.postsDataUrl || 'assets/data/posts.json',
+  siteLanguage: PAGE_CONFIG.language || 'en',
+  postLinkPrefix: PAGE_CONFIG.postLinkPrefix || '',
   languageCategoryMap: {
     en: ['en', 'english'],
     nl: ['nl', 'dutch', 'nederlands']
@@ -86,7 +105,7 @@ function mapLocalPost(entry) {
   }
 
   const typeDirectory = entry.type === 'interview' ? 'interviews' : 'ideas';
-  const path = entry.path || `posts/${typeDirectory}/${entry.language}/${entry.slug}.html`;
+  const path = resolvePostLink(entry.path || `posts/${typeDirectory}/${entry.language}/${entry.slug}.html`);
   const categories = Array.isArray(entry.categories) ? entry.categories : [];
   const normalizedCategories = [...new Set([entry.language, ...categories])];
   const excerpt = entry.excerpt || entry.description || '';
@@ -106,6 +125,15 @@ function mapLocalPost(entry) {
     author: entry.author || '',
     sourceUrl: entry.sourceUrl || ''
   };
+}
+
+function resolvePostLink(path) {
+  if (!path) return path;
+  if (/^(?:https?:)?\/\//.test(path) || path.startsWith('/')) {
+    return path;
+  }
+
+  return `${BEEHIIV_CONFIG.postLinkPrefix}${path}`;
 }
 
 
@@ -245,18 +273,18 @@ function formatDate(dateString) {
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) {
-    return 'Today';
+    return PAGE_STRINGS.today;
   }
 
   if (diffDays === 1) {
-    return 'Yesterday';
+    return PAGE_STRINGS.yesterday;
   }
 
   if (diffDays < 7) {
-    return `${diffDays} days ago`;
+    return PAGE_STRINGS.daysAgo.replace('{count}', diffDays);
   }
 
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(PAGE_STRINGS.siteLocale, {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
@@ -279,7 +307,7 @@ function extractTags(post) {
     }
   }
 
-  return getPostType(post) === 'interview' ? 'Interview' : 'Things I Learned';
+  return getPostType(post) === 'interview' ? PAGE_STRINGS.interview : PAGE_STRINGS.thingsILearned;
 }
 
 // =========================================
@@ -294,8 +322,8 @@ function createPostCard(post) {
   const tags = extractTags(post);
 
   const badge = type === 'interview'
-    ? { class: 's-badge-i', label: 'Interview' }
-    : { class: 's-badge-l', label: 'Things I Learned' };
+    ? { class: 's-badge-i', label: PAGE_STRINGS.interview }
+    : { class: 's-badge-l', label: PAGE_STRINGS.thingsILearned };
 
   return `
     <a class="s-card" data-type="${type}" data-date="${post.pubDate}" href="${post.link}">
@@ -310,7 +338,7 @@ function createPostCard(post) {
       <h3 class="s-title">${post.title}</h3>
       <p class="s-excerpt">${cleanExcerpt}</p>
       <div class="s-read">
-        Read edition &rarr;
+        ${PAGE_STRINGS.readEdition} &rarr;
       </div>
     </a>
   `;
@@ -327,7 +355,7 @@ function createHomepageSplitCard(post, variant = 'featured') {
   const excerpt = cleanHTML(post.description).substring(0, excerptLength) + '...';
   const formattedDate = formatDate(post.pubDate);
   const tags = extractTags(post);
-  const badgeLabel = type === 'interview' ? 'Interview' : 'Things I Learned';
+  const badgeLabel = type === 'interview' ? PAGE_STRINGS.interview : PAGE_STRINGS.thingsILearned;
 
   return `
     <a class="ih-post-card ${variant}" href="${post.link}">
@@ -342,7 +370,7 @@ function createHomepageSplitCard(post, variant = 'featured') {
         <div class="ih-post-badge ${type}">${badgeLabel}</div>
         <h3 class="ih-post-title">${post.title}</h3>
         <p class="ih-post-excerpt">${excerpt}</p>
-        <div class="ih-post-read">Read edition &rarr;</div>
+        <div class="ih-post-read">${PAGE_STRINGS.readEdition} &rarr;</div>
       </div>
     </a>
   `;
@@ -370,7 +398,7 @@ function renderHomepageSplitPosts(posts) {
     ? interviewPreview.map((post, index) => createHomepageSplitCard(post, index === 0 ? 'featured' : 'compact')).join('')
     : `
       <div class="ih-latest-empty">
-        No interviews found yet. Check back soon for the next conversation.
+        ${PAGE_STRINGS.noInterviewsTitle} ${PAGE_STRINGS.noInterviewsDesc}
       </div>
     `;
 
@@ -378,7 +406,7 @@ function renderHomepageSplitPosts(posts) {
     ? learnedPreview.map((post, index) => createHomepageSplitCard(post, index === 0 ? 'featured' : 'compact')).join('')
     : `
       <div class="ih-latest-empty">
-        No essays found yet. Check back soon for the next idea worth understanding.
+        ${PAGE_STRINGS.noEssaysTitle} ${PAGE_STRINGS.noEssaysDesc}
       </div>
     `;
 
@@ -401,8 +429,8 @@ function renderPosts(posts, containerId) {
   if (posts.length === 0) {
     container.innerHTML = `
       <div class="no-posts">
-        <p class="no-posts-title">No posts found</p>
-        <p class="no-posts-desc">Check back soon for new editions!</p>
+        <p class="no-posts-title">${PAGE_STRINGS.noPostsTitle}</p>
+        <p class="no-posts-desc">${PAGE_STRINGS.noPostsDesc}</p>
       </div>
     `;
     return;

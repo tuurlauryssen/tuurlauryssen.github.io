@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://tuurlauryssen.com/nl/blog.html">
+<link rel="alternate" hreflang="en" href="https://tuurlauryssen.com/blog.html">
+<link rel="alternate" hreflang="nl" href="https://tuurlauryssen.com/nl/blog.html">
+<link rel="alternate" hreflang="x-default" href="https://tuurlauryssen.com/blog.html">
+<title>Alle Edities — INSPIRE</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<meta name="description" content="Bekijk alle edities van Inspire — interviews met opmerkelijke mensen en ideeën die het waard zijn om te begrijpen.">
+<meta property="og:title" content="Alle Edities — INSPIRE">
+<meta property="og:description" content="Elk interview en elk inzicht, op één plek.">
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <div class="nav-left">
+    <a href="index.html" class="nav-logo">Inspire</a>
+    <div class="nav-divider"></div>
+    <div class="nav-tagline">Finding People Worth Learning From</div>
+  </div>
+  <div class="nav-right">
+    <a class="nl-link" href="../blog.html"><span class="nl-flag">EN</span></a>
+    <button class="nav-cta" onclick="window.location.href='index.html#subscribe'">Gratis inschrijven</button>
+  </div>
+</nav>
+
+<section class="blog-header sr">
+  <div class="container">
+    <div class="eyebrow">Archief</div>
+    <h1 class="blog-title">Alle edities</h1>
+    <p class="blog-subtitle">Elk interview en elk inzicht op één plek. Filter op type of blader chronologisch.</p>
+    <div class="filter-tabs">
+      <button class="ftab active" data-filter="all">Alles</button>
+      <button class="ftab" data-filter="interview">Interviews</button>
+      <button class="ftab" data-filter="learned">Dingen die ik leerde</button>
+    </div>
+  </div>
+</section>
+
+<section class="all-posts-section">
+  <div class="container">
+    <div class="stories-grid" id="allPosts">
+      <div class="loading">Alle edities laden...</div>
+    </div>
+    <div class="load-more-wrap" style="display:none;">
+      <button class="load-more-btn" id="loadMoreBtn">Meer edities laden</button>
+    </div>
+  </div>
+</section>
+
+<div class="pull-quote sr">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <p class="pq-text">"Elke editie is een bewuste keuze. Geen opvulling. Geen ruis. Alleen mensen en ideeën die je aandacht waard zijn."</p>
+  <div class="pq-author">Tuur Lauryssen &middot; Oprichter, Inspire</div>
+</div>
+
+<section class="subscribe-cta sr">
+  <div class="container">
+    <div class="cta-content">
+      <h2 class="cta-title">Mis geen editie</h2>
+      <p class="cta-desc">Sluit je aan bij lezers die gesprekken en inzichten ontvangen die het waard zijn om te begrijpen, wekelijks geleverd in het Engels en Nederlands.</p>
+      <div class="subscribe-row-inline">
+        <form action="#" method="post" data-subscribe-form>
+          <input type="email" name="email" placeholder="Je e-mailadres" required>
+          <button type="submit">Gratis inschrijven</button>
+          <p class="cta-note" data-subscribe-feedback aria-live="polite"></p>
+        </form>
+      </div>
+      <p class="cta-note">Gratis &middot; Geen spam &middot; Uitschrijven kan altijd</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">INSPIRE</div>
+  <div class="footer-links">
+    <a href="index.html#about">Over</a>
+    <a href="index.html#latest">Formats</a>
+    <a href="blog.html">Alle edities</a>
+    <a href="index.html#contact">Contact</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Inspire by Tuur Lauryssen<span class="footer-updated" data-last-updated></span></div>
+</footer>
+
+<script src="../assets/js/page-config-nl.js"></script>
+<script src="../assets/js/site-config.js"></script>
+<script src="../assets/js/main.js"></script>
+<script src="../assets/data/posts-data.js"></script>
+<script src="../assets/js/beehiiv.js"></script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    loadAllPosts();
+    setupFilters();
+  });
+</script>
+
+</body>
+</html>

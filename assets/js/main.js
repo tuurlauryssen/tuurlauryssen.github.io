@@ -225,6 +225,43 @@ function initMobileMenu() {
 // =========================================
 // FORM VALIDATION (for email subscription)
 // =========================================
+function getPageStrings() {
+  const defaults = {
+    subscribe: {
+      missingEmail: 'Please enter your email address.',
+      invalidEmail: 'Please enter a valid email address.',
+      endpointMissing: 'Subscription endpoint is not configured yet.',
+      submitting: 'Saving your subscription...',
+      failed: 'Subscription failed. Please try again.',
+      success: 'Subscription received.',
+      submitLabel: 'Subscribe Free'
+    },
+    contact: {
+      missingName: 'Please enter your name.',
+      invalidEmail: 'Please enter a valid email address.',
+      shortMessage: 'Please enter a message with a bit more detail.',
+      endpointMissing: 'Contact endpoint is not configured yet.',
+      submitting: 'Sending your message...',
+      failed: 'Message failed to send. Please try again.',
+      success: 'Your message is on its way.',
+      submitLabel: 'Send message'
+    },
+    meta: {
+      locale: 'en-US',
+      lastUpdatedPrefix: 'Last updated at'
+    }
+  };
+
+  const pageConfig = window.INSPIRE_PAGE_CONFIG || {};
+  const pageStrings = pageConfig.strings || {};
+
+  return {
+    subscribe: { ...defaults.subscribe, ...(pageStrings.subscribe || {}) },
+    contact: { ...defaults.contact, ...(pageStrings.contact || {}) },
+    meta: { ...defaults.meta, ...(pageStrings.meta || {}) }
+  };
+}
+
 function initFormValidation() {
   const forms = document.querySelectorAll('form:not([data-subscribe-form])');
   
@@ -379,6 +416,7 @@ function initSubscribeForms() {
   if (forms.length === 0) return;
 
   const config = window.INSPIRE_SITE_CONFIG || {};
+  const strings = getPageStrings().subscribe;
   const endpoint = typeof config.subscribeEndpoint === 'string'
     ? config.subscribeEndpoint.trim()
     : '';
@@ -396,28 +434,28 @@ function initSubscribeForms() {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       if (!email) {
-        setSubscribeFeedback(form, 'Please enter your email address.', true);
+        setSubscribeFeedback(form, strings.missingEmail, true);
         if (emailInput) emailInput.focus();
         return;
       }
 
       if (!emailPattern.test(email)) {
-        setSubscribeFeedback(form, 'Please enter a valid email address.', true);
+        setSubscribeFeedback(form, strings.invalidEmail, true);
         if (emailInput) emailInput.focus();
         return;
       }
 
       if (!endpoint) {
-        setSubscribeFeedback(form, 'Subscription endpoint is not configured yet.', true);
+        setSubscribeFeedback(form, strings.endpointMissing, true);
         return;
       }
 
       if (submitButton) {
         submitButton.disabled = true;
-        submitButton.textContent = 'Submitting...';
+        submitButton.textContent = '...';
       }
 
-      setSubscribeFeedback(form, 'Saving your subscription...');
+      setSubscribeFeedback(form, strings.submitting);
 
       try {
         const response = await fetch(endpoint, {
@@ -447,25 +485,25 @@ function initSubscribeForms() {
         if (!response.ok) {
           const message = payload && payload.error
             ? payload.error
-            : 'Subscription failed. Please try again.';
+            : strings.failed;
           throw new Error(message);
         }
 
         form.reset();
         setSubscribeFeedback(
           form,
-          payload && payload.message ? payload.message : 'Subscription received.'
+          strings.success
         );
       } catch (error) {
         setSubscribeFeedback(
           form,
-          error && error.message ? error.message : 'Subscription failed. Please try again.',
+          error && error.message ? error.message : strings.failed,
           true
         );
       } finally {
         if (submitButton) {
           submitButton.disabled = false;
-          submitButton.textContent = 'Subscribe Free';
+          submitButton.textContent = strings.submitLabel;
         }
       }
     });
@@ -483,6 +521,7 @@ function setContactFeedback(form, message, isError = false) {
 
 function initContactForm() {
   const config = window.INSPIRE_SITE_CONFIG || {};
+  const strings = getPageStrings().contact;
   const endpoint = typeof config.contactEndpoint === 'string'
     ? config.contactEndpoint.trim()
     : '';
@@ -528,34 +567,34 @@ function initContactForm() {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (name.length < 2) {
-      setContactFeedback(form, 'Please enter your name.', true);
+      setContactFeedback(form, strings.missingName, true);
       if (nameInput) nameInput.focus();
       return;
     }
 
     if (!emailPattern.test(email)) {
-      setContactFeedback(form, 'Please enter a valid email address.', true);
+      setContactFeedback(form, strings.invalidEmail, true);
       if (emailInput) emailInput.focus();
       return;
     }
 
     if (message.length < 10) {
-      setContactFeedback(form, 'Please enter a message with a bit more detail.', true);
+      setContactFeedback(form, strings.shortMessage, true);
       if (messageInput) messageInput.focus();
       return;
     }
 
     if (!endpoint) {
-      setContactFeedback(form, 'Contact endpoint is not configured yet.', true);
+      setContactFeedback(form, strings.endpointMissing, true);
       return;
     }
 
     if (submitButton) {
       submitButton.disabled = true;
-      submitButton.textContent = 'Sending...';
+      submitButton.textContent = '...';
     }
 
-    setContactFeedback(form, 'Sending your message...');
+    setContactFeedback(form, strings.submitting);
 
     try {
       const response = await fetch(endpoint, {
@@ -585,27 +624,27 @@ function initContactForm() {
       }
 
       if (!response.ok) {
-        const errorMessage = payload && payload.error
-          ? payload.error
-          : 'Message failed to send. Please try again.';
+          const errorMessage = payload && payload.error
+            ? payload.error
+            : strings.failed;
         throw new Error(errorMessage);
       }
 
-      form.reset();
-      setContactFeedback(
-        form,
-        payload && payload.message ? payload.message : 'Your message is on its way.'
-      );
+    form.reset();
+    setContactFeedback(
+      form,
+      strings.success
+    );
     } catch (error) {
       setContactFeedback(
         form,
-        error && error.message ? error.message : 'Message failed to send. Please try again.',
+        error && error.message ? error.message : strings.failed,
         true
       );
     } finally {
       if (submitButton) {
         submitButton.disabled = false;
-        submitButton.textContent = 'Send message';
+        submitButton.textContent = strings.submitLabel;
       }
     }
   });
@@ -616,13 +655,14 @@ function initContactForm() {
 // =========================================
 function initLastUpdated() {
   const targets = document.querySelectorAll('[data-last-updated]');
+  const metaStrings = getPageStrings().meta;
 
   if (targets.length === 0) return;
 
   const rawLastModified = document.lastModified;
   const parsed = rawLastModified ? new Date(rawLastModified) : new Date();
   const lastUpdated = Number.isNaN(parsed.getTime()) ? new Date() : parsed;
-  const formatted = lastUpdated.toLocaleString('en-US', {
+  const formatted = lastUpdated.toLocaleString(metaStrings.locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -631,7 +671,7 @@ function initLastUpdated() {
   });
 
   targets.forEach((target) => {
-    target.textContent = `Last updated at ${formatted}`;
+    target.textContent = `${metaStrings.lastUpdatedPrefix} ${formatted}`;
   });
 }
 

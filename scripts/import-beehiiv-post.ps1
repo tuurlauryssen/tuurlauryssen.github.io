@@ -99,17 +99,54 @@ function Convert-ToSlug {
 }
 
 function Format-DisplayDate {
-  param([string]$Value)
+  param(
+    [string]$Value,
+    [string]$Language = 'en'
+  )
 
   if ([string]::IsNullOrWhiteSpace($Value)) {
     return ''
   }
 
   try {
-    return ([datetime]$Value).ToString('MMM d, yyyy', [System.Globalization.CultureInfo]::InvariantCulture)
+    $date = [datetime]$Value
+    if ($Language -eq 'nl') {
+      return $date.ToString('d MMM yyyy', [System.Globalization.CultureInfo]::GetCultureInfo('nl-BE'))
+    }
+
+    return $date.ToString('MMM d, yyyy', [System.Globalization.CultureInfo]::InvariantCulture)
   }
   catch {
     return $Value
+  }
+}
+
+function Get-LocalizedArticleCopy {
+  param(
+    [string]$Language,
+    [string]$Type
+  )
+
+  if ($Language -eq 'nl') {
+    return @{
+      Home = 'Home'
+      Archive = 'Alle edities'
+      TypeLabel = if ($Type -eq 'interview') { 'Interview' } else { 'Dingen die ik leerde' }
+      SourceLabel = 'Originele bron'
+      EndcapTitle = 'Lees verder op INSPIRE'
+      EndcapText = 'Ga terug naar de homepage of blader door alle edities.'
+      PlaceholderBody = '<p>Plaats hier de opgeschoonde artikeltekst.</p>'
+    }
+  }
+
+  return @{
+    Home = 'Home'
+    Archive = 'All Editions'
+    TypeLabel = if ($Type -eq 'interview') { 'Interview' } else { 'Things I Learned' }
+    SourceLabel = 'Original source'
+    EndcapTitle = 'Continue reading on INSPIRE'
+    EndcapText = 'Go back to the homepage or browse all editions.'
+    PlaceholderBody = '<p>Paste the cleaned article body here.</p>'
   }
 }
 
@@ -592,11 +629,12 @@ function Write-PostFile {
   $escapedExcerpt = [System.Security.SecurityElement]::Escape($Excerpt)
   $relativeStylesheet = '../../../assets/css/style.css'
   $relativeMainJs = '../../../assets/js/main.js'
-  $displayDate = Format-DisplayDate -Value $Date
+  $displayDate = Format-DisplayDate -Value $Date -Language $Language
   $escapedDisplayDate = [System.Security.SecurityElement]::Escape($displayDate)
   $escapedReadTime = [System.Security.SecurityElement]::Escape($ReadTime)
   $escapedSourceUrl = [System.Security.SecurityElement]::Escape($SourceUrl)
   $authorsMarkup = Get-AuthorsMarkup -Authors $Authors -Profiles $AuthorProfiles
+  $copy = Get-LocalizedArticleCopy -Language $Language -Type $Type
 
   $coverHtml = ''
   if (-not [string]::IsNullOrWhiteSpace($Image)) {
@@ -609,7 +647,7 @@ function Write-PostFile {
   }
 
   if ([string]::IsNullOrWhiteSpace($BodyHtml)) {
-    $BodyHtml = '<p>Paste the cleaned article body here.</p>'
+    $BodyHtml = $copy.PlaceholderBody
   }
 
   $bylineParts = @()
@@ -623,12 +661,12 @@ function Write-PostFile {
     $bylineParts += '<span class="article-readtime-line">' + $escapedReadTime + '</span>'
   }
   $bylineHtml = if ($bylineParts.Count) { ($bylineParts -join '<span class="article-meta-separator">&middot;</span>') } else { '' }
-  $homeLink = '../../../index.html'
-  $archiveLink = '../../../blog.html'
-  $typeLabel = if ($Type -eq 'interview') { 'Interview' } else { 'Things I Learned' }
+  $homeLink = if ($Language -eq 'nl') { '../../../nl/index.html' } else { '../../../index.html' }
+  $archiveLink = if ($Language -eq 'nl') { '../../../nl/blog.html' } else { '../../../blog.html' }
+  $typeLabel = $copy.TypeLabel
   $sourceHtml = ''
   if (-not [string]::IsNullOrWhiteSpace($SourceUrl)) {
-    $sourceHtml = '<a class="article-source-link" href="' + $escapedSourceUrl + '" target="_blank" rel="noopener noreferrer">Original source</a>'
+    $sourceHtml = '<a class="article-source-link" href="' + $escapedSourceUrl + '" target="_blank" rel="noopener noreferrer">' + $copy.SourceLabel + '</a>'
   }
 
   $html = @"
@@ -652,8 +690,8 @@ $ImportedStyles
     <div class="article-topbar-inner">
       <a href="$homeLink" class="article-brand">INSPIRE</a>
       <div class="article-topbar-actions">
-        <a class="article-action-link" href="$homeLink">Home</a>
-        <a class="article-action-link" href="$archiveLink">All Editions</a>
+        <a class="article-action-link" href="$homeLink">$($copy.Home)</a>
+        <a class="article-action-link" href="$archiveLink">$($copy.Archive)</a>
       </div>
     </div>
   </div>
@@ -675,13 +713,13 @@ $BodyHtml
     </article>
     <div class="article-endcap">
       <div class="article-endcap-copy">
-        <div class="article-endcap-title">Continue reading on INSPIRE</div>
-        <div class="article-endcap-text">Go back to the homepage or browse all editions.<span class="article-updated" data-last-updated></span></div>
+        <div class="article-endcap-title">$($copy.EndcapTitle)</div>
+        <div class="article-endcap-text">$($copy.EndcapText)<span class="article-updated" data-last-updated></span></div>
         $sourceHtml
       </div>
       <div class="article-endcap-actions">
-        <a class="article-action-link" href="$homeLink">Home</a>
-        <a class="article-action-link" href="$archiveLink">All Editions</a>
+        <a class="article-action-link" href="$homeLink">$($copy.Home)</a>
+        <a class="article-action-link" href="$archiveLink">$($copy.Archive)</a>
       </div>
     </div>
   </main>
