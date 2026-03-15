@@ -1251,6 +1251,7 @@
     .ih-latest-stack {
       padding: 24px;
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 18px;
     }
 
@@ -1508,6 +1509,10 @@
     }
 
     @media (max-width: 768px) {
+      .ih-latest-stack {
+        grid-template-columns: 1fr;
+      }
+
       .ih-post-card.featured,
       .ih-post-card.compact {
         display: flex;

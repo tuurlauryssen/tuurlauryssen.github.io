@@ -421,11 +421,11 @@ function renderHomepageSplitPosts(posts) {
   const interviews = sortPostsForDisplay(posts.filter((post) => getPostType(post) === 'interview'));
   const learned = sortPostsForDisplay(posts.filter((post) => getPostType(post) === 'learned'));
 
-  const interviewPreview = interviews.slice(0, 3);
-  const learnedPreview = learned.slice(0, 3);
+  const interviewPreview = interviews.slice(0, 2);
+  const learnedPreview = learned.slice(0, 2);
 
   interviewsContainer.innerHTML = interviewPreview.length > 0
-    ? interviewPreview.map((post, index) => createHomepageSplitCard(post, index === 0 ? 'featured' : 'compact')).join('')
+    ? interviewPreview.map((post) => createHomepageSplitCard(post, 'compact')).join('')
     : `
       <div class="ih-latest-empty">
         ${PAGE_STRINGS.noInterviewsTitle} ${PAGE_STRINGS.noInterviewsDesc}
@@ -433,7 +433,7 @@ function renderHomepageSplitPosts(posts) {
     `;
 
   learnedContainer.innerHTML = learnedPreview.length > 0
-    ? learnedPreview.map((post, index) => createHomepageSplitCard(post, index === 0 ? 'featured' : 'compact')).join('')
+    ? learnedPreview.map((post) => createHomepageSplitCard(post, 'compact')).join('')
     : `
       <div class="ih-latest-empty">
         ${PAGE_STRINGS.noEssaysTitle} ${PAGE_STRINGS.noEssaysDesc}
