@@ -71,6 +71,36 @@ async function fetchBeehiivPosts(limit = null) {
 }
 
 async function fetchLocalPosts() {
+  const shouldFetchJson = window.location.protocol !== 'file:';
+
+  if (shouldFetchJson) {
+    try {
+      const freshUrl = `${BEEHIIV_CONFIG.localPostsUrl}${BEEHIIV_CONFIG.localPostsUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+      const response = await fetch(freshUrl, {
+        headers: {
+          'Accept': 'application/json'
+        },
+        cache: 'no-store'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Local posts HTTP error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!Array.isArray(data)) {
+        throw new Error('Local posts file must contain an array');
+      }
+
+      return data
+        .map(mapLocalPost)
+        .filter(Boolean)
+        .sort(comparePosts);
+    } catch (error) {
+      console.warn('Falling back to embedded posts-data.js:', error);
+    }
+  }
+
   if (Array.isArray(window.INSPIRE_LOCAL_POSTS)) {
     return window.INSPIRE_LOCAL_POSTS
       .map(mapLocalPost)
