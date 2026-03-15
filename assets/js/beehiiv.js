@@ -75,7 +75,7 @@ async function fetchLocalPosts() {
     return window.INSPIRE_LOCAL_POSTS
       .map(mapLocalPost)
       .filter(Boolean)
-      .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+      .sort(comparePosts);
   }
 
   const response = await fetch(BEEHIIV_CONFIG.localPostsUrl, {
@@ -96,7 +96,7 @@ async function fetchLocalPosts() {
   return data
     .map(mapLocalPost)
     .filter(Boolean)
-    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    .sort(comparePosts);
 }
 
 function mapLocalPost(entry) {
@@ -115,6 +115,7 @@ function mapLocalPost(entry) {
     title: entry.title,
     link: path,
     pubDate: entry.pubDate,
+    updatedAt: entry.updatedAt || '',
     description: excerpt,
     content: excerpt,
     categories: normalizedCategories,
@@ -134,6 +135,35 @@ function resolvePostLink(path) {
   }
 
   return `${BEEHIIV_CONFIG.postLinkPrefix}${path}`;
+}
+
+function getInterviewNumber(post) {
+  const title = String(post?.title || '').trim();
+  const match = title.match(/^(\d+)\.\s*/);
+  return match ? Number(match[1]) : null;
+}
+
+function comparePosts(a, b) {
+  const updatedAtDifference = new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+  if (updatedAtDifference !== 0) {
+    return updatedAtDifference;
+  }
+
+  const aType = getPostType(a);
+  const bType = getPostType(b);
+  const aInterviewNumber = aType === 'interview' ? getInterviewNumber(a) : null;
+  const bInterviewNumber = bType === 'interview' ? getInterviewNumber(b) : null;
+
+  if (aType === 'interview' && bType === 'interview' && aInterviewNumber !== null && bInterviewNumber !== null && aInterviewNumber !== bInterviewNumber) {
+    return bInterviewNumber - aInterviewNumber;
+  }
+
+  const dateDifference = new Date(b.pubDate) - new Date(a.pubDate);
+  if (dateDifference !== 0) {
+    return dateDifference;
+  }
+
+  return String(a.title || '').localeCompare(String(b.title || ''));
 }
 
 
@@ -384,12 +414,12 @@ function renderHomepageSplitPosts(posts) {
     return false;
   }
 
-  const sortNewestFirst = (items) => items
+  const sortPostsForDisplay = (items) => items
     .slice()
-    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    .sort(comparePosts);
 
-  const interviews = sortNewestFirst(posts.filter((post) => getPostType(post) === 'interview'));
-  const learned = sortNewestFirst(posts.filter((post) => getPostType(post) === 'learned'));
+  const interviews = sortPostsForDisplay(posts.filter((post) => getPostType(post) === 'interview'));
+  const learned = sortPostsForDisplay(posts.filter((post) => getPostType(post) === 'learned'));
 
   const interviewPreview = interviews.slice(0, 3);
   const learnedPreview = learned.slice(0, 3);

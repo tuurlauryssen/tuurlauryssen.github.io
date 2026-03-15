@@ -24,6 +24,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $postsDataPath = Join-Path $repoRoot 'assets\data\posts.json'
 $postsDataJsPath = Join-Path $repoRoot 'assets\data\posts-data.js'
 $authorsDataPath = Join-Path $repoRoot 'assets\data\authors.json'
+$syncPostsManifestScriptPath = Join-Path $PSScriptRoot 'sync-posts-manifest.ps1'
 
 function Get-PostsManifestEntries {
   if (-not (Test-Path $postsDataPath)) {
@@ -823,6 +824,15 @@ function Update-PostsManifest {
   Set-Content -Path $postsDataJsPath -Value $jsContent -Encoding UTF8
 }
 
+function Sync-PostsManifest {
+  if (-not (Test-Path $syncPostsManifestScriptPath)) {
+    Update-PostsManifest -Title $Title -Slug $slug -Language $Language -Type $Type -Date $Date -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl
+    return
+  }
+
+  & $syncPostsManifestScriptPath
+}
+
 if ([string]::IsNullOrWhiteSpace($Type)) {
   $Type = Prompt-Value 'Type (interview/learned)' 'learned'
 }
@@ -905,7 +915,7 @@ if (-not (Test-Path $rawPostDirectory)) {
 
 Write-PostFile -Path $postPath -Language $Language -Type $Type -Date $Date -Title $Title -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl -BodyHtml $bodyHtml -Authors $metadata.Authors -ReadTime $metadata.ReadTime -ImportedStyles $importedStyles -AuthorProfiles $authorProfiles
 Write-RawPostFile -Path $rawPostPath -RawHtml $rawHtml
-Update-PostsManifest -Title $Title -Slug $slug -Language $Language -Type $Type -Date $Date -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl
+Sync-PostsManifest
 
 Write-Host "Created or updated post file: $postPath"
 Write-Host "Created or updated raw import: $rawPostPath"
