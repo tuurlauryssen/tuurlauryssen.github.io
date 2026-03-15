@@ -25,6 +25,19 @@ $postsDataPath = Join-Path $repoRoot 'assets\data\posts.json'
 $postsDataJsPath = Join-Path $repoRoot 'assets\data\posts-data.js'
 $authorsDataPath = Join-Path $repoRoot 'assets\data\authors.json'
 
+function Get-PostsManifestEntries {
+  if (-not (Test-Path $postsDataPath)) {
+    return @()
+  }
+
+  $raw = Get-Content -Path $postsDataPath -Raw
+  if ([string]::IsNullOrWhiteSpace($raw)) {
+    return @()
+  }
+
+  return @($raw | ConvertFrom-Json)
+}
+
 function Get-TypeDirectoryName {
   param([string]$Type)
 
@@ -96,6 +109,37 @@ function Convert-ToSlug {
   }
 
   return $slug
+}
+
+function Resolve-PostSlug {
+  param(
+    [string]$Title,
+    [string]$Language,
+    [string]$Type
+  )
+
+  $baseSlug = Convert-ToSlug $Title
+  $typeDirectoryName = Get-TypeDirectoryName -Type $Type
+  $posts = Get-PostsManifestEntries
+
+  $candidateSlug = $baseSlug
+  $suffix = 2
+
+  while ($true) {
+    $postPath = Join-Path $repoRoot "posts\$typeDirectoryName\$Language\$candidateSlug.html"
+    $rawPostPath = Join-Path $repoRoot "posts\raw\$typeDirectoryName\$Language\$candidateSlug-raw.html"
+    $existingBySlug = $posts | Where-Object {
+      $_.language -eq $Language -and $_.slug -eq $candidateSlug
+    } | Select-Object -First 1
+
+    $slugIsAvailable = (-not $existingBySlug) -and (-not (Test-Path $postPath)) -and (-not (Test-Path $rawPostPath))
+    if ($slugIsAvailable) {
+      return $candidateSlug
+    }
+
+    $candidateSlug = "$baseSlug-$suffix"
+    $suffix += 1
+  }
 }
 
 function Format-DisplayDate {
@@ -757,13 +801,7 @@ function Update-PostsManifest {
     [string]$SourceUrl
   )
 
-  $posts = @()
-  if (Test-Path $postsDataPath) {
-    $raw = Get-Content -Path $postsDataPath -Raw
-    if (-not [string]::IsNullOrWhiteSpace($raw)) {
-      $posts = @($raw | ConvertFrom-Json)
-    }
-  }
+  $posts = Get-PostsManifestEntries
 
   $filtered = @($posts | Where-Object { $_.slug -ne $Slug -or $_.language -ne $Language })
   $entry = [PSCustomObject]@{
@@ -850,7 +888,7 @@ if ([string]::IsNullOrWhiteSpace($bodyHtml)) {
   throw 'Could not extract the article body from the raw HTML.'
 }
 
-$slug = Convert-ToSlug $Title
+$slug = Resolve-PostSlug -Title $Title -Language $Language -Type $Type
 $typeDirectoryName = Get-TypeDirectoryName -Type $Type
 $postDirectory = Join-Path $repoRoot "posts\$typeDirectoryName\$Language"
 $postPath = Join-Path $postDirectory "$slug.html"
