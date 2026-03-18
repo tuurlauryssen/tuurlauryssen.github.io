@@ -1,7 +1,7 @@
 <#
   File role: Rebuilds the local post manifest from the generated article files in /posts.
-  Project relation: Keeps assets/data/posts.json and posts-data.js aligned with the actual
-  HTML files that exist in /posts/interviews and /posts/ideas.
+  Project relation: Keeps assets/data/posts.json aligned with the actual HTML files
+  that exist in /posts/interviews and /posts/ideas.
 #>
 
 $ErrorActionPreference = 'Stop'
@@ -9,7 +9,24 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $postsRoot = Join-Path $repoRoot 'posts'
 $postsDataPath = Join-Path $repoRoot 'assets\data\posts.json'
-$postsDataJsPath = Join-Path $repoRoot 'assets\data\posts-data.js'
+
+function Get-ExistingManifestLookup {
+  if (-not (Test-Path $postsDataPath)) {
+    return @{}
+  }
+
+  $raw = Get-Content -Path $postsDataPath -Raw
+  if ([string]::IsNullOrWhiteSpace($raw)) {
+    return @{}
+  }
+
+  $lookup = @{}
+  foreach ($entry in @($raw | ConvertFrom-Json)) {
+    $lookup["$($entry.language)|$($entry.slug)"] = $entry
+  }
+
+  return $lookup
+}
 
 function Get-RegexValue {
   param(
@@ -32,7 +49,10 @@ function Get-RegexValue {
 }
 
 function Get-PostEntryFromFile {
-  param([System.IO.FileInfo]$File)
+  param(
+    [System.IO.FileInfo]$File,
+    [hashtable]$ExistingManifestLookup
+  )
 
   $relativePath = $File.FullName.Substring($repoRoot.Length).TrimStart('\').Replace('\', '/')
   $pathParts = $relativePath -split '/'
@@ -46,6 +66,7 @@ function Get-PostEntryFromFile {
   $slug = [System.IO.Path]::GetFileNameWithoutExtension($File.Name)
   $type = if ($typeDirectory -eq 'interviews') { 'interview' } else { 'learned' }
   $html = Get-Content -Path $File.FullName -Raw
+  $existingEntry = $ExistingManifestLookup["$language|$slug"]
 
   $title = Get-RegexValue -InputText $html -Pattern '<title>(.*?)</title>'
   $title = $title -replace '\s+\|\s+INSPIRE\s*$', ''
@@ -53,6 +74,10 @@ function Get-PostEntryFromFile {
   $image = Get-RegexValue -InputText $html -Pattern '<div class="article-cover">\s*<img[^>]+src="([^"]+)"'
   $sourceUrl = Get-RegexValue -InputText $html -Pattern '<a class="article-source-link"[^>]+href="([^"]+)"'
   $pubDate = Get-RegexValue -InputText $html -Pattern '<time class="article-date-line" datetime="([^"]+)"'
+  $visibility = Get-RegexValue -InputText $html -Pattern '<meta[^>]+name="inspire:visibility"[^>]+content="([^"]+)"'
+  if ($visibility -ne 'hidden' -and $visibility -ne 'public') {
+    $visibility = if ($existingEntry -and $existingEntry.visibility -eq 'hidden') { 'hidden' } else { 'public' }
+  }
 
   return [PSCustomObject]@{
     title = $title
@@ -65,6 +90,7 @@ function Get-PostEntryFromFile {
     image = $image
     sourceUrl = $sourceUrl
     path = $relativePath
+    visibility = $visibility
     categories = @()
   }
 }
@@ -84,13 +110,14 @@ function Get-InterviewNumber {
   return $null
 }
 
+$existingManifestLookup = Get-ExistingManifestLookup
 $postFiles = Get-ChildItem -Path $postsRoot -Recurse -File -Filter *.html | Where-Object {
   $_.FullName -notmatch '\\posts\\raw\\'
 }
 
 $entries = @()
 foreach ($file in $postFiles) {
-  $entry = Get-PostEntryFromFile -File $file
+  $entry = Get-PostEntryFromFile -File $file -ExistingManifestLookup $existingManifestLookup
   if ($null -ne $entry) {
     $entries += $entry
   }
@@ -111,9 +138,6 @@ $sortedEntries = @(
 )
 
 ConvertTo-Json -InputObject $sortedEntries -Depth 5 | Set-Content -Path $postsDataPath -Encoding UTF8
-$jsContent = 'window.INSPIRE_LOCAL_POSTS = ' + (ConvertTo-Json -InputObject $sortedEntries -Depth 5) + ';'
-Set-Content -Path $postsDataJsPath -Value $jsContent -Encoding UTF8
 
 Write-Host "Synced manifest with $($sortedEntries.Count) post file(s)."
 Write-Host "Updated: $postsDataPath"
-Write-Host "Updated: $postsDataJsPath"

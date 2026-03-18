@@ -15,14 +15,15 @@ param(
   [string]$Date,
   [string]$Excerpt,
   [string]$Image,
-  [string]$SourceUrl
+  [string]$SourceUrl,
+  [ValidateSet('public', 'hidden')]
+  [string]$Visibility = 'public'
 )
 
 $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $postsDataPath = Join-Path $repoRoot 'assets\data\posts.json'
-$postsDataJsPath = Join-Path $repoRoot 'assets\data\posts-data.js'
 $authorsDataPath = Join-Path $repoRoot 'assets\data\authors.json'
 $syncPostsManifestScriptPath = Join-Path $PSScriptRoot 'sync-posts-manifest.ps1'
 
@@ -667,12 +668,15 @@ function Write-PostFile {
     [string[]]$Authors,
     [string]$ReadTime,
     [string]$ImportedStyles,
-    [array]$AuthorProfiles
+    [array]$AuthorProfiles,
+    [string]$Visibility
   )
 
   $escapedTitle = [System.Security.SecurityElement]::Escape($Title)
   $escapedExcerpt = [System.Security.SecurityElement]::Escape($Excerpt)
   $relativeStylesheet = '../../../assets/css/style.css'
+  $relativeNlPageConfigJs = '../../../assets/js/page-config-nl.js'
+  $relativeSiteConfigJs = '../../../assets/js/site-config.js'
   $relativeMainJs = '../../../assets/js/main.js'
   $displayDate = Format-DisplayDate -Value $Date -Language $Language
   $escapedDisplayDate = [System.Security.SecurityElement]::Escape($displayDate)
@@ -693,6 +697,11 @@ function Write-PostFile {
 
   if ([string]::IsNullOrWhiteSpace($BodyHtml)) {
     $BodyHtml = $copy.PlaceholderBody
+  }
+
+  $pageConfigScriptHtml = ''
+  if ($Language -eq 'nl') {
+    $pageConfigScriptHtml = '  <script src="' + $relativeNlPageConfigJs + '"></script>'
   }
 
   $bylineParts = @()
@@ -722,6 +731,7 @@ function Write-PostFile {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$escapedTitle | INSPIRE</title>
   <meta name="description" content="$escapedExcerpt">
+  <meta name="inspire:visibility" content="$Visibility">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="$relativeStylesheet">
 $ImportedStyles
@@ -769,6 +779,8 @@ $BodyHtml
     </div>
   </main>
 
+${pageConfigScriptHtml}
+  <script src="$relativeSiteConfigJs"></script>
   <script src="$relativeMainJs"></script>
 </body>
 </html>
@@ -799,7 +811,8 @@ function Update-PostsManifest {
     [string]$Date,
     [string]$Excerpt,
     [string]$Image,
-    [string]$SourceUrl
+    [string]$SourceUrl,
+    [string]$Visibility
   )
 
   $posts = Get-PostsManifestEntries
@@ -815,23 +828,27 @@ function Update-PostsManifest {
     image = $Image
     sourceUrl = $SourceUrl
     path = "posts/$(Get-TypeDirectoryName -Type $Type)/$Language/$Slug.html"
+    visibility = if ($Visibility -eq 'hidden') { 'hidden' } else { 'public' }
     categories = @()
   }
 
   $updatedPosts = @($filtered + $entry) | Sort-Object -Property pubDate -Descending
   ConvertTo-Json -InputObject @($updatedPosts) -Depth 5 | Set-Content -Path $postsDataPath -Encoding UTF8
-  $jsContent = 'window.INSPIRE_LOCAL_POSTS = ' + (ConvertTo-Json -InputObject @($updatedPosts) -Depth 5) + ';'
-  Set-Content -Path $postsDataJsPath -Value $jsContent -Encoding UTF8
 }
 
 function Sync-PostsManifest {
   if (-not (Test-Path $syncPostsManifestScriptPath)) {
-    Update-PostsManifest -Title $Title -Slug $slug -Language $Language -Type $Type -Date $Date -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl
+    Update-PostsManifest -Title $Title -Slug $slug -Language $Language -Type $Type -Date $Date -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl -Visibility $Visibility
     return
   }
 
   & $syncPostsManifestScriptPath
 }
+
+if ([string]::IsNullOrWhiteSpace($Visibility)) {
+  $Visibility = Prompt-Value 'Visibility (public/hidden)' 'public'
+}
+$Visibility = $Visibility.ToLowerInvariant()
 
 if ([string]::IsNullOrWhiteSpace($Type)) {
   $Type = Prompt-Value 'Type (interview/learned)' 'learned'
@@ -913,7 +930,7 @@ if (-not (Test-Path $rawPostDirectory)) {
   New-Item -ItemType Directory -Path $rawPostDirectory -Force | Out-Null
 }
 
-Write-PostFile -Path $postPath -Language $Language -Type $Type -Date $Date -Title $Title -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl -BodyHtml $bodyHtml -Authors $metadata.Authors -ReadTime $metadata.ReadTime -ImportedStyles $importedStyles -AuthorProfiles $authorProfiles
+Write-PostFile -Path $postPath -Language $Language -Type $Type -Date $Date -Title $Title -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl -BodyHtml $bodyHtml -Authors $metadata.Authors -ReadTime $metadata.ReadTime -ImportedStyles $importedStyles -AuthorProfiles $authorProfiles -Visibility $Visibility
 Write-RawPostFile -Path $rawPostPath -RawHtml $rawHtml
 Sync-PostsManifest
 
@@ -921,5 +938,4 @@ Write-Host "Created or updated post file: $postPath"
 Write-Host "Created or updated raw import: $rawPostPath"
 Write-Host "Updated author data: $authorsDataPath"
 Write-Host "Updated manifest: $postsDataPath"
-Write-Host "Updated browser data: $postsDataJsPath"
 Write-Host "Next: review the generated HTML, adjust any formatting, then commit and push."

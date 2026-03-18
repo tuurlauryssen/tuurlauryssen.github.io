@@ -10,6 +10,7 @@
         "image":  "https://beehiiv-images-production.s3.amazonaws.com/uploads/asset/file/9421a957-a5c9-47f3-89d2-92211023f602/ChatGPT_Image_Mar_3__2026__06_26_13_PM.png?t=1772558799",
         "sourceUrl":  "https://tuurlauryssen.beehiiv.com/p/1-ai-might-get-you-noticed-but-people-skills-get-you-hired",
         "path":  "posts/interviews/en/1-ai-might-get-you-noticed-but-people-skills-get-you-hired.html",
+        "visibility":  "public",
         "categories":  [
 
                        ]
@@ -25,6 +26,7 @@
         "image":  "https://beehiiv-images-production.s3.amazonaws.com/uploads/asset/file/9421a957-a5c9-47f3-89d2-92211023f602/ChatGPT_Image_Mar_3__2026__06_26_13_PM.png?t=1772558799",
         "sourceUrl":  "https://tuurlauryssen.beehiiv.com/p/1-ai-might-get-you-noticed-but-people-skills-get-you-hired",
         "path":  "posts/interviews/en/2-ai-might-get-you-noticed-but-people-skills-get-you-hired.html",
+        "visibility":  "hidden",
         "categories":  [
 
                        ]

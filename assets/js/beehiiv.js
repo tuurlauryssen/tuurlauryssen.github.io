@@ -1,6 +1,6 @@
 /*
   File role: Loads local post data and renders posts on the homepage and archive page.
-  Project relation: Reads posts-data.js or posts.json, fills index.html and blog.html,
+  Project relation: Reads posts.json, fills index.html and blog.html,
   and links those cards to the processed article files inside /posts.
 */
 
@@ -71,47 +71,12 @@ async function fetchBeehiivPosts(limit = null) {
 }
 
 async function fetchLocalPosts() {
-  const shouldFetchJson = window.location.protocol !== 'file:';
-
-  if (shouldFetchJson) {
-    try {
-      const freshUrl = `${BEEHIIV_CONFIG.localPostsUrl}${BEEHIIV_CONFIG.localPostsUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
-      const response = await fetch(freshUrl, {
-        headers: {
-          'Accept': 'application/json'
-        },
-        cache: 'no-store'
-      });
-
-      if (!response.ok) {
-        throw new Error(`Local posts HTTP error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (!Array.isArray(data)) {
-        throw new Error('Local posts file must contain an array');
-      }
-
-      return data
-        .map(mapLocalPost)
-        .filter(Boolean)
-        .sort(comparePosts);
-    } catch (error) {
-      console.warn('Falling back to embedded posts-data.js:', error);
-    }
-  }
-
-  if (Array.isArray(window.INSPIRE_LOCAL_POSTS)) {
-    return window.INSPIRE_LOCAL_POSTS
-      .map(mapLocalPost)
-      .filter(Boolean)
-      .sort(comparePosts);
-  }
-
-  const response = await fetch(BEEHIIV_CONFIG.localPostsUrl, {
+  const freshUrl = `${BEEHIIV_CONFIG.localPostsUrl}${BEEHIIV_CONFIG.localPostsUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+  const response = await fetch(freshUrl, {
     headers: {
       'Accept': 'application/json'
-    }
+    },
+    cache: 'no-store'
   });
 
   if (!response.ok) {
@@ -154,7 +119,11 @@ function mapLocalPost(entry) {
     type: entry.type,
     language: entry.language,
     author: entry.author || '',
-    sourceUrl: entry.sourceUrl || ''
+    sourceUrl: entry.sourceUrl || '',
+    // visibility:
+    // - public: show in homepage/archive
+    // - hidden: keep direct URL working, but exclude from homepage/archive
+    visibility: entry.visibility === 'hidden' ? 'hidden' : 'public'
   };
 }
 
@@ -276,7 +245,10 @@ function normalizeCategory(category) {
 }
 
 function filterPostsForSiteLanguage(posts) {
-  return posts.filter((post) => detectPostLanguage(post) === BEEHIIV_CONFIG.siteLanguage);
+  return posts.filter((post) => (
+    detectPostLanguage(post) === BEEHIIV_CONFIG.siteLanguage
+    && (post.visibility || 'public') === 'public'
+  ));
 }
 
 // =========================================
@@ -562,6 +534,12 @@ function setupFilters() {
       currentFilter = button.dataset.filter;
       displayedCount = 9;
       displayPostsWithPagination();
+
+      if (window.siteUtils && typeof window.siteUtils.trackAnalyticsEvent === 'function') {
+        window.siteUtils.trackAnalyticsEvent('archive_filter_selected', {
+          filter_name: currentFilter
+        });
+      }
     });
   });
 

@@ -1611,6 +1611,193 @@ nav {
   background: rgba(245,240,232,0.16);
 }
 
+.consent-banner {
+  position: fixed;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px;
+  border: 1px solid rgba(27, 44, 69, 0.12);
+  background: rgba(245, 240, 232, 0.97);
+  box-shadow: 0 24px 60px rgba(27, 44, 69, 0.18);
+  backdrop-filter: blur(14px);
+}
+
+.consent-banner__content strong {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #1B2C45;
+}
+
+.consent-banner__content p {
+  margin: 8px 0 0;
+  max-width: 640px;
+  color: #6B7280;
+  line-height: 1.7;
+}
+
+.consent-banner__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.consent-banner__button,
+.privacy-settings-button,
+.article-community__like,
+.article-community__form button {
+  border: 1px solid #1B2C45;
+  background: transparent;
+  color: #1B2C45;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 13px 18px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.consent-banner__button:hover,
+.privacy-settings-button:hover,
+.article-community__like:hover,
+.article-community__form button:hover {
+  transform: translateY(-1px);
+}
+
+.consent-banner__button--primary,
+.article-community__like[data-liked="true"],
+.article-community__form button {
+  background: #1B2C45;
+  color: #F5F0E8;
+}
+
+.privacy-settings-button {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1100;
+  background: rgba(245, 240, 232, 0.92);
+}
+
+.article-community {
+  max-width: 670px;
+  margin: 36px auto 0;
+  padding: 32px;
+  border: 1px solid rgba(27, 44, 69, 0.12);
+  background: rgba(245, 240, 232, 0.68);
+}
+
+.article-community__header,
+.article-community__comments-head,
+.article-community__form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.article-community__title {
+  margin: 0 0 8px;
+}
+
+.article-community__intro {
+  margin: 0;
+  color: #6B7280;
+  line-height: 1.7;
+}
+
+.article-community__grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 28px;
+  margin-top: 28px;
+}
+
+.article-community__like {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.article-community__like-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.article-community__comment-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.article-community__comment,
+.article-community__empty {
+  padding: 18px;
+  border: 1px solid rgba(27, 44, 69, 0.1);
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.article-community__comment-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  color: #6B7280;
+  font-size: 14px;
+}
+
+.article-community__comment p {
+  margin: 0;
+  color: #1B2C45;
+  line-height: 1.75;
+}
+
+.article-community__form,
+.article-community__form-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.article-community__form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.article-community__form input,
+.article-community__form textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(27, 44, 69, 0.14);
+  background: #fffdf9;
+  color: #1B2C45;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+}
+
+.article-community__form textarea {
+  min-height: 180px;
+  resize: vertical;
+}
+
+.article-community__feedback {
+  color: #6B7280;
+  line-height: 1.6;
+}
+
 .cta-content {
   max-width: 600px;
   margin: 0 auto;
@@ -1953,6 +2140,24 @@ footer {
 
   .article-body blockquote {
     font-size: 24px;
+  }
+
+  .consent-banner,
+  .article-community__header,
+  .article-community__comments-head,
+  .article-community__form-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .consent-banner,
+  .article-community {
+    padding: 24px;
+  }
+
+  .article-community__grid,
+  .article-community__form-grid {
+    grid-template-columns: 1fr;
   }
 
   .subscribe-row-inline form {
