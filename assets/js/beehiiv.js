@@ -71,12 +71,17 @@ async function fetchBeehiivPosts(limit = null) {
 }
 
 async function fetchLocalPosts() {
-  const freshUrl = `${BEEHIIV_CONFIG.localPostsUrl}${BEEHIIV_CONFIG.localPostsUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
-  const response = await fetch(freshUrl, {
+  if (Array.isArray(window.INSPIRE_LOCAL_POSTS)) {
+    return window.INSPIRE_LOCAL_POSTS
+      .map(mapLocalPost)
+      .filter(Boolean)
+      .sort(comparePosts);
+  }
+
+  const response = await fetch(BEEHIIV_CONFIG.localPostsUrl, {
     headers: {
       'Accept': 'application/json'
-    },
-    cache: 'no-store'
+    }
   });
 
   if (!response.ok) {

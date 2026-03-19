@@ -9,6 +9,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $postsRoot = Join-Path $repoRoot 'posts'
 $postsDataPath = Join-Path $repoRoot 'assets\data\posts.json'
+$postsDataJsPath = Join-Path $repoRoot 'assets\data\posts-data.js'
 
 function Get-ExistingManifestLookup {
   if (-not (Test-Path $postsDataPath)) {
@@ -139,5 +140,18 @@ $sortedEntries = @(
 
 ConvertTo-Json -InputObject $sortedEntries -Depth 5 | Set-Content -Path $postsDataPath -Encoding UTF8
 
+$postsDataJsContent = @"
+/*
+  File role: Exposes the local posts manifest as an in-page JavaScript object.
+  Project relation: Lets the homepage and archive render posts without waiting on a
+  separate JSON fetch, matching the site's earlier faster load path.
+*/
+
+window.INSPIRE_LOCAL_POSTS = $(ConvertTo-Json -InputObject $sortedEntries -Depth 5);
+"@
+
+$postsDataJsContent | Set-Content -Path $postsDataJsPath -Encoding UTF8
+
 Write-Host "Synced manifest with $($sortedEntries.Count) post file(s)."
 Write-Host "Updated: $postsDataPath"
+Write-Host "Updated: $postsDataJsPath"
