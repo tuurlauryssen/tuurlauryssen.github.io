@@ -183,8 +183,7 @@ function getSharedContactSectionCopy() {
     messageTitle: "Just say hello",
     messageSubtitle: "Feedback, thoughts, or the start of a good conversation",
     rightLabel: "Stuur een bericht",
-    rightTitleHtml: "Schrijf direct,<br><em>zonder mail app</em>",
-    email: "tuurlauryssen@gmail.com",
+    rightTitleHtml: "Schrijf direct,<br><em>via de site</em>",
     namePlaceholder: "Je naam",
     emailPlaceholder: "Je e-mailadres",
     subjectPlaceholder: "Onderwerp",
@@ -194,7 +193,7 @@ function getSharedContactSectionCopy() {
   } : {
     eyebrow: "Get in touch",
     leftTitleHtml: "Know someone<br><em>remarkable?</em>",
-    description: "Got a tip, a topic, or someone you think I should sit down with? The quickest way to reach me is email, and each path below opens a ready-made message.",
+    description: "Got a tip, a topic, or someone you think I should sit down with? Use the form below and each path will open a ready-made message.",
     interviewKicker: "Interview",
     interviewTitle: "Suggest an interview guest",
     interviewSubtitle: "Someone doing something worth knowing about",
@@ -205,8 +204,7 @@ function getSharedContactSectionCopy() {
     messageTitle: "Just say hello",
     messageSubtitle: "Feedback, thoughts, or the start of a good conversation",
     rightLabel: "Send a message",
-    rightTitleHtml: "Write directly,<br><em>no email app</em>",
-    email: "tuurlauryssen@gmail.com",
+    rightTitleHtml: "Write directly,<br><em>through the site</em>",
     namePlaceholder: "Your name",
     emailPlaceholder: "Your email address",
     subjectPlaceholder: "Subject",
@@ -218,7 +216,6 @@ function getSharedContactSectionCopy() {
   return {
     ...defaults,
     description: homeContact.description || defaults.description,
-    email: homeContact.email || defaults.email,
   };
 }
 
@@ -272,7 +269,6 @@ function buildSharedContactSectionHtml(options = {}) {
           <div class="ih-ct-card">
             <div class="ih-tally-label">${copy.rightLabel}</div>
             <h2 class="ih-ct-title">${copy.rightTitleHtml}</h2>
-            <a class="ih-ct-email" href="mailto:${copy.email}">${copy.email}</a>
             <form class="ih-contact-form" data-contact-form>
               <div class="ih-contact-form-grid">
                 <input type="text" name="name" placeholder="${copy.namePlaceholder}" required>

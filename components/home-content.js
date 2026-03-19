@@ -32,7 +32,6 @@ window.INSPIRE_HOME_CONTENT = {
     author: 'Tuur Lauryssen &middot; Founder, Inspire'
   },
   contact: {
-    description: 'Got a tip, a topic, or someone you think I should sit down with? The quickest way to reach me is email, and each path below opens a ready-made message.',
-    email: 'tuurlauryssen@gmail.com'
+    description: 'Got a tip, a topic, or someone you think I should sit down with? Use the form below and each path will open a ready-made message.'
   }
 };

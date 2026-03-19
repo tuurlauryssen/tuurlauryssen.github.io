@@ -26,7 +26,6 @@ window.INSPIRE_HOME_CONTENT = {
     author: 'Tuur Lauryssen &middot; Oprichter, Inspire'
   },
   contact: {
-    description: 'Heb je een tip, een onderwerp, of iemand met wie ik echt moet gaan praten? Hieronder kan je rechtstreeks een bericht sturen.',
-    email: 'tuurlauryssen@gmail.com'
+    description: 'Heb je een tip, een onderwerp, of iemand met wie ik echt moet gaan praten? Gebruik het formulier hieronder om rechtstreeks een bericht te sturen.'
   }
 };
