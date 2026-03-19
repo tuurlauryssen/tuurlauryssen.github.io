@@ -171,6 +171,11 @@ function getInterviewNumber(post) {
 }
 
 function comparePosts(a, b) {
+  const dateDifference = new Date(b.pubDate) - new Date(a.pubDate);
+  if (dateDifference !== 0) {
+    return dateDifference;
+  }
+
   const updatedAtDifference = new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
   if (updatedAtDifference !== 0) {
     return updatedAtDifference;
@@ -183,11 +188,6 @@ function comparePosts(a, b) {
 
   if (aType === 'interview' && bType === 'interview' && aInterviewNumber !== null && bInterviewNumber !== null && aInterviewNumber !== bInterviewNumber) {
     return bInterviewNumber - aInterviewNumber;
-  }
-
-  const dateDifference = new Date(b.pubDate) - new Date(a.pubDate);
-  if (dateDifference !== 0) {
-    return dateDifference;
   }
 
   return String(a.title || '').localeCompare(String(b.title || ''));
