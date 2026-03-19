@@ -5,7 +5,7 @@
 */
 
 window.INSPIRE_SITE_CONFIG = {
-  gaMeasurementId: "G-XXXXXXXXXX",
+  gaMeasurementId: "G-06BN0LL37Q",
   analyticsConsentStorageKey: "inspire_analytics_consent",
   analyticsConsentVersion: "2026-03-18",
   subscribeEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/subscribe",
