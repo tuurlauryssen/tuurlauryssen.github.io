@@ -105,6 +105,7 @@ function mapLocalPost(entry) {
   const normalizedCategories = [...new Set([entry.language, ...categories])];
   const excerpt = entry.excerpt || entry.description || '';
   const image = entry.image || '';
+  const visibility = normalizePostVisibility(entry);
 
   return {
     title: entry.title,
@@ -123,8 +124,30 @@ function mapLocalPost(entry) {
     // visibility:
     // - public: show in homepage/archive
     // - hidden: keep direct URL working, but exclude from homepage/archive
-    visibility: entry.visibility === 'hidden' ? 'hidden' : 'public'
+    visibility
   };
+}
+
+function normalizePostVisibility(entry) {
+  if (!entry || typeof entry !== 'object') {
+    return 'public';
+  }
+
+  if (typeof entry.visibility === 'string') {
+    const normalized = entry.visibility.trim().toLowerCase();
+    if (normalized === 'hidden') return 'hidden';
+    if (normalized === 'public') return 'public';
+  }
+
+  if (typeof entry.public_visibility === 'boolean') {
+    return entry.public_visibility ? 'public' : 'hidden';
+  }
+
+  if (typeof entry.publicVisibility === 'boolean') {
+    return entry.publicVisibility ? 'public' : 'hidden';
+  }
+
+  return 'public';
 }
 
 function resolvePostLink(path) {
@@ -480,7 +503,7 @@ function renderPosts(posts, containerId) {
 
 async function loadLatestPosts(limit = null) {
   console.log('Loading latest posts...');
-  const posts = filterPostsForSiteLanguage(await fetchBeehiivPosts(limit));
+  const posts = filterPostsForSiteLanguage(await fetchBeehiivPosts());
 
   if (!renderHomepageSplitPosts(posts)) {
     renderPosts(limit ? posts.slice(0, limit) : posts.slice(0, 3), 'latestPosts');

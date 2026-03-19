@@ -53,25 +53,20 @@ function getPageStrings() {
     },
     community: {
       heading: "Join the conversation",
-      intro: "Leave a like or share a thoughtful comment. Comments appear after review.",
+      intro: "Leave an anonymous like or send me a private response about this article.",
       like: "Like this article",
       liked: "Liked",
-      commentsTitle: "Comments",
-      commentsEmpty: "No approved comments yet.",
-      commentsPending: "Your comment was received and is awaiting review.",
-      commentsLoading: "Loading comments...",
-      commentsError: "Unable to load comments right now.",
+      commentButton: "Comment",
+      contactTitle: "Send me a private note",
+      contactIntro: "Got a thought, a disagreement, or someone I should interview next? Send it straight to me.",
+      contactPromptInterview: "Suggest a guest",
+      contactPromptIdea: "Share an idea",
+      contactPromptReply: "Reply to this article",
       namePlaceholder: "Your name",
       emailPlaceholder: "Your email address",
-      commentPlaceholder: "Share your thoughts...",
-      submitLabel: "Submit comment",
-      submitting: "Sending...",
-      invalidName: "Please enter your name.",
-      invalidEmail: "Please enter a valid email address.",
-      invalidComment: "Please enter a longer comment.",
-      endpointMissing: "Comments are not configured yet.",
+      contactMessagePlaceholder: "Write your message...",
+      contactNote: "This goes directly to my inbox through the website backend.",
       likeError: "Unable to update your like right now.",
-      commentError: "Unable to send your comment right now.",
     },
   };
 
@@ -167,6 +162,146 @@ function getArticleMetadata() {
     article_language: articleLanguage,
     article_type: articleType,
   };
+}
+
+function getSharedContactSectionCopy() {
+  const language = (window.INSPIRE_PAGE_CONFIG?.language || document.documentElement.lang || "en").toLowerCase();
+  const isDutch = language.startsWith("nl");
+  const homeContact = window.INSPIRE_HOME_CONTENT?.contact || {};
+
+  const defaults = isDutch ? {
+    eyebrow: "Contact",
+    leftTitleHtml: "Ken je iemand<br><em>opmerkelijks?</em>",
+    description: "Heb je een tip, een onderwerp, of iemand met wie ik echt moet gaan praten? Hieronder kan je rechtstreeks een bericht sturen.",
+    interviewKicker: "Interview",
+    interviewTitle: "Suggest an interview guest",
+    interviewSubtitle: "Someone doing something worth knowing about",
+    ideaKicker: "Idee",
+    ideaTitle: "Share a topic or idea",
+    ideaSubtitle: "Something you'd like me to explore or explain clearly",
+    messageKicker: "Bericht",
+    messageTitle: "Just say hello",
+    messageSubtitle: "Feedback, thoughts, or the start of a good conversation",
+    rightLabel: "Stuur een bericht",
+    rightTitleHtml: "Schrijf direct,<br><em>zonder mail app</em>",
+    email: "tuurlauryssen@gmail.com",
+    namePlaceholder: "Je naam",
+    emailPlaceholder: "Je e-mailadres",
+    subjectPlaceholder: "Onderwerp",
+    messagePlaceholder: "Je bericht",
+    note: "Dit wordt rechtstreeks verzonden via de website-backend.",
+    submitLabel: "Bericht verzenden",
+  } : {
+    eyebrow: "Get in touch",
+    leftTitleHtml: "Know someone<br><em>remarkable?</em>",
+    description: "Got a tip, a topic, or someone you think I should sit down with? The quickest way to reach me is email, and each path below opens a ready-made message.",
+    interviewKicker: "Interview",
+    interviewTitle: "Suggest an interview guest",
+    interviewSubtitle: "Someone doing something worth knowing about",
+    ideaKicker: "Idea",
+    ideaTitle: "Share a topic or idea",
+    ideaSubtitle: "Something you'd like me to explore or explain clearly",
+    messageKicker: "Message",
+    messageTitle: "Just say hello",
+    messageSubtitle: "Feedback, thoughts, or the start of a good conversation",
+    rightLabel: "Send a message",
+    rightTitleHtml: "Write directly,<br><em>no email app</em>",
+    email: "tuurlauryssen@gmail.com",
+    namePlaceholder: "Your name",
+    emailPlaceholder: "Your email address",
+    subjectPlaceholder: "Subject",
+    messagePlaceholder: "Your message",
+    note: "This sends directly through the website backend.",
+    submitLabel: "Send message",
+  };
+
+  return {
+    ...defaults,
+    description: homeContact.description || defaults.description,
+    email: homeContact.email || defaults.email,
+  };
+}
+
+function buildContactPrompt(basePrompt, articleMetadata) {
+  if (!articleMetadata) {
+    return basePrompt;
+  }
+
+  return `${basePrompt}%0A%0AArticle: ${escapeHtml(articleMetadata.article_title)}%0ALink: ${escapeHtml(window.location.pathname)}%0A`;
+}
+
+function buildSharedContactSectionHtml(options = {}) {
+  const copy = getSharedContactSectionCopy();
+  const sectionId = options.sectionId || "contact";
+  const extraClass = options.extraClass ? ` ${options.extraClass}` : "";
+  const articleMetadata = options.articleMetadata || null;
+  const subjectValue = articleMetadata
+    ? `Reply to article: ${escapeHtml(articleMetadata.article_title)}`
+    : "";
+
+  return `
+    <section class="ih-ct-wrap${extraClass}" id="${sectionId}">
+      <div class="ih-ct-grid">
+        <div class="ih-ct-left ih-sr6">
+          <div class="ih-ct-eyebrow">${copy.eyebrow}</div>
+          <h2 class="ih-ct-title">${copy.leftTitleHtml}</h2>
+          <p class="ih-ct-desc">${copy.description}</p>
+
+          <div class="ih-ct-rows">
+            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="Interview guest suggestion" data-contact-prompt="${buildContactPrompt("Hi Tuur,%0A%0AI want to suggest this person for an interview:%0A%0AName:%0AWhy they are worth learning from:%0ARelevant links:%0A", articleMetadata)}">
+              <div class="ih-ct-kicker">${copy.interviewKicker}</div>
+              <strong class="ih-ct-row-title">${copy.interviewTitle}</strong>
+              <span class="ih-ct-row-sub">${copy.interviewSubtitle}</span>
+            </button>
+
+            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="Topic or idea suggestion" data-contact-prompt="${buildContactPrompt("Hi Tuur,%0A%0AI want to share this topic or idea:%0A%0ATopic:%0AWhy it matters:%0AUseful links or context:%0A", articleMetadata)}">
+              <div class="ih-ct-kicker">${copy.ideaKicker}</div>
+              <strong class="ih-ct-row-title">${copy.ideaTitle}</strong>
+              <span class="ih-ct-row-sub">${copy.ideaSubtitle}</span>
+            </button>
+
+            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="${articleMetadata ? subjectValue : "Hello Tuur"}" data-contact-prompt="${articleMetadata ? `Hi Tuur,%0A%0AI\'m responding to this article:%0A${escapeHtml(articleMetadata.article_title)}%0A${escapeHtml(window.location.pathname)}%0A%0AMy thoughts:%0A` : "Hi Tuur,%0A%0A"}">
+              <div class="ih-ct-kicker">${copy.messageKicker}</div>
+              <strong class="ih-ct-row-title">${copy.messageTitle}</strong>
+              <span class="ih-ct-row-sub">${copy.messageSubtitle}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="ih-ct-right ih-sr6">
+          <div class="ih-ct-card">
+            <div class="ih-tally-label">${copy.rightLabel}</div>
+            <h2 class="ih-ct-title">${copy.rightTitleHtml}</h2>
+            <a class="ih-ct-email" href="mailto:${copy.email}">${copy.email}</a>
+            <form class="ih-contact-form" data-contact-form>
+              <div class="ih-contact-form-grid">
+                <input type="text" name="name" placeholder="${copy.namePlaceholder}" required>
+                <input type="email" name="email" placeholder="${copy.emailPlaceholder}" required>
+              </div>
+              <input type="text" name="subject" placeholder="${copy.subjectPlaceholder}" value="${subjectValue}" ${articleMetadata ? "" : "required"}>
+              <textarea name="message" placeholder="${copy.messagePlaceholder}" required></textarea>
+              <div class="ih-contact-form-actions">
+                <div>
+                  <div class="ih-contact-form-note">${copy.note}</div>
+                  <div class="ih-contact-form-feedback" data-contact-feedback aria-live="polite"></div>
+                </div>
+                <button class="ih-ct-button primary" type="submit">${copy.submitLabel}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function initSharedHomeContactSections() {
+  const targets = document.querySelectorAll("[data-shared-contact-home]");
+  targets.forEach((target) => {
+    if (target.dataset.sharedContactRendered === "true") return;
+    target.innerHTML = buildSharedContactSectionHtml({ sectionId: "contact" });
+    target.dataset.sharedContactRendered = "true";
+  });
 }
 
 function getAnalyticsBaseParams() {
@@ -390,102 +525,60 @@ async function initArticleCommunity() {
     !articleEndcap ||
     !siteConfig.communitySummaryEndpoint ||
     !siteConfig.communityLikeEndpoint ||
-    !siteConfig.communityCommentEndpoint ||
-    !siteConfig.communityCommentsEndpoint
+    !siteConfig.contactEndpoint
   ) {
     return;
   }
 
   const visitorToken = getVisitorToken();
-  const section = document.createElement("section");
-  section.className = "article-community";
-  section.innerHTML = `
-    <div class="article-community__header">
-      <div>
-        <h2 class="article-community__title">${communityStrings.heading}</h2>
-        <p class="article-community__intro">${communityStrings.intro}</p>
-      </div>
-      <button type="button" class="article-community__like" data-like-button>
-        <span data-like-label>${communityStrings.like}</span>
+  const actionSection = document.createElement("section");
+  actionSection.className = "article-community";
+  actionSection.innerHTML = `
+    <div class="article-community__actions">
+      <button type="button" class="article-community__like" data-like-button aria-label="${communityStrings.like}">
+        <span class="article-community__like-icon" aria-hidden="true">&#128077;</span>
         <span class="article-community__like-count" data-like-count>0</span>
       </button>
-    </div>
-    <div class="article-community__grid">
-      <div class="article-community__comments">
-        <div class="article-community__comments-head">
-          <h3>${communityStrings.commentsTitle}</h3>
-          <span data-comment-count>0</span>
-        </div>
-        <div class="article-community__comment-list" data-comment-list>${communityStrings.commentsLoading}</div>
-      </div>
-      <form class="article-community__form" data-comment-form>
-        <div class="article-community__form-grid">
-          <input type="text" name="name" placeholder="${communityStrings.namePlaceholder}" required>
-          <input type="email" name="email" placeholder="${communityStrings.emailPlaceholder}" required>
-        </div>
-        <textarea name="comment" placeholder="${communityStrings.commentPlaceholder}" required></textarea>
-        <div class="article-community__form-actions">
-          <div class="article-community__feedback" data-comment-feedback aria-live="polite"></div>
-          <button type="submit">${communityStrings.submitLabel}</button>
-        </div>
-      </form>
+      <button
+        type="button"
+        class="article-community__comment-button"
+        data-scroll-contact
+        aria-label="${communityStrings.commentButton}"
+        title="${communityStrings.commentButton}"
+      >
+        <span class="article-community__comment-icon" aria-hidden="true">&#128172;</span>
+      </button>
     </div>
   `;
 
-  articleEndcap.parentNode.insertBefore(section, articleEndcap);
+  const contactSectionHost = document.createElement("div");
+  contactSectionHost.innerHTML = buildSharedContactSectionHtml({
+    sectionId: "article-contact",
+    extraClass: "article-contact-section",
+    articleMetadata,
+  });
+  const contactSection = contactSectionHost.firstElementChild;
 
-  const likeButton = section.querySelector("[data-like-button]");
-  const likeLabel = section.querySelector("[data-like-label]");
-  const likeCount = section.querySelector("[data-like-count]");
-  const commentCount = section.querySelector("[data-comment-count]");
-  const commentList = section.querySelector("[data-comment-list]");
-  const commentForm = section.querySelector("[data-comment-form]");
-  const commentFeedback = section.querySelector("[data-comment-feedback]");
+  articleEndcap.parentNode.insertBefore(actionSection, articleEndcap);
+  articleEndcap.insertAdjacentElement("afterend", contactSection);
 
-  function setCommentFeedback(message, isError = false) {
-    commentFeedback.textContent = message || "";
-    commentFeedback.style.color = isError ? "#b42318" : "";
-  }
-
-  function renderComments(comments) {
-    if (!Array.isArray(comments) || comments.length === 0) {
-      commentList.innerHTML = `<div class="article-community__empty">${communityStrings.commentsEmpty}</div>`;
-      return;
-    }
-
-    commentList.innerHTML = comments.map((comment) => `
-      <article class="article-community__comment">
-        <div class="article-community__comment-meta">
-          <strong>${escapeHtml(comment.name)}</strong>
-          <span>${escapeHtml(formatCommunityDate(comment.created_at))}</span>
-        </div>
-        <p>${escapeHtml(comment.comment)}</p>
-      </article>
-    `).join("");
-  }
+  const likeButton = actionSection.querySelector("[data-like-button]");
+  const likeCount = actionSection.querySelector("[data-like-count]");
+  const commentButton = actionSection.querySelector("[data-scroll-contact]");
 
   async function refreshCommunity() {
-    commentList.textContent = communityStrings.commentsLoading;
-
     try {
-      const [summary, commentsResponse] = await Promise.all([
-        postJson(siteConfig.communitySummaryEndpoint, {
-          articleSlug: articleMetadata.article_slug,
-          visitorToken,
-        }),
-        postJson(siteConfig.communityCommentsEndpoint, {
-          articleSlug: articleMetadata.article_slug,
-        }),
-      ]);
+      const summary = await postJson(siteConfig.communitySummaryEndpoint, {
+        articleSlug: articleMetadata.article_slug,
+        visitorToken,
+      });
 
       likeCount.textContent = String(summary.likeCount || 0);
-      commentCount.textContent = String(summary.commentCount || 0);
       likeButton.dataset.liked = summary.likedByCurrentVisitor ? "true" : "false";
-      likeLabel.textContent = summary.likedByCurrentVisitor ? communityStrings.liked : communityStrings.like;
-      renderComments(commentsResponse.comments || []);
+      likeButton.setAttribute("aria-label", summary.likedByCurrentVisitor ? communityStrings.liked : communityStrings.like);
+      likeButton.setAttribute("aria-pressed", summary.likedByCurrentVisitor ? "true" : "false");
     } catch (error) {
       console.error("Unable to refresh article community", error);
-      commentList.innerHTML = `<div class="article-community__empty">${communityStrings.commentsError}</div>`;
     }
   }
 
@@ -507,80 +600,33 @@ async function initArticleCommunity() {
 
       likeCount.textContent = String(response.likeCount || 0);
       likeButton.dataset.liked = response.likedByCurrentVisitor ? "true" : "false";
-      likeLabel.textContent = response.likedByCurrentVisitor ? communityStrings.liked : communityStrings.like;
+      likeButton.setAttribute("aria-label", response.likedByCurrentVisitor ? communityStrings.liked : communityStrings.like);
+      likeButton.setAttribute("aria-pressed", response.likedByCurrentVisitor ? "true" : "false");
       trackAnalyticsEvent("article_like", {
         liked: response.likedByCurrentVisitor ? "true" : "false",
       });
     } catch (error) {
       console.error("Unable to update like", error);
-      setCommentFeedback(error && error.message ? error.message : communityStrings.likeError, true);
+      const form = contactSection.querySelector("[data-contact-form]");
+      if (form) {
+        setContactFeedback(form, error && error.message ? error.message : communityStrings.likeError, true);
+      }
     } finally {
       likeButton.disabled = false;
     }
   });
 
-  commentForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  if (commentButton && contactSection) {
+    commentButton.addEventListener("click", () => {
+      contactSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      const messageField = contactSection.querySelector('textarea[name="message"]');
+      if (messageField) {
+        window.setTimeout(() => messageField.focus(), 250);
+      }
+    });
+  }
 
-    const nameInput = commentForm.querySelector('input[name="name"]');
-    const emailInput = commentForm.querySelector('input[name="email"]');
-    const commentInput = commentForm.querySelector('textarea[name="comment"]');
-    const submitButton = commentForm.querySelector('button[type="submit"]');
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim();
-    const comment = commentInput.value.trim();
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (name.length < 2) {
-      setCommentFeedback(communityStrings.invalidName, true);
-      nameInput.focus();
-      return;
-    }
-
-    if (!emailPattern.test(email)) {
-      setCommentFeedback(communityStrings.invalidEmail, true);
-      emailInput.focus();
-      return;
-    }
-
-    if (comment.length < 10) {
-      setCommentFeedback(communityStrings.invalidComment, true);
-      commentInput.focus();
-      return;
-    }
-
-    submitButton.disabled = true;
-    submitButton.textContent = communityStrings.submitting;
-    setCommentFeedback("");
-
-    try {
-      const response = await postJson(siteConfig.communityCommentEndpoint, {
-        articleSlug: articleMetadata.article_slug,
-        articleTitle: articleMetadata.article_title,
-        articleLanguage: articleMetadata.article_language,
-        articleType: articleMetadata.article_type,
-        name,
-        email,
-        comment,
-        source: "website-article",
-        metadata: {
-          page: window.location.pathname,
-        },
-      });
-
-      commentForm.reset();
-      setCommentFeedback(response.message || communityStrings.commentsPending);
-      trackAnalyticsEvent("comment_submit");
-      await refreshCommunity();
-    } catch (error) {
-      console.error("Unable to submit comment", error);
-      setCommentFeedback(error && error.message ? error.message : communityStrings.commentError, true);
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = communityStrings.submitLabel;
-    }
-  });
-
+  initContactForm();
   await refreshCommunity();
 }
 
@@ -1193,6 +1239,7 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Initializing site...");
 
   updateAnalyticsFromConsent();
+  initSharedHomeContactSections();
   initConsentBanner();
   initCursor();
   initScrollProgress();
@@ -1231,6 +1278,7 @@ window.addEventListener("error", (e) => {
 });
 
 document.addEventListener("components:loaded", () => {
+  initSharedHomeContactSections();
   initCursor();
   initScrollProgress();
   initScrollReveal();
