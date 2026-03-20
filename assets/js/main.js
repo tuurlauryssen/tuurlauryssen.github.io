@@ -259,6 +259,13 @@ function getAnalyticsParams(extraParams = {}) {
   };
 }
 
+function setLikeButtonState(button, liked) {
+  if (!button) return;
+
+  button.dataset.liked = liked ? "true" : "false";
+  button.setAttribute("aria-pressed", liked ? "true" : "false");
+}
+
 function loadScriptOnce(src) {
   return new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[data-src="${src}"]`);
@@ -414,7 +421,7 @@ async function initArticleCommunity() {
   actionSection.className = "article-community";
   actionSection.innerHTML = `
     <div class="article-community__actions">
-      <button type="button" class="article-community__like" data-like-button aria-label="${communityStrings.like}">
+      <button type="button" class="article-community__like" data-like-button data-liked="false" aria-label="${communityStrings.like}" aria-pressed="false">
         <span class="article-community__like-icon" aria-hidden="true">&#128077;</span>
         <span class="article-community__like-count" data-like-count>0</span>
       </button>
@@ -453,16 +460,20 @@ async function initArticleCommunity() {
       });
 
       likeCount.textContent = String(summary.likeCount || 0);
-      likeButton.dataset.liked = summary.likedByCurrentVisitor ? "true" : "false";
+      setLikeButtonState(likeButton, Boolean(summary.likedByCurrentVisitor));
       likeButton.setAttribute("aria-label", summary.likedByCurrentVisitor ? communityStrings.liked : communityStrings.like);
-      likeButton.setAttribute("aria-pressed", summary.likedByCurrentVisitor ? "true" : "false");
     } catch (error) {
       console.error("Unable to refresh article community", error);
     }
   }
 
   likeButton.addEventListener("click", async () => {
+    const wasLiked = likeButton.dataset.liked === "true";
+    const optimisticLiked = !wasLiked;
+
     likeButton.disabled = true;
+    setLikeButtonState(likeButton, optimisticLiked);
+    likeButton.setAttribute("aria-label", optimisticLiked ? communityStrings.liked : communityStrings.like);
 
     try {
       const response = await postJson(siteConfig.communityLikeEndpoint, {
@@ -478,13 +489,14 @@ async function initArticleCommunity() {
       });
 
       likeCount.textContent = String(response.likeCount || 0);
-      likeButton.dataset.liked = response.likedByCurrentVisitor ? "true" : "false";
+      setLikeButtonState(likeButton, Boolean(response.likedByCurrentVisitor));
       likeButton.setAttribute("aria-label", response.likedByCurrentVisitor ? communityStrings.liked : communityStrings.like);
-      likeButton.setAttribute("aria-pressed", response.likedByCurrentVisitor ? "true" : "false");
       trackAnalyticsEvent("article_like", {
         liked: response.likedByCurrentVisitor ? "true" : "false",
       });
     } catch (error) {
+      setLikeButtonState(likeButton, wasLiked);
+      likeButton.setAttribute("aria-label", wasLiked ? communityStrings.liked : communityStrings.like);
       console.error("Unable to update like", error);
       const form = contactSection.querySelector("[data-contact-form]");
       if (form) {

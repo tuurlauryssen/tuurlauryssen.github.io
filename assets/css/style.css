@@ -2042,8 +2042,15 @@ nav {
 }
 
 .article-community__like-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
   font-size: 20px;
   line-height: 1;
+  filter: grayscale(1) saturate(0.2) brightness(0.9);
+  transition: filter 0.18s ease, transform 0.18s ease;
 }
 
 .article-community__comment-icon {
@@ -2069,6 +2076,10 @@ nav {
 .article-community__like[data-liked="true"] {
   background: transparent;
   color: #1B2C45;
+}
+
+.article-community__like[data-liked="true"] .article-community__like-icon {
+  filter: none;
 }
 
 .cta-content {
