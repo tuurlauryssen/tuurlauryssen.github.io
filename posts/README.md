@@ -1,9 +1,12 @@
 # Posts
 
-This file explains how the local article folders are organized. These folders hold the final site pages and the raw imported copies that feed the homepage and archive through the post data files.
+Article content lives here.
 
-- `posts/interviews/en` and `posts/interviews/nl` contain site interview pages.
-- `posts/ideas/en` and `posts/ideas/nl` contain site idea pages.
-- `posts/raw/...` contains raw imported versions for review.
-- `assets/data/posts.json` drives `index.html` and `blog.html`.
-- `assets/data/authors.json` controls clickable author names and socials.
+- `interviews/en` and `interviews/nl`: published interview pages
+- `ideas/en` and `ideas/nl`: published idea pages
+- `raw/...`: imported source copies kept for review
+
+Related data:
+
+- `assets/data/posts.json`: manifest used by the homepage and archive
+- `assets/data/authors.json`: author names, links, and socials

@@ -1,12 +1,11 @@
 # Post Workflow
 
-1. Import a post by double-clicking `scripts/import-beehiiv-post.cmd`.
-   Choose `interview` or `learned`, choose `en` or `nl`, choose `public` or `hidden`, paste the raw Beehiiv HTML, then type `ENDHTML`.
+1. Run `scripts/import-beehiiv-post.cmd`.
+2. Choose the post type, language, and visibility.
+3. Paste the raw Beehiiv HTML and finish with `ENDHTML`.
+4. Review the generated files under `posts/...`.
+5. Update `assets/data/authors.json` if needed.
+6. If you added or removed files manually, run `scripts/sync-posts-manifest.cmd`.
+7. Push and verify the homepage, archive, and article page.
 
-2. Check the generated files in `posts/...` and, if needed, update `assets/data/authors.json`.
-
-3. Hidden posts stay in the repo and open by direct URL, but they are excluded from the homepage and archive until their `visibility` in `assets/data/posts.json` is changed from `hidden` to `public`.
-
-4. If you manually add or delete post files later, double-click `scripts/sync-posts-manifest.cmd` to refresh `assets/data/posts.json`.
-
-5. Push to GitHub and verify the homepage and archive.
+`hidden` posts remain available by direct URL but stay out of the homepage and archive until their `visibility` is set to `public` in `assets/data/posts.json`.
