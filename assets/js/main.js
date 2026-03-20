@@ -1,19 +1,21 @@
 /*
-  File role: Handles shared site interactions, analytics, consent, and article community UI.
+  File role: Handles shared site interactions, analytics, and article community UI.
   Project relation: Used by public pages and article pages across the site.
 */
 
 const INSPIRE_ANALYTICS = {
   scriptLoaded: false,
   initialized: false,
-  consentState: "unknown",
   measurementId: "",
+};
+
+const INSPIRE_RUNTIME = {
+  visitorToken: "",
 };
 
 const INSPIRE_TRACKED_SCROLL_THRESHOLDS = [25, 50, 75, 90];
 const INSPIRE_READ_COMPLETE_SCROLL_THRESHOLD = 90;
 const INSPIRE_READ_COMPLETE_MIN_ACTIVE_SECONDS = 30;
-const INSPIRE_VISITOR_TOKEN_STORAGE_KEY = "inspire_article_visitor_token";
 
 function getSiteConfig() {
   return window.INSPIRE_SITE_CONFIG || {};
@@ -44,13 +46,6 @@ function getPageStrings() {
       locale: "en-US",
       lastUpdatedPrefix: "Last updated at",
     },
-    analytics: {
-      consentTitle: "Analytics preferences",
-      consentText: "Allow analytics so we can understand visits, article engagement, and what readers find useful.",
-      consentAccept: "Allow analytics",
-      consentReject: "Reject",
-      consentManage: "Privacy settings",
-    },
     community: {
       heading: "Join the conversation",
       intro: "Leave an anonymous like or send me a private response about this article.",
@@ -77,59 +72,8 @@ function getPageStrings() {
     subscribe: { ...defaults.subscribe, ...(pageStrings.subscribe || {}) },
     contact: { ...defaults.contact, ...(pageStrings.contact || {}) },
     meta: { ...defaults.meta, ...(pageStrings.meta || {}) },
-    analytics: { ...defaults.analytics, ...(pageStrings.analytics || {}) },
     community: { ...defaults.community, ...(pageStrings.community || {}) },
   };
-}
-
-function safeLocalStorageGet(key) {
-  try {
-    return window.localStorage.getItem(key);
-  } catch (error) {
-    return null;
-  }
-}
-
-function safeLocalStorageSet(key, value) {
-  try {
-    window.localStorage.setItem(key, value);
-  } catch (error) {
-    // Ignore storage failures
-  }
-}
-
-function safeLocalStorageRemove(key) {
-  try {
-    window.localStorage.removeItem(key);
-  } catch (error) {
-    // Ignore storage failures
-  }
-}
-
-function getAnalyticsConsentStorageKey() {
-  const config = getSiteConfig();
-  const baseKey = typeof config.analyticsConsentStorageKey === "string"
-    ? config.analyticsConsentStorageKey.trim()
-    : "inspire_analytics_consent";
-  const version = typeof config.analyticsConsentVersion === "string"
-    ? config.analyticsConsentVersion.trim()
-    : "v1";
-  return `${baseKey}:${version}`;
-}
-
-function getAnalyticsConsentState() {
-  const stored = safeLocalStorageGet(getAnalyticsConsentStorageKey());
-  return stored === "granted" || stored === "denied" ? stored : "unknown";
-}
-
-function setAnalyticsConsentState(state) {
-  const storageKey = getAnalyticsConsentStorageKey();
-  if (state === "granted" || state === "denied") {
-    safeLocalStorageSet(storageKey, state);
-  } else {
-    safeLocalStorageRemove(storageKey);
-  }
-  INSPIRE_ANALYTICS.consentState = state;
 }
 
 function getMeasurementId() {
@@ -355,8 +299,16 @@ async function initializeAnalytics() {
     window.dataLayer.push(arguments);
   };
 
+  // Session-scoped ID only — not persisted anywhere, resets on every page load.
+  const sessionClientId = window.crypto && typeof window.crypto.randomUUID === "function"
+    ? window.crypto.randomUUID()
+    : `session-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
   window.gtag("js", new Date());
   window.gtag("config", measurementId, {
+    storage: "none",         // No cookies written
+    client_id: sessionClientId,
+    anonymize_ip: true,
     send_page_view: false,
   });
 
@@ -370,16 +322,6 @@ async function initializeAnalytics() {
   }
 }
 
-function updateAnalyticsFromConsent() {
-  const consentState = getAnalyticsConsentState();
-  INSPIRE_ANALYTICS.consentState = consentState;
-  if (consentState === "granted") {
-    initializeAnalytics().catch((error) => {
-      console.error("Analytics initialization failed", error);
-    });
-  }
-}
-
 function trackAnalyticsEvent(eventName, params = {}) {
   if (!INSPIRE_ANALYTICS.initialized || typeof window.gtag !== "function") {
     return;
@@ -388,78 +330,19 @@ function trackAnalyticsEvent(eventName, params = {}) {
   window.gtag("event", eventName, getAnalyticsParams(params));
 }
 
-function buildConsentBanner() {
-  const analyticsStrings = getPageStrings().analytics;
-  const banner = document.createElement("div");
-  banner.className = "consent-banner";
-  banner.innerHTML = `
-    <div class="consent-banner__content">
-      <strong>${analyticsStrings.consentTitle}</strong>
-      <p>${analyticsStrings.consentText}</p>
-    </div>
-    <div class="consent-banner__actions">
-      <button type="button" class="consent-banner__button consent-banner__button--secondary" data-consent-action="reject">
-        ${analyticsStrings.consentReject}
-      </button>
-      <button type="button" class="consent-banner__button consent-banner__button--primary" data-consent-action="accept">
-        ${analyticsStrings.consentAccept}
-      </button>
-    </div>
-  `;
-
-  banner.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-consent-action]");
-    if (!button) return;
-
-    const nextState = button.dataset.consentAction === "accept" ? "granted" : "denied";
-    setAnalyticsConsentState(nextState);
-    banner.remove();
-    updateAnalyticsFromConsent();
-  });
-
-  return banner;
-}
-
-function buildPrivacyButton() {
-  const analyticsStrings = getPageStrings().analytics;
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "privacy-settings-button";
-  button.textContent = analyticsStrings.consentManage;
-  button.addEventListener("click", () => {
-    const existingBanner = document.querySelector(".consent-banner");
-    if (!existingBanner) {
-      document.body.appendChild(buildConsentBanner());
-    }
-  });
-  return button;
-}
-
-function initConsentBanner() {
-  if (!document.body) return;
-
-  if (!document.querySelector(".privacy-settings-button")) {
-    document.body.appendChild(buildPrivacyButton());
-  }
-
-  if (getAnalyticsConsentState() === "unknown" && !document.querySelector(".consent-banner")) {
-    document.body.appendChild(buildConsentBanner());
-  }
-}
-
 function getVisitorToken() {
-  let token = safeLocalStorageGet(INSPIRE_VISITOR_TOKEN_STORAGE_KEY);
-  if (token) {
-    return token;
+  if (INSPIRE_RUNTIME.visitorToken) {
+    return INSPIRE_RUNTIME.visitorToken;
   }
 
+  let token = "";
   if (window.crypto && typeof window.crypto.randomUUID === "function") {
     token = window.crypto.randomUUID();
   } else {
     token = `visitor-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   }
 
-  safeLocalStorageSet(INSPIRE_VISITOR_TOKEN_STORAGE_KEY, token);
+  INSPIRE_RUNTIME.visitorToken = token;
   return token;
 }
 
@@ -1234,9 +1117,10 @@ function initLastUpdated() {
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Initializing site...");
 
-  updateAnalyticsFromConsent();
+  initializeAnalytics().catch((error) => {
+    console.error("Analytics initialization failed", error);
+  });
   initSharedHomeContactSections();
-  initConsentBanner();
   initCursor();
   initScrollProgress();
   initScrollReveal();
