@@ -1013,7 +1013,7 @@ function initContactForm() {
         subjectInput.value = trigger.dataset.contactSubject;
       }
 
-      if (messageInput && trigger.dataset.contactPrompt && !messageInput.value.trim()) {
+      if (messageInput && trigger.dataset.contactPrompt) {
         messageInput.value = trigger.dataset.contactPrompt.replace(/%0A/g, "\n");
       }
 
