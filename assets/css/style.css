@@ -2480,6 +2480,24 @@ footer {
 
   nav {
     padding: 0 24px;
+    height: auto;
+    min-height: 68px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    row-gap: 12px;
+  }
+
+  .nav-left,
+  .nav-right {
+    flex: 1 1 100%;
+  }
+
+  .nav-left {
+    min-width: 0;
+  }
+
+  .nav-right {
+    justify-content: flex-start;
   }
 
   .nav-tagline,
@@ -2674,6 +2692,77 @@ footer {
   .footer-links {
     flex-wrap: wrap;
     justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  nav {
+    padding: 14px 18px;
+    row-gap: 10px;
+  }
+
+  .nav-left {
+    align-items: center;
+  }
+
+  .nav-logo {
+    max-width: 100%;
+  }
+
+  .nav-logo .brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .nav-logo .brand-mark svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  .brand-lockup {
+    gap: 10px;
+  }
+
+  .brand-lockup-text {
+    font-size: 20px;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .nav-right {
+    gap: 10px;
+    width: 100%;
+  }
+
+  .nl-link,
+  .nav-cta {
+    min-height: 42px;
+  }
+}
+
+@media (max-width: 480px) {
+  nav {
+    padding: 12px 14px;
+  }
+
+  .brand-lockup-text {
+    font-size: 18px;
+    letter-spacing: 0.16em;
+  }
+
+  .nav-right {
+    align-items: stretch;
+  }
+
+  .nl-link,
+  .nav-cta {
+    flex: 1 1 0;
+    justify-content: center;
+    text-align: center;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
 
