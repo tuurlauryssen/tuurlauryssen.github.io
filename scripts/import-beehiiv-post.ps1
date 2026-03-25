@@ -743,7 +743,7 @@ $ImportedStyles
 
   <div class="article-topbar">
     <div class="article-topbar-inner">
-      <a href="$homeLink" class="article-brand">INSPIRE</a>
+      <a href="$homeLink" class="article-brand" data-brand-lockup>INSPIRE</a>
       <div class="article-topbar-actions">
         <a class="article-action-link" href="$homeLink">$($copy.Home)</a>
         <a class="article-action-link" href="$archiveLink">$($copy.Archive)</a>
@@ -812,6 +812,7 @@ function Update-PostsManifest {
     [string]$Excerpt,
     [string]$Image,
     [string]$SourceUrl,
+    [string]$ReadTime,
     [string]$Visibility
   )
 
@@ -827,6 +828,7 @@ function Update-PostsManifest {
     excerpt = $Excerpt
     image = $Image
     sourceUrl = $SourceUrl
+    readTime = $ReadTime
     path = "posts/$(Get-TypeDirectoryName -Type $Type)/$Language/$Slug.html"
     visibility = if ($Visibility -eq 'hidden') { 'hidden' } else { 'public' }
     categories = @()
@@ -838,7 +840,7 @@ function Update-PostsManifest {
 
 function Sync-PostsManifest {
   if (-not (Test-Path $syncPostsManifestScriptPath)) {
-    Update-PostsManifest -Title $Title -Slug $slug -Language $Language -Type $Type -Date $Date -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl -Visibility $Visibility
+    Update-PostsManifest -Title $Title -Slug $slug -Language $Language -Type $Type -Date $Date -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl -ReadTime $metadata.ReadTime -Visibility $Visibility
     return
   }
 

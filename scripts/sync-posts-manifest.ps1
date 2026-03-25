@@ -75,6 +75,7 @@ function Get-PostEntryFromFile {
   $image = Get-RegexValue -InputText $html -Pattern '<div class="article-cover">\s*<img[^>]+src="([^"]+)"'
   $sourceUrl = Get-RegexValue -InputText $html -Pattern '<a class="article-source-link"[^>]+href="([^"]+)"'
   $pubDate = Get-RegexValue -InputText $html -Pattern '<time class="article-date-line" datetime="([^"]+)"'
+  $readTime = Get-RegexValue -InputText $html -Pattern '<span class="article-readtime-line">([^<]+)</span>'
   $visibility = Get-RegexValue -InputText $html -Pattern '<meta[^>]+name="inspire:visibility"[^>]+content="([^"]+)"'
   if ($visibility -ne 'hidden' -and $visibility -ne 'public') {
     $visibility = if ($existingEntry -and $existingEntry.visibility -eq 'hidden') { 'hidden' } else { 'public' }
@@ -90,6 +91,9 @@ function Get-PostEntryFromFile {
     excerpt = $excerpt
     image = $image
     sourceUrl = $sourceUrl
+    readTime = $readTime
+    likes = if ($existingEntry -and $null -ne $existingEntry.likes) { $existingEntry.likes } else { $null }
+    reads = if ($existingEntry -and $existingEntry.reads) { $existingEntry.reads } else { '' }
     path = $relativePath
     visibility = $visibility
     categories = @()

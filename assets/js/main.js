@@ -1104,6 +1104,183 @@ function initContactForm() {
   });
 }
 
+function buildBrandMarkSvg(centerFill) {
+  return `
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M50 54.5 L88 50 L50 45.5Z" fill="#1B2C45"></path>
+      <path d="M47.7 51.6 L61.5 66.4 L52.3 48.4Z" fill="#1B2C45"></path>
+      <path d="M46.6 49.4 L44.8 79.5 L53.4 50.6Z" fill="#1B2C45"></path>
+      <path d="M48.5 47.6 L36.4 58.5 L51.5 52.4Z" fill="#1B2C45"></path>
+      <path d="M50.4 45.5 L14.1 46.9 L49.6 54.5Z" fill="#1B2C45"></path>
+      <path d="M52.5 48.7 L39.7 30.6 L47.5 51.3Z" fill="#1B2C45"></path>
+      <path d="M53.3 51.1 L58.7 23.4 L46.7 48.9Z" fill="#1B2C45"></path>
+      <circle cx="50" cy="50" r="4" fill="${centerFill}"></circle>
+    </svg>
+  `;
+}
+
+function enhanceBrandLockup(link) {
+  if (!link || link.dataset.brandInitialized === "true") return;
+
+  const text = (link.textContent || "").trim() || "Inspire";
+  const centerFill = "#F5F0E8";
+
+  link.textContent = "";
+  link.classList.add("brand-lockup");
+  link.insertAdjacentHTML(
+    "afterbegin",
+    `
+      <span class="brand-mark" aria-hidden="true">
+        ${buildBrandMarkSvg(centerFill)}
+        <canvas class="brand-mark-canvas"></canvas>
+      </span>
+      <span class="brand-lockup-text">${escapeHtml(text)}</span>
+    `
+  );
+  link.dataset.brandInitialized = "true";
+
+  const stage = link.querySelector(".brand-mark");
+  const canvas = link.querySelector(".brand-mark-canvas");
+  if (!stage || !canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const angles = [0, 51.4, 85.7, 128.6, 180, 231.4, 308.6];
+  const color = "#1B2C45";
+  const rgb = {
+    r: parseInt(color.slice(1, 3), 16),
+    g: parseInt(color.slice(3, 5), 16),
+    b: parseInt(color.slice(5, 7), 16),
+  };
+  let particles = [];
+  let raf = null;
+  let stopTimer = null;
+  let isRunning = false;
+
+  function getScale() {
+    return window.devicePixelRatio || 1;
+  }
+
+  function resizeCanvas() {
+    const rect = stage.getBoundingClientRect();
+    const scale = getScale();
+    canvas.width = Math.max(1, Math.round(rect.width * scale));
+    canvas.height = Math.max(1, Math.round(rect.height * scale));
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  }
+
+  function emitParticles() {
+    const rect = stage.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    angles.forEach((degrees) => {
+      const radians = (degrees - 90) * Math.PI / 180;
+      const burstCount = Math.floor(Math.random() * 2) + 2;
+
+      for (let index = 0; index < burstCount; index += 1) {
+        const spread = radians + (Math.random() - 0.5) * 0.38;
+        const speed = 0.9 + Math.random() * 1.8;
+        particles.push({
+          x: centerX,
+          y: centerY,
+          vx: Math.cos(spread) * speed,
+          vy: Math.sin(spread) * speed,
+          life: 1,
+          decay: 0.04 + Math.random() * 0.03,
+          size: 0.8 + Math.random() * 1.5,
+          trail: [],
+        });
+      }
+    });
+  }
+
+  function tickParticles() {
+    const scale = getScale();
+    const width = canvas.width / scale;
+    const height = canvas.height / scale;
+    ctx.clearRect(0, 0, width, height);
+    particles = particles.filter((particle) => particle.life > 0);
+
+    particles.forEach((particle) => {
+      particle.trail.push({ x: particle.x, y: particle.y });
+      if (particle.trail.length > 5) {
+        particle.trail.shift();
+      }
+
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      particle.vx *= 0.93;
+      particle.vy *= 0.93;
+      particle.life -= particle.decay;
+
+      if (particle.trail.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(particle.trail[0].x, particle.trail[0].y);
+        particle.trail.slice(1).forEach((point) => {
+          ctx.lineTo(point.x, point.y);
+        });
+        ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${particle.life * 0.18})`;
+        ctx.lineWidth = particle.size * 0.42;
+        ctx.lineCap = "round";
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.size * particle.life, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${particle.life * 0.75})`;
+      ctx.fill();
+    });
+
+    if (particles.length > 0) {
+      raf = window.requestAnimationFrame(tickParticles);
+    } else {
+      isRunning = false;
+      raf = null;
+    }
+  }
+
+  function fireParticles() {
+    window.clearTimeout(stopTimer);
+    resizeCanvas();
+    emitParticles();
+
+    if (!isRunning) {
+      isRunning = true;
+      tickParticles();
+    }
+  }
+
+  function stopParticles() {
+    window.clearTimeout(stopTimer);
+    stopTimer = window.setTimeout(() => {
+      if (raf) {
+        window.cancelAnimationFrame(raf);
+      }
+      particles = [];
+      resizeCanvas();
+      ctx.clearRect(0, 0, canvas.width / getScale(), canvas.height / getScale());
+      isRunning = false;
+      raf = null;
+    }, 700);
+  }
+
+  link.addEventListener("mouseenter", fireParticles);
+  link.addEventListener("mouseleave", stopParticles);
+  link.addEventListener("click", fireParticles);
+  link.addEventListener("focus", fireParticles);
+  link.addEventListener("blur", stopParticles);
+  window.addEventListener("resize", resizeCanvas);
+
+  resizeCanvas();
+}
+
+function initBrandLogos() {
+  document.querySelectorAll(".nav-logo, .article-brand, [data-brand-lockup]").forEach((link) => {
+    if (!(link instanceof HTMLElement)) return;
+    enhanceBrandLockup(link);
+  });
+}
+
 function initLastUpdated() {
   const targets = document.querySelectorAll("[data-last-updated]");
   const metaStrings = getPageStrings().meta;
@@ -1144,6 +1321,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initFormValidation();
   initSubscribeForms();
   initContactForm();
+  initBrandLogos();
   initStatsCounter();
   initExternalLinks();
   initKeyboardNav();
@@ -1181,6 +1359,7 @@ document.addEventListener("components:loaded", () => {
   initFormValidation();
   initSubscribeForms();
   initContactForm();
+  initBrandLogos();
   initStatsCounter();
   initExternalLinks();
   initLastUpdated();

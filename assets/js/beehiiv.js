@@ -17,6 +17,9 @@ const PAGE_STRINGS = {
   interview: 'Interview',
   thingsILearned: 'Things I Learned',
   readEdition: 'Read edition',
+  metricReadTime: 'Read',
+  metricLikes: 'Likes',
+  metricReads: 'Reads',
   noInterviewsTitle: 'No interviews found yet.',
   noInterviewsDesc: 'Check back soon for the next conversation.',
   noEssaysTitle: 'No essays found yet.',
@@ -43,6 +46,8 @@ const BEEHIIV_CONFIG = {
 const CACHE_DURATION = 10 * 60 * 1000;
 let cachedPosts = null;
 let cacheTime = null;
+const POST_COMMUNITY_CACHE = new Map();
+const POST_READ_SUMMARY_CACHE = new Map();
 
 // =========================================
 // FETCH POSTS FROM LOCAL DATA
@@ -114,7 +119,9 @@ function mapLocalPost(entry) {
 
   return {
     title: entry.title,
+    slug: entry.slug,
     link: path,
+    articlePath: path,
     pubDate: entry.pubDate,
     updatedAt: entry.updatedAt || '',
     description: excerpt,
@@ -126,11 +133,209 @@ function mapLocalPost(entry) {
     language: entry.language,
     author: entry.author || '',
     sourceUrl: entry.sourceUrl || '',
+    readTime: entry.readTime || '',
+    likes: typeof entry.likes === 'number' ? entry.likes : null,
+    reads: entry.reads || '',
     // visibility:
     // - public: show in homepage/archive
     // - hidden: keep direct URL working, but exclude from homepage/archive
     visibility
   };
+}
+
+function getPostMetrics(post) {
+  return {
+    readTime: typeof post.readTime === 'string' ? post.readTime.trim() : '',
+    likes: typeof post.likes === 'number' ? String(post.likes) : ''
+  };
+}
+
+function normalizeArticlePath(path) {
+  if (typeof path !== 'string' || !path.trim()) {
+    return '';
+  }
+
+  const trimmed = path.trim();
+  if (/^(?:https?:)?\/\//.test(trimmed)) {
+    try {
+      return new URL(trimmed).pathname;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  return trimmed.startsWith('/') ? trimmed : `/${trimmed.replace(/^\.?\//, '')}`;
+}
+
+function createPostMetricsHtml(post, classNamePrefix) {
+  const metrics = getPostMetrics(post);
+  const items = [];
+  const articlePath = normalizeArticlePath(post.articlePath || post.link);
+
+  if (metrics.readTime) {
+    items.push(`<div class="${classNamePrefix}-stat"><span>${PAGE_STRINGS.metricReadTime}</span> <strong>${metrics.readTime}</strong></div>`);
+  }
+
+  if (post.slug) {
+    const likeCount = metrics.likes || '0';
+    items.push(`<div class="${classNamePrefix}-stat"><span>${PAGE_STRINGS.metricLikes}</span> <strong data-post-like-count>${likeCount}</strong></div>`);
+  }
+
+  if (articlePath) {
+    items.push(`<div class="${classNamePrefix}-stat" data-post-read-stat hidden><span>${PAGE_STRINGS.metricReads}</span> <strong data-post-read-count></strong></div>`);
+  }
+
+  if (items.length === 0) {
+    return '';
+  }
+
+  const slugAttribute = post.slug ? ` data-post-slug="${post.slug}"` : '';
+  const pathAttribute = articlePath ? ` data-post-path="${articlePath}"` : '';
+  return `<div class="${classNamePrefix}-stats" aria-label="Article metrics"${slugAttribute}${pathAttribute}>${items.join('')}</div>`;
+}
+
+async function fetchPostCommunitySummary(articleSlug) {
+  if (!articleSlug) {
+    return null;
+  }
+
+  if (POST_COMMUNITY_CACHE.has(articleSlug)) {
+    return POST_COMMUNITY_CACHE.get(articleSlug);
+  }
+
+  const siteConfig = window.INSPIRE_SITE_CONFIG || {};
+  const endpoint = siteConfig.communitySummaryEndpoint;
+  if (!endpoint) {
+    return null;
+  }
+
+  const request = fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      articleSlug
+    })
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Community summary HTTP error: ${response.status}`);
+      }
+
+      return response.json();
+    })
+    .catch((error) => {
+      POST_COMMUNITY_CACHE.delete(articleSlug);
+      throw error;
+    });
+
+  POST_COMMUNITY_CACHE.set(articleSlug, request);
+  return request;
+}
+
+async function fetchPostReadSummaries(articlePaths) {
+  const normalizedPaths = [...new Set(
+    (Array.isArray(articlePaths) ? articlePaths : [])
+      .map(normalizeArticlePath)
+      .filter(Boolean)
+  )];
+
+  if (normalizedPaths.length === 0) {
+    return new Map();
+  }
+
+  const siteConfig = window.INSPIRE_SITE_CONFIG || {};
+  const endpoint = siteConfig.readSummaryEndpoint;
+  if (!endpoint) {
+    return new Map();
+  }
+
+  const uncachedPaths = normalizedPaths.filter((path) => !POST_READ_SUMMARY_CACHE.has(path));
+  if (uncachedPaths.length > 0) {
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          articlePaths: uncachedPaths
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Read summary HTTP error: ${response.status}`);
+      }
+
+      const payload = await response.json();
+      const counts = payload && typeof payload === 'object' && payload.readCounts && typeof payload.readCounts === 'object'
+        ? payload.readCounts
+        : {};
+
+      uncachedPaths.forEach((path) => {
+        const value = Number(counts[path]);
+        POST_READ_SUMMARY_CACHE.set(path, Number.isFinite(value) && value >= 0 ? value : null);
+      });
+    } catch (error) {
+      uncachedPaths.forEach((path) => {
+        POST_READ_SUMMARY_CACHE.set(path, null);
+      });
+      throw error;
+    }
+  }
+
+  return new Map(normalizedPaths.map((path) => [path, POST_READ_SUMMARY_CACHE.get(path)]));
+}
+
+async function hydratePostMetrics(root = document) {
+  const metricGroups = [...root.querySelectorAll('[data-post-slug]')];
+  if (metricGroups.length === 0) {
+    return;
+  }
+
+  const articlePaths = metricGroups
+    .map((group) => group.getAttribute('data-post-path'))
+    .filter(Boolean);
+
+  let readCounts = new Map();
+  try {
+    readCounts = await fetchPostReadSummaries(articlePaths);
+  } catch (error) {
+    console.error('Unable to hydrate read counts', error);
+  }
+
+  await Promise.all(metricGroups.map(async (group) => {
+    const articleSlug = group.getAttribute('data-post-slug');
+    const articlePath = normalizeArticlePath(group.getAttribute('data-post-path') || '');
+    const likeCountNode = group.querySelector('[data-post-like-count]');
+    const readCountNode = group.querySelector('[data-post-read-count]');
+    const readStatNode = group.querySelector('[data-post-read-stat]');
+    if (!articleSlug || !likeCountNode) {
+      return;
+    }
+
+    try {
+      const summary = await fetchPostCommunitySummary(articleSlug);
+      if (!summary || typeof summary.likeCount !== 'number') {
+        return;
+      }
+
+      likeCountNode.textContent = String(summary.likeCount);
+    } catch (error) {
+      console.error(`Unable to hydrate metrics for ${articleSlug}`, error);
+    }
+
+    if (articlePath && readCountNode && readStatNode && readCounts.has(articlePath)) {
+      const readCount = readCounts.get(articlePath);
+      if (typeof readCount === 'number' && Number.isFinite(readCount)) {
+        readCountNode.textContent = String(readCount);
+        readStatNode.hidden = false;
+      }
+    }
+  }));
 }
 
 function normalizePostVisibility(entry) {
@@ -397,6 +602,7 @@ function createPostCard(post) {
       </div>
       <h3 class="s-title">${post.title}</h3>
       <p class="s-excerpt">${cleanExcerpt}</p>
+      ${createPostMetricsHtml(post, 's')}
       <div class="s-read">
         ${PAGE_STRINGS.readEdition} &rarr;
       </div>
@@ -430,6 +636,7 @@ function createHomepageSplitCard(post, variant = 'featured') {
         <div class="ih-post-badge ${type}">${badgeLabel}</div>
         <h3 class="ih-post-title">${post.title}</h3>
         <p class="ih-post-excerpt">${excerpt}</p>
+        ${createPostMetricsHtml(post, 'ih-post')}
         <div class="ih-post-read">${PAGE_STRINGS.readEdition} &rarr;</div>
       </div>
     </a>
@@ -470,6 +677,8 @@ function renderHomepageSplitPosts(posts) {
       </div>
     `;
 
+  hydratePostMetrics(interviewsContainer);
+  hydratePostMetrics(learnedContainer);
   console.log(`Rendered homepage split preview from ${posts.length} total posts`);
   return true;
 }
@@ -499,6 +708,7 @@ function renderPosts(posts, containerId) {
   const postsHTML = posts.map((post) => createPostCard(post)).join('');
   container.innerHTML = postsHTML;
 
+  hydratePostMetrics(container);
   console.log(`Rendered ${posts.length} posts to #${containerId}`);
 }
 
