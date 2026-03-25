@@ -122,6 +122,7 @@ function mapLocalPost(entry) {
     slug: entry.slug,
     link: path,
     articlePath: path,
+    articleTitle: entry.title,
     pubDate: entry.pubDate,
     updatedAt: entry.updatedAt || '',
     description: excerpt,
@@ -171,6 +172,7 @@ function createPostMetricsHtml(post, classNamePrefix) {
   const metrics = getPostMetrics(post);
   const items = [];
   const articlePath = normalizeArticlePath(post.articlePath || post.link);
+  const articleTitle = typeof post.articleTitle === 'string' ? post.articleTitle.trim() : '';
 
   if (metrics.readTime) {
     items.push(`<div class="${classNamePrefix}-stat"><span>${PAGE_STRINGS.metricReadTime}</span> <strong>${metrics.readTime}</strong></div>`);
@@ -191,7 +193,8 @@ function createPostMetricsHtml(post, classNamePrefix) {
 
   const slugAttribute = post.slug ? ` data-post-slug="${post.slug}"` : '';
   const pathAttribute = articlePath ? ` data-post-path="${articlePath}"` : '';
-  return `<div class="${classNamePrefix}-stats" aria-label="Article metrics"${slugAttribute}${pathAttribute}>${items.join('')}</div>`;
+  const titleAttribute = articleTitle ? ` data-post-title="${escapeHtml(articleTitle)}"` : '';
+  return `<div class="${classNamePrefix}-stats" aria-label="Article metrics"${slugAttribute}${pathAttribute}${titleAttribute}>${items.join('')}</div>`;
 }
 
 async function fetchPostCommunitySummary(articleSlug) {
@@ -236,13 +239,21 @@ async function fetchPostCommunitySummary(articleSlug) {
 }
 
 async function fetchPostReadSummaries(articlePaths) {
-  const normalizedPaths = [...new Set(
+  const normalizedEntries = [...new Map(
     (Array.isArray(articlePaths) ? articlePaths : [])
-      .map(normalizeArticlePath)
-      .filter(Boolean)
-  )];
+      .map((entry) => {
+        const path = normalizeArticlePath(entry && entry.articlePath);
+        const title = typeof entry?.articleTitle === 'string' ? entry.articleTitle.trim() : '';
+        if (!path || !title) {
+          return null;
+        }
 
-  if (normalizedPaths.length === 0) {
+        return [path, { articlePath: path, articleTitle: title }];
+      })
+      .filter(Boolean)
+  ).values()];
+
+  if (normalizedEntries.length === 0) {
     return new Map();
   }
 
@@ -252,8 +263,8 @@ async function fetchPostReadSummaries(articlePaths) {
     return new Map();
   }
 
-  const uncachedPaths = normalizedPaths.filter((path) => !POST_READ_SUMMARY_CACHE.has(path));
-  if (uncachedPaths.length > 0) {
+  const uncachedEntries = normalizedEntries.filter((entry) => !POST_READ_SUMMARY_CACHE.has(entry.articlePath));
+  if (uncachedEntries.length > 0) {
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -262,7 +273,7 @@ async function fetchPostReadSummaries(articlePaths) {
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          articlePaths: uncachedPaths
+          articles: uncachedEntries
         })
       });
 
@@ -275,19 +286,19 @@ async function fetchPostReadSummaries(articlePaths) {
         ? payload.readCounts
         : {};
 
-      uncachedPaths.forEach((path) => {
-        const value = Number(counts[path]);
-        POST_READ_SUMMARY_CACHE.set(path, Number.isFinite(value) && value >= 0 ? value : null);
+      uncachedEntries.forEach(({ articlePath }) => {
+        const value = Number(counts[articlePath]);
+        POST_READ_SUMMARY_CACHE.set(articlePath, Number.isFinite(value) && value >= 0 ? value : null);
       });
     } catch (error) {
-      uncachedPaths.forEach((path) => {
-        POST_READ_SUMMARY_CACHE.set(path, null);
+      uncachedEntries.forEach(({ articlePath }) => {
+        POST_READ_SUMMARY_CACHE.set(articlePath, null);
       });
       throw error;
     }
   }
 
-  return new Map(normalizedPaths.map((path) => [path, POST_READ_SUMMARY_CACHE.get(path)]));
+  return new Map(normalizedEntries.map(({ articlePath }) => [articlePath, POST_READ_SUMMARY_CACHE.get(articlePath)]));
 }
 
 async function hydratePostMetrics(root = document) {
@@ -296,13 +307,16 @@ async function hydratePostMetrics(root = document) {
     return;
   }
 
-  const articlePaths = metricGroups
-    .map((group) => group.getAttribute('data-post-path'))
-    .filter(Boolean);
+  const articleEntries = metricGroups
+    .map((group) => ({
+      articlePath: group.getAttribute('data-post-path'),
+      articleTitle: group.getAttribute('data-post-title')
+    }))
+    .filter((entry) => entry.articlePath && entry.articleTitle);
 
   let readCounts = new Map();
   try {
-    readCounts = await fetchPostReadSummaries(articlePaths);
+    readCounts = await fetchPostReadSummaries(articleEntries);
   } catch (error) {
     console.error('Unable to hydrate read counts', error);
   }
