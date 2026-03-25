@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  File role: Archive page that shows all editions.
+  Project relation: Shares style.css and main.js with the homepage and uses beehiiv.js
+  to render local processed posts from the project data files.
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Editions — INSPIRE</title>
+<link rel="canonical" href="https://tuurlauryssen.com/blog.html">
+<link rel="alternate" hreflang="en" href="https://tuurlauryssen.com/blog.html">
+<link rel="alternate" hreflang="nl" href="https://tuurlauryssen.com/nl/blog.html">
+<link rel="alternate" hreflang="x-default" href="https://tuurlauryssen.com/blog.html">
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+<!-- Stylesheet -->
+<link rel="stylesheet" href="../assets/css/style.css">
+
+<!-- SEO Meta Tags -->
+<meta name="description" content="Browse all editions of Inspire — interviews with remarkable people and ideas worth understanding.">
+<meta property="og:title" content="All Editions — INSPIRE">
+<meta property="og:description" content="Every interview and insight, in one place.">
+<style>
+  .sandbox-card-note {
+    margin-top: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    color: rgba(27, 44, 69, 0.62);
+  }
+
+  .s-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .s-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border: 1px solid rgba(27, 44, 69, 0.1);
+    background: rgba(245, 240, 232, 0.56);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #1B2C45;
+  }
+
+  .s-stat strong {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  .s-read {
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- SCROLL PROGRESS -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-left">
+    <a href="../index.html" class="nav-logo" data-brand-lockup>Inspire</a>
+    <div class="nav-divider"></div>
+    <div class="nav-tagline">Finding People Worth Learning From</div>
+  </div>
+  <div class="nav-right">
+    <a class="nl-link" href="../nl/blog.html">NL</a>
+    <button class="nav-cta" onclick="window.location.href='../index.html#subscribe'">Subscribe Free</button>
+  </div>
+</nav>
+
+<!-- ── BLOG HEADER ── -->
+<section class="blog-header sr">
+  <div class="container">
+    <div class="eyebrow">Archive</div>
+    <h1 class="blog-title">All Editions</h1>
+    <p class="blog-subtitle">Every interview and insight, in one place. Filter by type or browse chronologically.</p>
+    
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button class="ftab active" data-filter="all">All</button>
+      <button class="ftab" data-filter="interview">🎙 Interviews</button>
+      <button class="ftab" data-filter="learned">📖 Things I Learned</button>
+    </div>
+    <p class="sandbox-card-note">Sandbox test: trying a compact metadata row with demo likes and reads on each article card.</p>
+  </div>
+</section>
+
+<!-- ── ALL POSTS GRID ── -->
+<section class="all-posts-section">
+  <div class="container">
+    <div class="stories-grid" id="allPosts">
+      <div class="loading">Loading all editions...</div>
+    </div>
+    
+    <!-- Load More Button -->
+    <div class="load-more-wrap" style="display:none;">
+      <button class="load-more-btn" id="loadMoreBtn">Load More Editions</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── PULL QUOTE ── -->
+<div class="pull-quote sr">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <p class="pq-text">"Every edition is a deliberate choice. No filler. No noise. Just people and ideas worth your attention."</p>
+  <div class="pq-author">Tuur Lauryssen · Founder, Inspire</div>
+</div>
+
+<!-- ── SUBSCRIBE CTA ── -->
+<section class="subscribe-cta sr">
+  <div class="container">
+    <div class="cta-content">
+      <h2 class="cta-title">Never miss an edition</h2>
+      <p class="cta-desc">Join 1,200+ readers getting conversations and insights worth understanding, delivered weekly in English and Dutch.</p>
+      <div class="subscribe-row-inline">
+        <form action="#" method="post" data-subscribe-form>
+          <input type="email" name="email" placeholder="Your email address" required>
+          <button type="submit">Subscribe Free</button>
+          <p class="cta-note" data-subscribe-feedback aria-live="polite"></p>
+        </form>
+      </div>
+      <p class="cta-note">Free · No spam · Unsubscribe anytime</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">INSPIRE</div>
+  <div class="footer-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#formats">Formats</a>
+    <a href="../blog.html">All Editions</a>
+    <a href="../index.html#contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Inspire by Tuur Lauryssen<span class="footer-updated" data-last-updated></span></div>
+</footer>
+
+<!-- Scripts -->
+<script>
+  window.INSPIRE_PAGE_CONFIG = {
+    postsDataUrl: '../assets/data/posts.json',
+    postLinkPrefix: '../'
+  };
+
+  window.INSPIRE_SANDBOX_CARD_METRICS = {
+    '1-ai-might-get-you-noticed-but-people-skills-get-you-hired': {
+      readTime: '11 min',
+      likes: 32,
+      reads: '1.2k'
+    }
+  };
+</script>
+<script src="../assets/js/site-config.js"></script>
+<script src="../assets/js/main.js"></script>
+<script src="../assets/data/posts-data.js"></script>
+<script src="../assets/js/beehiiv.js"></script>
+
+<script>
+  function getSandboxCardMetrics(post) {
+    const slug = String(post.link || '').split('/').pop().replace(/\.html$/, '');
+    const demo = (window.INSPIRE_SANDBOX_CARD_METRICS || {})[slug] || {};
+
+    return {
+      readTime: demo.readTime || '8 min',
+      likes: demo.likes || 18,
+      reads: demo.reads || '640'
+    };
+  }
+
+  createPostCard = function sandboxCreatePostCard(post) {
+    const type = getPostType(post);
+    const image = extractFeaturedImage(post);
+    const cleanExcerpt = cleanHTML(post.description).substring(0, 180) + '...';
+    const formattedDate = formatDate(post.pubDate);
+    const tags = extractTags(post);
+    const metrics = getSandboxCardMetrics(post);
+
+    const badge = type === 'interview'
+      ? { class: 's-badge-i', label: PAGE_STRINGS.interview }
+      : { class: 's-badge-l', label: PAGE_STRINGS.thingsILearned };
+
+    return `
+      <a class="s-card" data-type="${type}" data-date="${post.pubDate}" href="${post.link}">
+        <div class="s-img-wrap">
+          <div class="s-badge ${badge.class}">${badge.label}</div>
+          <img class="s-img" src="${image}" alt="${post.title}" loading="lazy" onerror="this.src='../assets/images/post-placeholder.jpg'">
+        </div>
+        <div class="s-meta">
+          <div class="s-tag">${tags}</div>
+          <div class="s-date">${formattedDate}</div>
+        </div>
+        <h3 class="s-title">${post.title}</h3>
+        <p class="s-excerpt">${cleanExcerpt}</p>
+        <div class="s-stats" aria-label="Article metrics preview">
+          <div class="s-stat"><span>Read</span> <strong>${metrics.readTime}</strong></div>
+          <div class="s-stat"><span>Likes</span> <strong>${metrics.likes}</strong></div>
+          <div class="s-stat"><span>Reads</span> <strong>${metrics.reads}</strong></div>
+        </div>
+        <div class="s-read">
+          ${PAGE_STRINGS.readEdition} &rarr;
+        </div>
+      </a>
+    `;
+  };
+
+  // Initialize blog page
+  window.addEventListener('DOMContentLoaded', () => {
+    loadAllPosts();
+    setupFilters();
+  });
+</script>
+
+</body>
+</html>
