@@ -15,6 +15,7 @@ window.INSPIRE_SITE_CONFIG = {
   contactSource: "website-contact",
   communitySummaryEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/article-community-summary",
   communityLikeEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/article-like-toggle",
+  readTrackEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/article-read-track",
   readSummaryEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/article-read-summary",
   communityCommentEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/article-comment-submit",
   communityCommentsEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/article-comments-list"

@@ -102,6 +102,7 @@ function getArticleMetadata() {
 
   return {
     article_slug: articleSlug,
+    article_path: window.location.pathname,
     article_title: title,
     article_language: articleLanguage,
     article_type: articleType,
@@ -400,6 +401,29 @@ async function postJson(url, payload) {
   return data;
 }
 
+async function trackArticleRead(eventType, extraMetadata = {}) {
+  const articleMetadata = getArticleMetadata();
+  const siteConfig = getSiteConfig();
+  if (!articleMetadata || !siteConfig.readTrackEndpoint) {
+    return null;
+  }
+
+  return postJson(siteConfig.readTrackEndpoint, {
+    articleSlug: articleMetadata.article_slug,
+    articlePath: articleMetadata.article_path,
+    articleTitle: articleMetadata.article_title,
+    articleLanguage: articleMetadata.article_language,
+    articleType: articleMetadata.article_type,
+    visitorToken: getVisitorToken(),
+    eventType,
+    source: "website-article",
+    metadata: {
+      page: window.location.pathname,
+      ...extraMetadata,
+    },
+  });
+}
+
 async function initArticleCommunity() {
   const articleMetadata = getArticleMetadata();
   const siteConfig = getSiteConfig();
@@ -529,11 +553,44 @@ function initArticleAnalytics() {
 
   const trackedThresholds = new Set();
   let readCompleteTracked = false;
+  let openedTracked = false;
+  let engagedTracked = false;
   let activeSeconds = 0;
+
+  async function maybeTrackOpened() {
+    if (openedTracked) {
+      return;
+    }
+
+    openedTracked = true;
+    try {
+      await trackArticleRead("opened");
+    } catch (error) {
+      console.error("Unable to track article open", error);
+    }
+  }
+
+  async function maybeTrackEngagedRead() {
+    if (engagedTracked || activeSeconds < 10) {
+      return;
+    }
+
+    engagedTracked = true;
+
+    try {
+      await trackArticleRead("engaged", {
+        active_seconds: activeSeconds,
+      });
+    } catch (error) {
+      engagedTracked = false;
+      console.error("Unable to track engaged article read", error);
+    }
+  }
 
   window.setInterval(() => {
     if (!document.hidden) {
       activeSeconds += 1;
+      maybeTrackEngagedRead();
       maybeTrackReadComplete();
     }
   }, 1000);
@@ -582,6 +639,7 @@ function initArticleAnalytics() {
 
   window.addEventListener("scroll", handleScroll, { passive: true });
   document.addEventListener("visibilitychange", maybeTrackReadComplete);
+  maybeTrackOpened();
   handleScroll();
 }
 
