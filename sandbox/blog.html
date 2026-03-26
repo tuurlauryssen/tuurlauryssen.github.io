@@ -165,13 +165,7 @@
     postLinkPrefix: '../'
   };
 
-  window.INSPIRE_SANDBOX_CARD_METRICS = {
-    '1-ai-might-get-you-noticed-but-people-skills-get-you-hired': {
-      readTime: '11 min',
-      likes: 32,
-      reads: '1.2k'
-    }
-  };
+  window.INSPIRE_SANDBOX_CARD_METRICS = {};
 </script>
 <script src="../assets/js/site-config.js"></script>
 <script src="../assets/js/main.js"></script>
@@ -184,9 +178,9 @@
     const demo = (window.INSPIRE_SANDBOX_CARD_METRICS || {})[slug] || {};
 
     return {
-      readTime: demo.readTime || '8 min',
-      likes: demo.likes || 18,
-      reads: demo.reads || '640'
+      readTime: demo.readTime || post.readTime || '',
+      likes: typeof demo.likes === 'number' ? String(demo.likes) : '',
+      reads: demo.reads || ''
     };
   }
 
@@ -215,9 +209,9 @@
         <h3 class="s-title">${post.title}</h3>
         <p class="s-excerpt">${cleanExcerpt}</p>
         <div class="s-stats" aria-label="Article metrics preview">
-          <div class="s-stat"><span>Read</span> <strong>${metrics.readTime}</strong></div>
-          <div class="s-stat"><span>Likes</span> <strong>${metrics.likes}</strong></div>
-          <div class="s-stat"><span>Reads</span> <strong>${metrics.reads}</strong></div>
+          ${metrics.readTime ? `<div class="s-stat"><span>Read</span> <strong>${metrics.readTime}</strong></div>` : ''}
+          ${metrics.likes ? `<div class="s-stat"><span>Likes</span> <strong>${metrics.likes}</strong></div>` : ''}
+          ${metrics.reads ? `<div class="s-stat"><span>Reads</span> <strong>${metrics.reads}</strong></div>` : ''}
         </div>
         <div class="s-read">
           ${PAGE_STRINGS.readEdition} &rarr;

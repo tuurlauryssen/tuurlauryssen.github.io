@@ -179,8 +179,7 @@ function createPostMetricsHtml(post, classNamePrefix) {
   }
 
   if (post.slug) {
-    const likeCount = metrics.likes || '0';
-    items.push(`<div class="${classNamePrefix}-stat"><span>${PAGE_STRINGS.metricLikes}</span> <strong data-post-like-count>${likeCount}</strong></div>`);
+    items.push(`<div class="${classNamePrefix}-stat" data-post-like-stat hidden><span>${PAGE_STRINGS.metricLikes}</span> <strong data-post-like-count></strong></div>`);
   }
 
   if (articlePath) {
@@ -324,6 +323,7 @@ async function hydratePostMetrics(root = document) {
   await Promise.all(metricGroups.map(async (group) => {
     const articleSlug = group.getAttribute('data-post-slug');
     const articlePath = normalizeArticlePath(group.getAttribute('data-post-path') || '');
+    const likeStatNode = group.querySelector('[data-post-like-stat]');
     const likeCountNode = group.querySelector('[data-post-like-count]');
     const readCountNode = group.querySelector('[data-post-read-count]');
     const readStatNode = group.querySelector('[data-post-read-stat]');
@@ -338,6 +338,9 @@ async function hydratePostMetrics(root = document) {
       }
 
       likeCountNode.textContent = String(summary.likeCount);
+      if (likeStatNode) {
+        likeStatNode.hidden = false;
+      }
     } catch (error) {
       console.error(`Unable to hydrate metrics for ${articleSlug}`, error);
     }
