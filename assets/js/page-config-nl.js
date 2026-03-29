@@ -11,7 +11,7 @@ window.INSPIRE_PAGE_CONFIG = {
       submitting: 'Je inschrijving wordt opgeslagen...',
       failed: 'Inschrijven mislukt. Probeer het opnieuw.',
       success: 'Je staat op de lijst.',
-      submitLabel: 'Gratis inschrijven'
+      submitLabel: 'Subscribe gratis'
     },
     contact: {
       missingName: 'Voer je naam in.',

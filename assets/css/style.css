@@ -2745,6 +2745,20 @@ footer {
 @media (max-width: 480px) {
   nav {
     padding: 12px 14px;
+    min-height: 68px;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    row-gap: 0;
+  }
+
+  .nav-left,
+  .nav-right {
+    flex: 0 1 auto;
+  }
+
+  .nav-left {
+    min-width: 0;
   }
 
   .brand-lockup-text {
@@ -2753,7 +2767,11 @@ footer {
   }
 
   .nav-right {
-    align-items: stretch;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    width: auto;
+    margin-left: auto;
   }
 
   .nl-link,
@@ -2763,6 +2781,40 @@ footer {
     text-align: center;
     padding-left: 12px;
     padding-right: 12px;
+  }
+
+  .nav-cta {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .nl-link {
+    flex: 0 1 auto;
+    min-width: 0;
+    gap: 7px;
+    padding: 7px 14px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    margin-left: 52px;
+  }
+
+  html[lang="nl"] .nav-right {
+    gap: 6px;
+  }
+
+  html[lang="nl"] .nl-link {
+    margin-left: 52px;
+    padding: 7px 12px;
+  }
+
+  html[lang="nl"] .nav-cta {
+    padding-left: 6px;
+    padding-right: 6px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
   }
 }
 
