@@ -2479,30 +2479,169 @@ footer {
   }
 
   nav {
-    padding: 0 24px;
-    height: auto;
+    padding: 0 clamp(14px, 3vw, 24px);
+    height: 68px;
     min-height: 68px;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    row-gap: 12px;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: clamp(8px, 1.5vw, 16px);
+    row-gap: 0;
   }
 
   .nav-left,
   .nav-right {
-    flex: 1 1 100%;
+    flex: 0 1 auto;
   }
 
   .nav-left {
+    flex: 1 1 auto;
     min-width: 0;
+    padding-right: clamp(175px, 24vw, 210px);
   }
 
   .nav-right {
-    justify-content: flex-start;
+    flex: 0 0 auto;
+    position: absolute;
+    right: clamp(14px, 3vw, 24px);
+    top: 50%;
+    transform: translateY(-50%);
+    justify-content: flex-end;
+    width: auto;
+    margin-left: auto;
+    gap: 8px;
+  }
+
+  .nav-logo {
+    min-width: 0;
+  }
+
+  .brand-lockup-text {
+    white-space: nowrap;
+  }
+
+  .nav-logo .brand-mark {
+    width: clamp(32px, 5vw, 38px);
+    height: clamp(32px, 5vw, 38px);
+    border-radius: clamp(10px, 1.6vw, 13px);
+  }
+
+  .nav-logo .brand-mark svg {
+    width: clamp(18px, 3vw, 23px);
+    height: clamp(18px, 3vw, 23px);
+  }
+
+  .brand-lockup {
+    gap: clamp(5px, 1.2vw, 8px);
+  }
+
+  .brand-lockup-text {
+    line-height: 1;
+  }
+
+  .nl-link,
+  .nav-cta {
+    flex: 0 0 auto;
+    min-height: 38px;
+    white-space: nowrap;
+  }
+
+  .nl-link {
+    padding: 7px 10px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .nav-cta {
+    padding: 8px 10px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  html[lang="nl"] .nav-right {
+    gap: 6px;
+  }
+
+  html[lang="nl"] .nav-left {
+    padding-right: clamp(155px, 22vw, 190px);
+  }
+
+  html[lang="nl"] .nl-link {
+    padding: 7px 10px;
+  }
+
+  html[lang="nl"] .nav-cta {
+    padding-left: 6px;
+    padding-right: 6px;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
   }
 
   .nav-tagline,
   .nav-divider {
     display: none;
+  }
+
+  @media (max-width: 390px) {
+    nav {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .nav-left {
+      padding-right: 160px;
+    }
+
+    .nav-logo {
+      font-size: 19px;
+      letter-spacing: 0.16em;
+    }
+
+    .nav-logo .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+    }
+
+    .nav-logo .brand-mark svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .brand-lockup {
+      gap: 5px;
+    }
+
+    .nav-right {
+      right: 10px;
+      gap: 6px;
+    }
+
+    .nl-link {
+      padding: 6px 8px;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-cta {
+      padding: 7px 8px;
+      font-size: 9px;
+      letter-spacing: 0.06em;
+    }
+
+    html[lang="nl"] .nav-left {
+      padding-right: 150px;
+    }
+
+    html[lang="nl"] .nav-right {
+      gap: 5px;
+    }
+
+    html[lang="nl"] .nav-cta {
+      padding-left: 5px;
+      padding-right: 5px;
+      letter-spacing: 0.03em;
+    }
   }
 
   .hero {
@@ -2692,129 +2831,6 @@ footer {
   .footer-links {
     flex-wrap: wrap;
     justify-content: center;
-  }
-}
-
-@media (max-width: 640px) {
-  nav {
-    padding: 14px 18px;
-    row-gap: 10px;
-  }
-
-  .nav-left {
-    align-items: center;
-  }
-
-  .nav-logo {
-    max-width: 100%;
-  }
-
-  .nav-logo .brand-mark {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-  }
-
-  .nav-logo .brand-mark svg {
-    width: 25px;
-    height: 25px;
-  }
-
-  .brand-lockup {
-    gap: 10px;
-  }
-
-  .brand-lockup-text {
-    font-size: 20px;
-    letter-spacing: 0.18em;
-    line-height: 1;
-    white-space: nowrap;
-  }
-
-  .nav-right {
-    gap: 10px;
-    width: 100%;
-  }
-
-  .nl-link,
-  .nav-cta {
-    min-height: 42px;
-  }
-}
-
-@media (max-width: 480px) {
-  nav {
-    padding: 12px 14px;
-    min-height: 68px;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 8px;
-    row-gap: 0;
-  }
-
-  .nav-left,
-  .nav-right {
-    flex: 0 1 auto;
-  }
-
-  .nav-left {
-    min-width: 0;
-  }
-
-  .brand-lockup-text {
-    font-size: 18px;
-    letter-spacing: 0.16em;
-  }
-
-  .nav-right {
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-    width: auto;
-    margin-left: auto;
-  }
-
-  .nl-link,
-  .nav-cta {
-    flex: 1 1 0;
-    justify-content: center;
-    text-align: center;
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .nav-cta {
-    flex: 0 1 auto;
-    min-width: 0;
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-
-  .nl-link {
-    flex: 0 1 auto;
-    min-width: 0;
-    gap: 7px;
-    padding: 7px 14px;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    margin-left: 52px;
-  }
-
-  html[lang="nl"] .nav-right {
-    gap: 6px;
-  }
-
-  html[lang="nl"] .nl-link {
-    margin-left: 52px;
-    padding: 7px 12px;
-  }
-
-  html[lang="nl"] .nav-cta {
-    padding-left: 6px;
-    padding-right: 6px;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    white-space: nowrap;
   }
 }
 
