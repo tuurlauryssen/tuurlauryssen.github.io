@@ -1366,9 +1366,10 @@ nav {
 }
 
 .article-topbar-inner {
-  max-width: 1120px;
+  max-width: none;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 0 64px;
+  height: 68px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1376,34 +1377,35 @@ nav {
 }
 
 .article-brand {
-  font-family: 'Inter', 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--navy);
   text-decoration: none;
+  transition: opacity 0.2s;
 }
 
 .article-brand.brand-lockup {
-  gap: 12px;
+  gap: 14px;
 }
 
 .article-brand .brand-mark {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
   border: 1px solid rgba(27,44,69,0.1);
   background:
     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.82), rgba(255,255,255,0) 58%),
     linear-gradient(180deg, rgba(245,240,232,0.98), rgba(234,227,213,0.92));
-  box-shadow: 0 8px 20px rgba(27,44,69,0.08);
+  box-shadow: 0 8px 24px rgba(27,44,69,0.08);
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
 .article-brand .brand-mark svg {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
 }
 
 .article-brand:hover .brand-mark,
@@ -1420,8 +1422,8 @@ nav {
 
 .article-topbar-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-wrap: nowrap;
+  gap: 16px;
   align-items: center;
 }
 
@@ -1451,20 +1453,39 @@ nav {
 .article-action-link {
   display: inline-flex;
   align-items: center;
-  padding: 8px 12px;
+  justify-content: center;
   border: 1px solid var(--line);
-  background: #fff;
+  padding: 7px 14px;
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-weight: 600;
-  color: var(--navy);
+  font-weight: 400;
+  color: var(--muted);
   text-decoration: none;
-  border-radius: 999px;
+  white-space: nowrap;
+  transition: border-color 0.2s, color 0.2s, background 0.25s, transform 0.15s;
 }
 
 .article-action-link:hover {
-  background: var(--beige);
+  border-color: var(--navy);
+  color: var(--navy);
+}
+
+.article-topbar-actions .article-action-link:last-child {
+  background: var(--navy);
+  color: var(--beige);
+  border-color: var(--navy);
+  padding: 10px 26px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+}
+
+.article-topbar-actions .article-action-link:last-child:hover {
+  background: var(--navy2);
+  color: var(--beige);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 640px) {
@@ -2582,6 +2603,46 @@ footer {
     display: none;
   }
 
+  .article-topbar-inner {
+    padding: 0 clamp(14px, 3vw, 24px);
+    height: 68px;
+    flex-wrap: nowrap;
+    gap: clamp(8px, 1.5vw, 16px);
+  }
+
+  .article-brand {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .article-brand .brand-mark {
+    width: clamp(32px, 5vw, 38px);
+    height: clamp(32px, 5vw, 38px);
+    border-radius: clamp(10px, 1.6vw, 13px);
+  }
+
+  .article-brand .brand-mark svg {
+    width: clamp(18px, 3vw, 23px);
+    height: clamp(18px, 3vw, 23px);
+  }
+
+  .article-topbar-actions {
+    flex: 0 0 auto;
+    gap: 8px;
+  }
+
+  .article-action-link {
+    padding: 7px 10px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .article-topbar-actions .article-action-link:last-child {
+    padding: 8px 10px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
   @media (max-width: 390px) {
     nav {
       padding-left: 10px;
@@ -2641,6 +2702,38 @@ footer {
       padding-left: 5px;
       padding-right: 5px;
       letter-spacing: 0.03em;
+    }
+
+    .article-topbar-inner {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .article-brand .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+    }
+
+    .article-brand .brand-mark svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .article-topbar-actions {
+      gap: 6px;
+    }
+
+    .article-action-link {
+      padding: 6px 8px;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+
+    .article-topbar-actions .article-action-link:last-child {
+      padding: 7px 8px;
+      font-size: 9px;
+      letter-spacing: 0.06em;
     }
   }
 
