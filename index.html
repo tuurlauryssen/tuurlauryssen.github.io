@@ -2642,7 +2642,7 @@
       <div class="orb orb1"></div>
       <div class="orb orb2"></div>
       <div class="orb orb3"></div>
-      <p class="pq-text" data-copy="quote.text">"The best insights don't come from books or podcasts. They come from sitting down with someone who has actually done the work."</p>
+      <p class="pq-text" data-quote-rotate>"Everyone is fighting for my attention. Almost nobody is asking me to think."</p>
       <div class="pq-author" data-copy-html="quote.author">Tuur Lauryssen &middot; Founder, Inspire</div>
     </div>
 
@@ -2692,6 +2692,25 @@
           element.innerHTML = value;
         }
       });
+    }
+
+    function initQuoteRotation() {
+      const el = document.querySelector('[data-quote-rotate]');
+      const quotes = (window.INSPIRE_HOME_CONTENT || {}).quote?.quotes;
+      if (!el || !Array.isArray(quotes) || quotes.length < 2) return;
+
+      el.style.transition = 'opacity 0.4s ease';
+      let index = 0;
+      el.textContent = quotes[0];
+
+      setInterval(() => {
+        el.style.opacity = '0';
+        setTimeout(() => {
+          index = (index + 1) % quotes.length;
+          el.textContent = quotes[index];
+          el.style.opacity = '1';
+        }, 400);
+      }, 5000);
     }
 
     function initHeroLogo() {
@@ -2832,6 +2851,7 @@
 
     function initIndexPage() {
       applyHomeContent();
+      initQuoteRotation();
       initHeroLogo();
 
       const letters = document.querySelectorAll('#ihInspire .ih-letter');

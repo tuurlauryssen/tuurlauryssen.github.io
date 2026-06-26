@@ -2,7 +2,7 @@ window.INSPIRE_HOME_CONTENT = {
   hero: {
     est: 'Newsletter &middot; Est. 2026',
     taglineHtml: 'Jouw aandacht waard.',
-    description: 'Twee soorten verhalen &mdash; gesprekken met opmerkelijke mensen en idee&euml;n die het waard zijn om te begrijpen. In het Engels en Nederlands.',
+    description: 'Twee formats. Ik interview mensen die het waard zijn om over te horen, en schrijf columns over wat ik maar niet uit mijn hoofd kan zetten. In het Nederlands en Engels.',
     editions: '1',
     languages: '2'
   },
@@ -12,16 +12,21 @@ window.INSPIRE_HOME_CONTENT = {
     note: 'Geen spam. Alleen de nieuwsbrief. Uitschrijven kan altijd.'
   },
   about: {
-    description: 'Een newsletter gebouwd op het idee dat je van iedereen iets kan leren.',
-    what: 'Gesprekken met mensen die echte wijsheid meedragen, en artikels over wat me bezighoudt.',
-    why: 'Echte inzichten vind je bij mensen, niet online.',
-    who: 'Wat mij inspireert, kan misschien ook iemand anders inspireren.'
+    description: 'Een newsletter over mensen en idee&euml;n die je tijd waard zijn.',
+    what: 'Interviews en columns. Mensen met wie ik heb gesproken, dingen waar ik over nagedacht heb.',
+    why: 'Nieuwsgierigheid. Dat is alles.',
+    who: 'Als het mij aan het denken zette, zet het jou misschien ook aan het denken.'
   },
   formats: {
-    description: 'Twee formats. Gesprekken waarin de ander aan het woord is, en columns waarin ik dat ben.'
+    description: 'Interviews en columns. E&eacute;n waarbij ik luister, e&eacute;n waarbij ik praat.'
   },
   quote: {
-    text: '"Veel van de meest waardevolle dingen die ik heb geleerd, kwamen uit gesprekken met mensen. Vaak in de meest onverwachte momenten."',
+    quotes: [
+      '"Iedereen vecht om mijn aandacht. Bijna niemand vraagt me om na te denken."',
+      '"Sommige mensen noemen het geluk. Ik noem het serendipiteit. Het soort dat gebeurt wanneer je oprecht nieuwsgierig bent naar de mensen om je heen."',
+      '"Ik heb vijf jaar techniek gestudeerd. Niemand heeft me gewaarschuwd dat mensen begrijpen moeilijker zou zijn."',
+      '"Hoe meer ik leer, hoe meer ik besef hoeveel ik nog niet weet. Vroeger stoorde me dat. Nu is het het punt."'
+    ],
     author: 'Tuur Lauryssen &middot; Oprichter, Inspire'
   },
   contact: {

@@ -59,7 +59,7 @@
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
   <div class="orb orb3"></div>
-  <p class="pq-text">"Elke editie is een bewuste keuze. Geen opvulling. Geen ruis. Alleen mensen en ideeën die je aandacht waard zijn."</p>
+  <p class="pq-text" data-quote-rotate>"Iedereen vecht om mijn aandacht. Bijna niemand vraagt me om na te denken."</p>
   <div class="pq-author">Tuur Lauryssen &middot; Oprichter, Inspire</div>
 </div>
 
@@ -96,6 +96,29 @@
 <script src="../assets/js/main.js"></script>
 <script src="../assets/data/posts-data.js"></script>
 <script src="../assets/js/beehiiv.js"></script>
+<script>
+  (function () {
+    var quotes = [
+      '"Iedereen vecht om mijn aandacht. Bijna niemand vraagt me om na te denken."',
+      '"Sommige mensen noemen het geluk. Ik noem het serendipiteit. Het soort dat gebeurt wanneer je oprecht nieuwsgierig bent naar de mensen om je heen."',
+      '"Ik heb vijf jaar techniek gestudeerd. Niemand heeft me gewaarschuwd dat mensen begrijpen moeilijker zou zijn."',
+      '"Hoe meer ik leer, hoe meer ik besef hoeveel ik nog niet weet. Vroeger stoorde me dat. Nu is het het punt."'
+    ];
+    var el = document.querySelector('[data-quote-rotate]');
+    if (!el || quotes.length < 2) return;
+    el.style.transition = 'opacity 0.4s ease';
+    var index = 0;
+    el.textContent = quotes[0];
+    setInterval(function () {
+      el.style.opacity = '0';
+      setTimeout(function () {
+        index = (index + 1) % quotes.length;
+        el.textContent = quotes[index];
+        el.style.opacity = '1';
+      }, 400);
+    }, 5000);
+  })();
+</script>
 
 
 </body>

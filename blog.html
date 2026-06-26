@@ -83,7 +83,7 @@
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
   <div class="orb orb3"></div>
-  <p class="pq-text">"Every edition is a deliberate choice. No filler. No noise. Just people and ideas worth your attention."</p>
+  <p class="pq-text" data-quote-rotate>"Everyone is fighting for my attention. Almost nobody is asking me to think."</p>
   <div class="pq-author">Tuur Lauryssen · Founder, Inspire</div>
 </div>
 
@@ -122,6 +122,29 @@
 <script src="assets/js/main.js"></script>
 <script src="assets/data/posts-data.js"></script>
 <script src="assets/js/beehiiv.js"></script>
+<script>
+  (function () {
+    var quotes = [
+      '"Everyone is fighting for my attention. Almost nobody is asking me to think."',
+      '"Some people call it luck. I call it serendipity. The kind of thing that happens when you\'re genuinely curious about the people around you."',
+      '"I spent five years studying engineering. Nobody warned me that understanding people would be harder."',
+      '"The more I learn, the more I realise how much I still don\'t know. That used to bother me. Now it\'s the whole point."'
+    ];
+    var el = document.querySelector('[data-quote-rotate]');
+    if (!el || quotes.length < 2) return;
+    el.style.transition = 'opacity 0.4s ease';
+    var index = 0;
+    el.textContent = quotes[0];
+    setInterval(function () {
+      el.style.opacity = '0';
+      setTimeout(function () {
+        index = (index + 1) % quotes.length;
+        el.textContent = quotes[index];
+        el.style.opacity = '1';
+      }, 400);
+    }, 5000);
+  })();
+</script>
 
 
 </body>

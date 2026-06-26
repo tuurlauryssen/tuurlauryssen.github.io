@@ -8,7 +8,7 @@ window.INSPIRE_HOME_CONTENT = {
   hero: {
     est: 'Newsletter &middot; Est. 2026',
     taglineHtml: 'Worth your attention.',
-    description: 'Two kinds of stories. Conversations with people who\'ve genuinely figured something out, and articles on whatever catches my attention. In Dutch and English.',
+    description: 'Two formats. I interview people worth knowing about, and write columns on whatever I can\'t stop thinking about. In Dutch and English.',
     editions: '1',
     languages: '2'
   },
@@ -18,17 +18,22 @@ window.INSPIRE_HOME_CONTENT = {
     note: 'No spam. Just the newsletter. Unsubscribe whenever.'
   },
   about: {
-    description: 'A newsletter built on the belief that you can learn something from anyone.',
-    what: 'Conversations with people who carry real wisdom. And articles on whatever I happen to be curious about.',
-    why: 'Real insight lives in people, not online.',
-    who: 'What inspires me might inspire someone else.'
+    description: 'A newsletter about people and ideas worth your time.',
+    what: 'Interviews and columns. People I\'ve talked to, things I\'ve thought about.',
+    why: 'Curiosity. That\'s it.',
+    who: 'If it made me think, it might make you think too.'
   },
   formats: {
-    description: 'Two formats. Interviews where I let the other person do the talking, and columns where I do.'
+    description: 'Interviews and columns. One where I listen, one where I talk.'
   },
   quote: {
-    text: '"Some of the most valuable things I’ve learned came from talking to people. Often in the most unexpected conversations."',
-    author: 'Tuur Lauryssen &middot; Founder, Inspire'
+    quotes: [
+      ‘"Everyone is fighting for my attention. Almost nobody is asking me to think."’,
+      ‘"Some people call it luck. I call it serendipity. The kind of thing that happens when you\’re genuinely curious about the people around you."’,
+      ‘"I spent five years studying engineering. Nobody warned me that understanding people would be harder."’,
+      ‘"The more I learn, the more I realise how much I still don\’t know. That used to bother me. Now it\’s the whole point."’
+    ],
+    author: ‘Tuur Lauryssen &middot; Founder, Inspire’
   },
   contact: {
     description: 'Know someone I should sit down with? Have a topic you want me to dig into? Or just want to say something? Drop me a message.'
