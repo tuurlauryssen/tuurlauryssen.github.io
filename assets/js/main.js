@@ -813,23 +813,6 @@ function initNavbarScroll() {
   }, { passive: true });
 }
 
-function initLazyLoad() {
-  const images = document.querySelectorAll('img[loading="lazy"]');
-
-  if ("IntersectionObserver" in window) {
-    const imageObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          img.src = img.dataset.src || img.src;
-          imageObserver.unobserve(img);
-        }
-      });
-    });
-
-    images.forEach((img) => imageObserver.observe(img));
-  }
-}
 
 function initMobileMenu() {
   const menuToggle = document.getElementById("menuToggle");
@@ -850,68 +833,7 @@ function initMobileMenu() {
   });
 }
 
-function initFormValidation() {
-  const forms = document.querySelectorAll("form:not([data-subscribe-form]):not([data-contact-form]):not([data-comment-form])");
 
-  forms.forEach((form) => {
-    form.addEventListener("submit", (e) => {
-      const emailInput = form.querySelector('input[type="email"]');
-
-      if (emailInput && !emailInput.value) {
-        e.preventDefault();
-        alert("Please enter your email address");
-        return;
-      }
-
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (emailInput && !emailPattern.test(emailInput.value)) {
-        e.preventDefault();
-        alert("Please enter a valid email address");
-      }
-    });
-  });
-}
-
-function initStatsCounter() {
-  const stats = document.querySelectorAll(".stat-num");
-
-  if (stats.length === 0) return;
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const target = entry.target;
-        const targetText = target.textContent;
-        const targetNumber = parseInt(targetText.replace(/[^0-9]/g, ""), 10);
-
-        if (Number.isNaN(targetNumber)) return;
-
-        animateCounter(target, 0, targetNumber, 1500, targetText);
-        observer.unobserve(target);
-      }
-    });
-  }, { threshold: 0.5 });
-
-  stats.forEach((stat) => observer.observe(stat));
-}
-
-function animateCounter(element, start, end, duration, originalText) {
-  const range = end - start;
-  const increment = range / (duration / 16);
-  let current = start;
-
-  const timer = window.setInterval(() => {
-    current += increment;
-
-    if (current >= end) {
-      window.clearInterval(timer);
-      element.textContent = originalText;
-    } else {
-      const suffix = originalText.match(/[^0-9]+$/)?.[0] || "";
-      element.textContent = `${Math.floor(current)}${suffix}`;
-    }
-  }, 16);
-}
 
 function initExternalLinks() {
   const links = document.querySelectorAll('a[href^="http"]');
@@ -929,25 +851,7 @@ function initExternalLinks() {
   });
 }
 
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
 
-function isMobile() {
-  return window.innerWidth <= 768;
-}
-
-function isTablet() {
-  return window.innerWidth > 768 && window.innerWidth <= 1024;
-}
 
 function initKeyboardNav() {
   if (!document.querySelector(".skip-link")) {
@@ -1362,8 +1266,6 @@ function initLastUpdated() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Initializing site...");
-
   initializeAnalytics().catch((error) => {
     console.error("Analytics initialization failed", error);
   });
@@ -1374,13 +1276,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initParallax();
   initSmoothScroll();
   initNavbarScroll();
-  initLazyLoad();
   initMobileMenu();
-  initFormValidation();
   initSubscribeForms();
   initContactForm();
   initBrandLogos();
-  initStatsCounter();
   initExternalLinks();
   initKeyboardNav();
   initLastUpdated();
@@ -1390,15 +1289,6 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("Article community failed to initialize", error);
   });
 
-  console.log("Site initialized successfully");
-});
-
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    console.log("Page hidden");
-  } else {
-    console.log("Page visible");
-  }
 });
 
 window.addEventListener("error", (e) => {
@@ -1413,21 +1303,15 @@ document.addEventListener("components:loaded", () => {
   initParallax();
   initSmoothScroll();
   initNavbarScroll();
-  initLazyLoad();
-  initFormValidation();
   initSubscribeForms();
   initContactForm();
   initBrandLogos();
-  initStatsCounter();
   initExternalLinks();
   initLastUpdated();
   initOutboundLinkTracking();
 });
 
 window.siteUtils = {
-  isMobile,
-  isTablet,
-  debounce,
   trackAnalyticsEvent,
   getArticleMetadata,
 };

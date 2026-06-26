@@ -15,14 +15,14 @@ const PAGE_STRINGS = {
   yesterday: 'Yesterday',
   daysAgo: '{count} days ago',
   interview: 'Interview',
-  thingsILearned: 'Essays',
+  thingsILearned: 'Column',
   readEdition: 'Read edition',
   metricReadTime: 'Read',
   metricLikes: 'Likes',
   metricReads: 'Reads',
   noInterviewsTitle: 'No interviews found yet.',
   noInterviewsDesc: 'Check back soon for the next conversation.',
-  noEssaysTitle: 'No essays found yet.',
+  noEssaysTitle: 'No columns found yet.',
   noEssaysDesc: 'Check back soon for the next idea worth understanding.',
   noPostsTitle: 'No posts found',
   noPostsDesc: 'Check back soon for new editions!'
@@ -696,7 +696,6 @@ function renderHomepageSplitPosts(posts) {
 
   hydratePostMetrics(interviewsContainer);
   hydratePostMetrics(learnedContainer);
-  console.log(`Rendered homepage split preview from ${posts.length} total posts`);
   return true;
 }
 
@@ -726,7 +725,6 @@ function renderPosts(posts, containerId) {
   container.innerHTML = postsHTML;
 
   hydratePostMetrics(container);
-  console.log(`Rendered ${posts.length} posts to #${containerId}`);
 }
 
 // =========================================
@@ -734,7 +732,6 @@ function renderPosts(posts, containerId) {
 // =========================================
 
 async function loadLatestPosts(limit = null) {
-  console.log('Loading latest posts...');
   const posts = filterPostsForSiteLanguage(await fetchBeehiivPosts());
 
   if (!renderHomepageSplitPosts(posts)) {
@@ -751,7 +748,6 @@ let displayedCount = 9;
 let currentFilter = 'all';
 
 async function loadAllPosts() {
-  console.log('Loading all posts...');
   allPostsCache = filterPostsForSiteLanguage(await fetchBeehiivPosts());
   displayPostsWithPagination();
 }
@@ -771,7 +767,6 @@ function displayPostsWithPagination() {
     loadMoreWrap.style.display = displayedCount < filteredPosts.length ? 'block' : 'none';
   }
 
-  console.log(`Showing ${postsToShow.length} of ${filteredPosts.length} posts`);
 }
 
 // =========================================
@@ -798,7 +793,6 @@ function setupFilters() {
     });
   });
 
-  console.log('Filters initialized');
 }
 
 // =========================================
@@ -833,42 +827,4 @@ if (document.getElementById('allPosts')) {
   });
 }
 
-// =========================================
-// SEARCH FUNCTIONALITY (Optional Enhancement)
-// =========================================
 
-function setupSearch() {
-  const searchInput = document.getElementById('searchInput');
-
-  if (!searchInput) return;
-
-  searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase();
-
-    if (query.length === 0) {
-      displayPostsWithPagination();
-      return;
-    }
-
-    const searchResults = allPostsCache.filter((post) => {
-      const searchText = `${post.title} ${post.description}`.toLowerCase();
-      return searchText.includes(query);
-    });
-
-    renderPosts(searchResults, 'allPosts');
-  });
-}
-
-// =========================================
-// ERROR HANDLING & DEBUGGING
-// =========================================
-
-window.addEventListener('error', (e) => {
-  console.error('JavaScript Error:', e.message);
-});
-
-console.log('Local post configuration:', {
-  localPostsUrl: BEEHIIV_CONFIG.localPostsUrl,
-  cacheDuration: `${CACHE_DURATION / 1000 / 60} minutes`,
-  siteLanguage: BEEHIIV_CONFIG.siteLanguage
-});

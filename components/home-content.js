@@ -6,7 +6,7 @@
 
 window.INSPIRE_HOME_CONTENT = {
   hero: {
-    est: 'Newsletter &middot; Since 2026',
+    est: 'Newsletter &middot; Est. 2026',
     taglineHtml: 'Finding people<br>worth learning from.',
     description: 'Two kinds of stories. Conversations with people who\'ve genuinely figured something out, and articles on whatever catches my attention. In Dutch and English.',
     editions: '1',
@@ -24,7 +24,7 @@ window.INSPIRE_HOME_CONTENT = {
     who: 'What inspires me might inspire someone else.'
   },
   formats: {
-    description: 'Two formats. Interviews where I let the other person do the talking, and essays where I do.'
+    description: 'Two formats. Interviews where I let the other person do the talking, and a column where I do.'
   },
   quote: {
     text: '"Some of the most valuable things I’ve learned came from talking to people. Often in the most unexpected conversations."',

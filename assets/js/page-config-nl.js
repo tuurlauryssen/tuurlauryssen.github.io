@@ -27,13 +27,6 @@ window.INSPIRE_PAGE_CONFIG = {
       locale: 'nl-BE',
       lastUpdatedPrefix: 'Laatst bijgewerkt op'
     },
-    analytics: {
-      consentTitle: 'Voorkeuren voor analytics',
-      consentText: 'Laat analytics toe zodat we bezoeken, leesgedrag en nuttige content beter kunnen begrijpen.',
-      consentAccept: 'Analytics toelaten',
-      consentReject: 'Weigeren',
-      consentManage: 'Privacy-instellingen'
-    },
     community: {
       heading: 'Praat mee',
       intro: 'Geef anoniem een like of stuur me rechtstreeks een privéreactie over dit artikel.',
@@ -58,14 +51,14 @@ window.INSPIRE_PAGE_CONFIG = {
     yesterday: 'Gisteren',
     daysAgo: '{count} dagen geleden',
     interview: 'Interview',
-    thingsILearned: 'Essays',
+    thingsILearned: 'Column',
     readEdition: 'Lees editie',
     metricReadTime: 'Leestijd',
     metricLikes: 'Likes',
     metricReads: 'Reads',
     noInterviewsTitle: 'Nog geen interviews gevonden.',
     noInterviewsDesc: 'Kom binnenkort terug voor het volgende gesprek.',
-    noEssaysTitle: 'Nog geen essays gevonden.',
+    noEssaysTitle: 'Nog geen columns gevonden.',
     noEssaysDesc: 'Kom binnenkort terug voor het volgende inzicht.',
     noPostsTitle: 'Geen posts gevonden',
     noPostsDesc: 'Kom binnenkort terug voor nieuwe edities.'
