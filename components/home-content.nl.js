@@ -1,7 +1,7 @@
 window.INSPIRE_HOME_CONTENT = {
   hero: {
     est: 'Newsletter &middot; Est. 2026',
-    taglineHtml: 'Finding people<br>worth learning from.',
+    taglineHtml: 'Jouw aandacht waard.',
     description: 'Twee soorten verhalen &mdash; gesprekken met opmerkelijke mensen en idee&euml;n die het waard zijn om te begrijpen. In het Engels en Nederlands.',
     editions: '1',
     languages: '2'
@@ -18,7 +18,7 @@ window.INSPIRE_HOME_CONTENT = {
     who: 'Wat mij inspireert, kan misschien ook iemand anders inspireren.'
   },
   formats: {
-    description: 'Twee formats. Gesprekken waarin de ander aan het woord is, en een column waarin ik dat ben.'
+    description: 'Twee formats. Gesprekken waarin de ander aan het woord is, en columns waarin ik dat ben.'
   },
   quote: {
     text: '"Veel van de meest waardevolle dingen die ik heb geleerd, kwamen uit gesprekken met mensen. Vaak in de meest onverwachte momenten."',
