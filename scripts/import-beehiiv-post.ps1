@@ -177,7 +177,7 @@ function Get-LocalizedArticleCopy {
     return @{
       Home = 'Home'
       Archive = 'Alle edities'
-      TypeLabel = if ($Type -eq 'interview') { 'Interview' } else { 'Dingen die ik leerde' }
+      TypeLabel = if ($Type -eq 'interview') { 'Interview' } else { 'Column' }
       SourceLabel = 'Originele bron'
       EndcapTitle = 'Lees verder op INSPIRE'
       EndcapText = 'Ga terug naar de homepage of blader door alle edities.'
@@ -188,7 +188,7 @@ function Get-LocalizedArticleCopy {
   return @{
     Home = 'Home'
     Archive = 'All Editions'
-    TypeLabel = if ($Type -eq 'interview') { 'Interview' } else { 'Things I Learned' }
+    TypeLabel = if ($Type -eq 'interview') { 'Interview' } else { 'Column' }
     SourceLabel = 'Original source'
     EndcapTitle = 'Continue reading on INSPIRE'
     EndcapText = 'Go back to the homepage or browse all editions.'
