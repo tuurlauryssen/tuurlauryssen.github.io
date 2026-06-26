@@ -2695,22 +2695,39 @@
     }
 
     function initQuoteRotation() {
-      const el = document.querySelector('[data-quote-rotate]');
-      const quotes = (window.INSPIRE_HOME_CONTENT || {}).quote?.quotes;
-      if (!el || !Array.isArray(quotes) || quotes.length < 2) return;
+      var el = document.querySelector('[data-quote-rotate]');
+      var content = window.INSPIRE_HOME_CONTENT;
+      if (!el || !content || !content.quote || !Array.isArray(content.quote.quotes)) return;
+      var quotes = content.quote.quotes;
+      if (quotes.length < 2) return;
 
-      el.style.transition = 'opacity 0.4s ease';
-      let index = 0;
-      el.textContent = quotes[0];
+      var index = 0;
 
-      setInterval(() => {
-        el.style.opacity = '0';
-        setTimeout(() => {
-          index = (index + 1) % quotes.length;
-          el.textContent = quotes[index];
-          el.style.opacity = '1';
-        }, 400);
-      }, 5000);
+      function typeQuote(text, onDone) {
+        el.textContent = '';
+        var i = 0;
+        function next() {
+          if (i < text.length) {
+            el.textContent += text[i];
+            i++;
+            setTimeout(next, 32);
+          } else if (onDone) {
+            onDone();
+          }
+        }
+        next();
+      }
+
+      function cycle() {
+        index = (index + 1) % quotes.length;
+        typeQuote(quotes[index], function () {
+          setTimeout(cycle, 5000);
+        });
+      }
+
+      typeQuote(quotes[0], function () {
+        setTimeout(cycle, 5000);
+      });
     }
 
     function initHeroLogo() {
