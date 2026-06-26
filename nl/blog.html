@@ -107,8 +107,8 @@
     var el = document.querySelector('[data-quote-rotate]');
     if (!el || quotes.length < 2) return;
     el.style.transition = 'opacity 0.4s ease';
-    var index = 0;
-    el.textContent = quotes[0];
+    var index = 2;
+    el.textContent = quotes[2];
     setInterval(function () {
       el.style.opacity = '0';
       setTimeout(function () {
