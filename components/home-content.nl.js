@@ -30,6 +30,6 @@ window.INSPIRE_HOME_CONTENT = {
     author: 'Tuur Lauryssen &middot; Oprichter, Inspire'
   },
   contact: {
-    description: 'Ken je iemand met wie ik eens moet gaan praten? Of een onderwerp waar ik in moet duiken? Of wil je gewoon iets delen? Stuur me gerust een bericht.'
+    description: 'Ken je iemand die ik zou moeten ontmoeten? Een onderwerp waar ik over na zou moeten denken? Ik ben oprecht nieuwsgierig. Stuur me een bericht.'
   }
 };

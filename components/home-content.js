@@ -36,6 +36,6 @@ window.INSPIRE_HOME_CONTENT = {
     author: ‘Tuur Lauryssen &middot; Founder, Inspire’
   },
   contact: {
-    description: 'Know someone I should sit down with? Have a topic you want me to dig into? Or just want to say something? Drop me a message.'
+    description: 'Have someone in mind I should meet? A topic I should think about? I\'m genuinely curious. Drop me a message.'
   }
 };
