@@ -8,7 +8,6 @@ window.INSPIRE_SITE_CONFIG = {
   gaMeasurementId: "G-06BN0LL37Q",
   subscribeEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/subscribe",
   subscribeSource: "website",
-  subscribeLanguage: "en",
   contactEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/contact-message",
   contactSource: "website-contact",
   communitySummaryEndpoint: "https://jnhygvustbwwzfqrpklr.supabase.co/functions/v1/article-community-summary",
