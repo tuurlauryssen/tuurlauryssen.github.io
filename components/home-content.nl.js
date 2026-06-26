@@ -3,9 +3,8 @@ window.INSPIRE_HOME_CONTENT = {
     est: 'Newsletter &middot; Est. 2026',
     taglineHtml: 'Finding people<br>worth learning from.',
     description: 'Twee soorten verhalen &mdash; gesprekken met opmerkelijke mensen en ideeen die het waard zijn om te begrijpen. In het Engels en Nederlands.',
-    subscribers: '0',
     editions: '1',
-    languages: '5+'
+    languages: '2'
   },
   subscribe: {
     title: 'Ontvang de volgende editie in je inbox.',
@@ -19,7 +18,7 @@ window.INSPIRE_HOME_CONTENT = {
     who: 'Wat mij inspireert, kan misschien ook iemand anders inspireren.'
   },
   formats: {
-    description: 'Twee formats. Gesprekken waarin de ander aan het woord is, en artikels waarin ik dat ben.'
+    description: 'Twee formats. Gesprekken waarin de ander aan het woord is, en essays waarin ik dat ben.'
   },
   quote: {
     text: '"Veel van de meest waardevolle dingen die ik heb geleerd, kwamen uit gesprekken met mensen. Vaak in de meest onverwachte momenten."',

@@ -15,7 +15,7 @@ const PAGE_STRINGS = {
   yesterday: 'Yesterday',
   daysAgo: '{count} days ago',
   interview: 'Interview',
-  thingsILearned: 'Things I Learned',
+  thingsILearned: 'Essays',
   readEdition: 'Read edition',
   metricReadTime: 'Read',
   metricLikes: 'Likes',

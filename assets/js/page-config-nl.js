@@ -58,7 +58,7 @@ window.INSPIRE_PAGE_CONFIG = {
     yesterday: 'Gisteren',
     daysAgo: '{count} dagen geleden',
     interview: 'Interview',
-    thingsILearned: 'Dingen die ik leerde',
+    thingsILearned: 'Essays',
     readEdition: 'Lees editie',
     metricReadTime: 'Leestijd',
     metricLikes: 'Likes',
