@@ -2694,42 +2694,6 @@
       });
     }
 
-    function initQuoteRotation() {
-      var el = document.querySelector('[data-quote-rotate]');
-      var content = window.INSPIRE_HOME_CONTENT;
-      if (!el || !content || !content.quote || !Array.isArray(content.quote.quotes)) return;
-      var quotes = content.quote.quotes;
-      if (quotes.length < 2) return;
-
-      var index = 0;
-
-      function typeQuote(text, onDone) {
-        el.textContent = '';
-        var i = 0;
-        function next() {
-          if (i < text.length) {
-            el.textContent += text[i];
-            i++;
-            setTimeout(next, 32);
-          } else if (onDone) {
-            onDone();
-          }
-        }
-        next();
-      }
-
-      function cycle() {
-        index = (index + 1) % quotes.length;
-        typeQuote(quotes[index], function () {
-          setTimeout(cycle, 5000);
-        });
-      }
-
-      typeQuote(quotes[0], function () {
-        setTimeout(cycle, 5000);
-      });
-    }
-
     function initHeroLogo() {
       const stage = document.getElementById('heroLogoStage');
       const canvas = document.getElementById('heroLogoCanvas');
@@ -2868,7 +2832,6 @@
 
     function initIndexPage() {
       applyHomeContent();
-      initQuoteRotation();
       initHeroLogo();
 
       const letters = document.querySelectorAll('#ihInspire .ih-letter');
@@ -3005,6 +2968,39 @@
         });
       });
     }
+  </script>
+  <script>
+    (function () {
+      var content = window.INSPIRE_HOME_CONTENT;
+      if (!content || !content.quote || !Array.isArray(content.quote.quotes)) return;
+      var quotes = content.quote.quotes;
+      if (quotes.length < 2) return;
+      var el = document.querySelector('[data-quote-rotate]');
+      if (!el) return;
+      var index = 0;
+
+      function typeQuote(text, onDone) {
+        el.textContent = '';
+        var i = 0;
+        function next() {
+          if (i < text.length) {
+            el.textContent += text[i];
+            i++;
+            setTimeout(next, 32);
+          } else if (onDone) {
+            onDone();
+          }
+        }
+        next();
+      }
+
+      function cycle() {
+        index = (index + 1) % quotes.length;
+        typeQuote(quotes[index], function () { setTimeout(cycle, 5000); });
+      }
+
+      typeQuote(quotes[0], function () { setTimeout(cycle, 5000); });
+    })();
   </script>
 
 </body>
