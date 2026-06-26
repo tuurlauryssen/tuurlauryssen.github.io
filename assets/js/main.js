@@ -174,12 +174,30 @@ function buildContactPrompt(basePrompt, articleMetadata) {
 
 function buildSharedContactSectionHtml(options = {}) {
   const copy = getSharedContactSectionCopy();
+  const language = (window.INSPIRE_PAGE_CONFIG?.language || document.documentElement.lang || "en").toLowerCase();
+  const isDutch = language.startsWith("nl");
   const sectionId = options.sectionId || "contact";
   const extraClass = options.extraClass ? ` ${options.extraClass}` : "";
   const articleMetadata = options.articleMetadata || null;
   const subjectValue = articleMetadata
     ? `Reply to article: ${escapeHtml(articleMetadata.article_title)}`
     : "";
+
+  const interviewSubject = isDutch ? "Voorstel interviewgast" : "Interview guest suggestion";
+  const interviewPrompt = isDutch
+    ? "Hallo Tuur,%0A%0AIk wil deze persoon voorstellen voor een interview:%0A%0ANaam:%0AWaarom ze het waard zijn om van te leren:%0ARelevante links:%0A"
+    : "Hi Tuur,%0A%0AI want to suggest this person for an interview:%0A%0AName:%0AWhy they are worth learning from:%0ARelevant links:%0A";
+
+  const ideaSubject = isDutch ? "Voorstel onderwerp of idee" : "Topic or idea suggestion";
+  const ideaPrompt = isDutch
+    ? "Hallo Tuur,%0A%0AIk wil dit onderwerp of idee delen:%0A%0AOnderwerp:%0AWaarom het belangrijk is:%0ARelevante links of context:%0A"
+    : "Hi Tuur,%0A%0AI want to share this topic or idea:%0A%0ATopic:%0AWhy it matters:%0AUseful links or context:%0A";
+
+  const helloSubject = isDutch ? "Hallo Tuur" : "Hello Tuur";
+  const helloPrompt = isDutch ? "Hallo Tuur,%0A%0A" : "Hi Tuur,%0A%0A";
+  const articleReplyPrompt = isDutch
+    ? `Hallo Tuur,%0A%0AIk reageer op dit artikel:%0A${escapeHtml(articleMetadata?.article_title || "")}%0A${escapeHtml(window.location.pathname)}%0A%0AMijn gedachten:%0A`
+    : `Hi Tuur,%0A%0AI\'m responding to this article:%0A${escapeHtml(articleMetadata?.article_title || "")}%0A${escapeHtml(window.location.pathname)}%0A%0AMy thoughts:%0A`;
 
   return `
     <section class="ih-ct-wrap${extraClass}" id="${sectionId}">
@@ -190,19 +208,19 @@ function buildSharedContactSectionHtml(options = {}) {
           <p class="ih-ct-desc">${copy.description}</p>
 
           <div class="ih-ct-rows">
-            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="Interview guest suggestion" data-contact-prompt="${buildContactPrompt("Hi Tuur,%0A%0AI want to suggest this person for an interview:%0A%0AName:%0AWhy they are worth learning from:%0ARelevant links:%0A", articleMetadata)}">
+            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="${interviewSubject}" data-contact-prompt="${buildContactPrompt(interviewPrompt, articleMetadata)}">
               <div class="ih-ct-kicker">${copy.interviewKicker}</div>
               <strong class="ih-ct-row-title">${copy.interviewTitle}</strong>
               <span class="ih-ct-row-sub">${copy.interviewSubtitle}</span>
             </button>
 
-            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="Topic or idea suggestion" data-contact-prompt="${buildContactPrompt("Hi Tuur,%0A%0AI want to share this topic or idea:%0A%0ATopic:%0AWhy it matters:%0AUseful links or context:%0A", articleMetadata)}">
+            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="${ideaSubject}" data-contact-prompt="${buildContactPrompt(ideaPrompt, articleMetadata)}">
               <div class="ih-ct-kicker">${copy.ideaKicker}</div>
               <strong class="ih-ct-row-title">${copy.ideaTitle}</strong>
               <span class="ih-ct-row-sub">${copy.ideaSubtitle}</span>
             </button>
 
-            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="${articleMetadata ? subjectValue : "Hello Tuur"}" data-contact-prompt="${articleMetadata ? `Hi Tuur,%0A%0AI\'m responding to this article:%0A${escapeHtml(articleMetadata.article_title)}%0A${escapeHtml(window.location.pathname)}%0A%0AMy thoughts:%0A` : "Hi Tuur,%0A%0A"}">
+            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="${articleMetadata ? subjectValue : helloSubject}" data-contact-prompt="${articleMetadata ? articleReplyPrompt : helloPrompt}">
               <div class="ih-ct-kicker">${copy.messageKicker}</div>
               <strong class="ih-ct-row-title">${copy.messageTitle}</strong>
               <span class="ih-ct-row-sub">${copy.messageSubtitle}</span>
