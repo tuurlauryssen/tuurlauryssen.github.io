@@ -27,6 +27,19 @@ $postsDataPath = Join-Path $repoRoot 'assets\data\posts.json'
 $authorsDataPath = Join-Path $repoRoot 'assets\data\authors.json'
 $syncPostsManifestScriptPath = Join-Path $PSScriptRoot 'sync-posts-manifest.ps1'
 
+# `Set-Content -Encoding UTF8` writes a UTF-8 BOM on Windows PowerShell 5.1,
+# which lands at the start of the generated HTML/JSON files. Write explicitly
+# without a BOM so behavior is the same on every PowerShell version.
+function Set-Utf8NoBomContent {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory, ValueFromPipeline)][string]$Content
+  )
+  process {
+    [System.IO.File]::WriteAllText($Path, $Content, (New-Object System.Text.UTF8Encoding($false)))
+  }
+}
+
 function Get-PostsManifestEntries {
   if (-not (Test-Path $postsDataPath)) {
     return @()
@@ -500,7 +513,7 @@ function Load-AuthorProfiles {
 function Save-AuthorProfiles {
   param([array]$Profiles)
 
-  ConvertTo-Json -InputObject @($Profiles) -Depth 6 | Set-Content -Path $authorsDataPath -Encoding UTF8
+  ConvertTo-Json -InputObject @($Profiles) -Depth 6 | Set-Utf8NoBomContent -Path $authorsDataPath
 }
 
 function Ensure-AuthorProfiles {
@@ -786,7 +799,7 @@ ${pageConfigScriptHtml}
 </html>
 "@
 
-  $html | Set-Content -Path $Path -Encoding UTF8
+  $html | Set-Utf8NoBomContent -Path $Path
 }
 
 function Write-RawPostFile {
@@ -799,7 +812,7 @@ function Write-RawPostFile {
     throw 'Raw HTML is empty, so the raw reference file could not be written.'
   }
 
-  $RawHtml | Set-Content -Path $Path -Encoding UTF8
+  $RawHtml | Set-Utf8NoBomContent -Path $Path
 }
 
 function Update-PostsManifest {
@@ -835,7 +848,7 @@ function Update-PostsManifest {
   }
 
   $updatedPosts = @($filtered + $entry) | Sort-Object -Property pubDate -Descending
-  ConvertTo-Json -InputObject @($updatedPosts) -Depth 5 | Set-Content -Path $postsDataPath -Encoding UTF8
+  ConvertTo-Json -InputObject @($updatedPosts) -Depth 5 | Set-Utf8NoBomContent -Path $postsDataPath
 }
 
 function Sync-PostsManifest {

@@ -11,6 +11,19 @@ $postsRoot = Join-Path $repoRoot 'posts'
 $postsDataPath = Join-Path $repoRoot 'assets\data\posts.json'
 $postsDataJsPath = Join-Path $repoRoot 'assets\data\posts-data.js'
 
+# `Set-Content -Encoding UTF8` writes a UTF-8 BOM on Windows PowerShell 5.1,
+# which lands at the start of the generated JSON/JS files. Write explicitly
+# without a BOM so behavior is the same on every PowerShell version.
+function Set-Utf8NoBomContent {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory, ValueFromPipeline)][string]$Content
+  )
+  process {
+    [System.IO.File]::WriteAllText($Path, $Content, (New-Object System.Text.UTF8Encoding($false)))
+  }
+}
+
 function Get-ExistingManifestLookup {
   if (-not (Test-Path $postsDataPath)) {
     return @{}
@@ -142,7 +155,7 @@ $sortedEntries = @(
     }
 )
 
-ConvertTo-Json -InputObject $sortedEntries -Depth 5 | Set-Content -Path $postsDataPath -Encoding UTF8
+ConvertTo-Json -InputObject $sortedEntries -Depth 5 | Set-Utf8NoBomContent -Path $postsDataPath
 
 $postsDataJsContent = @"
 /*
@@ -154,7 +167,7 @@ $postsDataJsContent = @"
 window.INSPIRE_LOCAL_POSTS = $(ConvertTo-Json -InputObject $sortedEntries -Depth 5);
 "@
 
-$postsDataJsContent | Set-Content -Path $postsDataJsPath -Encoding UTF8
+$postsDataJsContent | Set-Utf8NoBomContent -Path $postsDataJsPath
 
 Write-Host "Synced manifest with $($sortedEntries.Count) post file(s)."
 Write-Host "Updated: $postsDataPath"
