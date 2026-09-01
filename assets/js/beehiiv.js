@@ -151,6 +151,19 @@ function getPostMetrics(post) {
   };
 }
 
+function sanitizeHref(value) {
+  const trimmed = String(value || '').trim();
+  if (!trimmed) {
+    return '#';
+  }
+
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed) && !/^https?:/i.test(trimmed)) {
+    return '#';
+  }
+
+  return trimmed;
+}
+
 function normalizeArticlePath(path) {
   if (typeof path !== 'string' || !path.trim()) {
     return '';
@@ -190,8 +203,8 @@ function createPostMetricsHtml(post, classNamePrefix) {
     return '';
   }
 
-  const slugAttribute = post.slug ? ` data-post-slug="${post.slug}"` : '';
-  const pathAttribute = articlePath ? ` data-post-path="${articlePath}"` : '';
+  const slugAttribute = post.slug ? ` data-post-slug="${escapeHtml(post.slug)}"` : '';
+  const pathAttribute = articlePath ? ` data-post-path="${escapeHtml(articlePath)}"` : '';
   const titleAttribute = articleTitle ? ` data-post-title="${escapeHtml(articleTitle)}"` : '';
   return `<div class="${classNamePrefix}-stats" aria-label="Article metrics"${slugAttribute}${pathAttribute}${titleAttribute}>${items.join('')}</div>`;
 }
@@ -603,17 +616,17 @@ function createPostCard(post) {
   const formattedDate = formatDate(post.pubDate);
   const tags = escapeHtml(extractTags(post));
   const title = escapeHtml(post.title);
-  const link = escapeHtml(post.link);
+  const link = escapeHtml(sanitizeHref(post.link));
 
   const badge = type === 'interview'
     ? { class: 's-badge-i', label: PAGE_STRINGS.interview }
     : { class: 's-badge-l', label: PAGE_STRINGS.thingsILearned };
 
   return `
-    <a class="s-card" data-type="${type}" data-date="${post.pubDate}" href="${link}">
+    <a class="s-card" data-type="${type}" data-date="${escapeHtml(post.pubDate)}" href="${link}">
       <div class="s-img-wrap">
         <div class="s-badge ${badge.class}">${badge.label}</div>
-        <img class="s-img" src="${escapeHtml(image)}" alt="${title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
+        <img class="s-img" src="${escapeHtml(sanitizeHref(image))}" alt="${title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
       </div>
       <div class="s-meta">
         <div class="s-tag">${tags}</div>
@@ -641,13 +654,13 @@ function createHomepageSplitCard(post, variant = 'featured') {
   const formattedDate = formatDate(post.pubDate);
   const tags = escapeHtml(extractTags(post));
   const title = escapeHtml(post.title);
-  const link = escapeHtml(post.link);
+  const link = escapeHtml(sanitizeHref(post.link));
   const badgeLabel = type === 'interview' ? PAGE_STRINGS.interview : PAGE_STRINGS.thingsILearned;
 
   return `
     <a class="ih-post-card ${variant}" href="${link}">
       <div class="ih-post-media">
-        <img src="${escapeHtml(image)}" alt="${title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
+        <img src="${escapeHtml(sanitizeHref(image))}" alt="${title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
       </div>
       <div class="ih-post-copy">
         <div class="ih-post-meta">
