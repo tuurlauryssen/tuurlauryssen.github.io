@@ -24,7 +24,7 @@ Public site for INSPIRE. This repo serves the homepage, archive, bilingual artic
 4. Rebuild the manifest with `scripts/sync-posts-manifest.cmd` if files were added or removed manually.
 5. Push and verify the homepage, archive, and article page.
 
-See [`POST_WORKFLOW.md`](/c:/Users/tuurl/Projects/Blog/tuurlauryssen.github.io/POST_WORKFLOW.md) for the short step-by-step version.
+See [`POST_WORKFLOW.md`](POST_WORKFLOW.md) for the short step-by-step version.
 
 ## Runtime Notes
 
@@ -34,4 +34,4 @@ See [`POST_WORKFLOW.md`](/c:/Users/tuurl/Projects/Blog/tuurlauryssen.github.io/P
 
 ## Backend
 
-The private backend lives in [`../inspire-backend`](/c:/Users/tuurl/Projects/Blog/inspire-backend/README.md).
+The private backend lives in the separate `inspire-backend` repository.

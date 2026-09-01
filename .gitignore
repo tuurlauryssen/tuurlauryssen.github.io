@@ -1,0 +1,11 @@
+# Local secrets — this is a static public site with no server-side .env,
+# but keep the door shut for local tooling/config that might add one.
+.env
+.env.local
+.env.*.local
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

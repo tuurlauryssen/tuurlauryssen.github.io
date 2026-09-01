@@ -151,6 +151,19 @@ function getPostMetrics(post) {
   };
 }
 
+function sanitizeHref(value) {
+  const trimmed = String(value || '').trim();
+  if (!trimmed) {
+    return '#';
+  }
+
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed) && !/^https?:/i.test(trimmed)) {
+    return '#';
+  }
+
+  return trimmed;
+}
+
 function normalizeArticlePath(path) {
   if (typeof path !== 'string' || !path.trim()) {
     return '';
@@ -190,8 +203,8 @@ function createPostMetricsHtml(post, classNamePrefix) {
     return '';
   }
 
-  const slugAttribute = post.slug ? ` data-post-slug="${post.slug}"` : '';
-  const pathAttribute = articlePath ? ` data-post-path="${articlePath}"` : '';
+  const slugAttribute = post.slug ? ` data-post-slug="${escapeHtml(post.slug)}"` : '';
+  const pathAttribute = articlePath ? ` data-post-path="${escapeHtml(articlePath)}"` : '';
   const titleAttribute = articleTitle ? ` data-post-title="${escapeHtml(articleTitle)}"` : '';
   return `<div class="${classNamePrefix}-stats" aria-label="Article metrics"${slugAttribute}${pathAttribute}${titleAttribute}>${items.join('')}</div>`;
 }
@@ -599,25 +612,27 @@ function extractTags(post) {
 function createPostCard(post) {
   const type = getPostType(post);
   const image = extractFeaturedImage(post);
-  const cleanExcerpt = cleanHTML(post.description).substring(0, 180) + '...';
+  const cleanExcerpt = escapeHtml(cleanHTML(post.description).substring(0, 180) + '...');
   const formattedDate = formatDate(post.pubDate);
-  const tags = extractTags(post);
+  const tags = escapeHtml(extractTags(post));
+  const title = escapeHtml(post.title);
+  const link = escapeHtml(sanitizeHref(post.link));
 
   const badge = type === 'interview'
     ? { class: 's-badge-i', label: PAGE_STRINGS.interview }
     : { class: 's-badge-l', label: PAGE_STRINGS.thingsILearned };
 
   return `
-    <a class="s-card" data-type="${type}" data-date="${post.pubDate}" href="${post.link}">
+    <a class="s-card" data-type="${type}" data-date="${escapeHtml(post.pubDate)}" href="${link}">
       <div class="s-img-wrap">
         <div class="s-badge ${badge.class}">${badge.label}</div>
-        <img class="s-img" src="${image}" alt="${post.title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
+        <img class="s-img" src="${escapeHtml(sanitizeHref(image))}" alt="${title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
       </div>
       <div class="s-meta">
         <div class="s-tag">${tags}</div>
         <div class="s-date">${formattedDate}</div>
       </div>
-      <h3 class="s-title">${post.title}</h3>
+      <h3 class="s-title">${title}</h3>
       <p class="s-excerpt">${cleanExcerpt}</p>
       ${createPostMetricsHtml(post, 's')}
       <div class="s-read">
@@ -635,15 +650,17 @@ function createHomepageSplitCard(post, variant = 'featured') {
   const type = getPostType(post);
   const image = extractFeaturedImage(post);
   const excerptLength = variant === 'featured' ? 180 : 110;
-  const excerpt = cleanHTML(post.description).substring(0, excerptLength) + '...';
+  const excerpt = escapeHtml(cleanHTML(post.description).substring(0, excerptLength) + '...');
   const formattedDate = formatDate(post.pubDate);
-  const tags = extractTags(post);
+  const tags = escapeHtml(extractTags(post));
+  const title = escapeHtml(post.title);
+  const link = escapeHtml(sanitizeHref(post.link));
   const badgeLabel = type === 'interview' ? PAGE_STRINGS.interview : PAGE_STRINGS.thingsILearned;
 
   return `
-    <a class="ih-post-card ${variant}" href="${post.link}">
+    <a class="ih-post-card ${variant}" href="${link}">
       <div class="ih-post-media">
-        <img src="${image}" alt="${post.title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
+        <img src="${escapeHtml(sanitizeHref(image))}" alt="${title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
       </div>
       <div class="ih-post-copy">
         <div class="ih-post-meta">
@@ -651,7 +668,7 @@ function createHomepageSplitCard(post, variant = 'featured') {
           <div class="ih-post-date">${formattedDate}</div>
         </div>
         <div class="ih-post-badge ${type}">${badgeLabel}</div>
-        <h3 class="ih-post-title">${post.title}</h3>
+        <h3 class="ih-post-title">${title}</h3>
         <p class="ih-post-excerpt">${excerpt}</p>
         ${createPostMetricsHtml(post, 'ih-post')}
         <div class="ih-post-read">${PAGE_STRINGS.readEdition} &rarr;</div>
