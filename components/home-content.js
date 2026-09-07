@@ -28,12 +28,12 @@ window.INSPIRE_HOME_CONTENT = {
   },
   quote: {
     quotes: [
-      ‘"Everyone is fighting for my attention. Almost nobody is asking me to think."’,
-      ‘"Some people call it luck. I call it serendipity. The kind of thing that happens when you\’re genuinely curious about the people around you."’,
-      ‘"I spent five years studying engineering. Nobody warned me that understanding people would be harder."’,
-      ‘"The more I learn, the more I realise how much I still don\’t know. That used to bother me. Now it\’s the whole point."’
+      '"Everyone is fighting for my attention. Almost nobody is asking me to think."',
+      '"Some people call it luck. I call it serendipity. The kind of thing that happens when you\'re genuinely curious about the people around you."',
+      '"I spent five years studying engineering. Nobody warned me that understanding people would be harder."',
+      '"The more I learn, the more I realise how much I still don\'t know. That used to bother me. Now it\'s the whole point."'
     ],
-    author: ‘Tuur Lauryssen &middot; Founder, Inspire’
+    author: 'Tuur Lauryssen &middot; Founder, Inspire'
   },
   contact: {
     description: 'Have someone in mind I should meet? A topic I should think about? I\'m genuinely curious. Drop me a message.'
