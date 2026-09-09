@@ -3,7 +3,7 @@
         "title":  "1. AI might get you noticed, but people skills get you hired",
         "slug":  "1-ai-might-get-you-noticed-but-people-skills-get-you-hired",
         "language":  "en",
-        "type":  "interview",
+        "type":  "explained",
         "pubDate":  "2026-03-22",
         "updatedAt":  "2026-03-15T11:25:26.5350741Z",
         "excerpt":  "Networking, AI in the job market, and why attitude may become the most valuable skill of all",
@@ -12,8 +12,8 @@
         "readTime":  "11 min",
         "likes":  32,
         "reads":  "1.2k",
-        "path":  "posts/interviews/en/1-ai-might-get-you-noticed-but-people-skills-get-you-hired.html",
-        "visibility":  "hidden",
+        "path":  "posts/explained/en/1-ai-might-get-you-noticed-but-people-skills-get-you-hired.html",
+        "visibility":  "public",
         "categories":  [
 
                        ]
