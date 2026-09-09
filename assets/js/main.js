@@ -94,9 +94,9 @@ function getArticleMetadata() {
   }
 
   const title = (document.querySelector(".article-page-title")?.textContent || "").trim();
-  const pathMatch = window.location.pathname.match(/\/posts\/(interviews|ideas|curiosity)\/(en|nl)\/([^/]+)\.html$/i);
+  const pathMatch = window.location.pathname.match(/\/posts\/(interviews|ideas|explained)\/(en|nl)\/([^/]+)\.html$/i);
   const typeDirectory = pathMatch ? pathMatch[1].toLowerCase() : "";
-  const articleType = typeDirectory === "interviews" ? "interview" : typeDirectory === "curiosity" ? "curiosity" : "learned";
+  const articleType = typeDirectory === "interviews" ? "interview" : typeDirectory === "explained" ? "explained" : "learned";
   const articleLanguage = pathMatch ? pathMatch[2].toLowerCase() : ((document.documentElement.lang || "en").toLowerCase());
   const articleSlug = pathMatch ? pathMatch[3] : window.location.pathname.split("/").pop()?.replace(/\.html$/, "") || "";
 
