@@ -1,7 +1,7 @@
 <#
   File role: Rebuilds the local post manifest from the generated article files in /posts.
   Project relation: Keeps assets/data/posts.json aligned with the actual HTML files
-  that exist in /posts/interviews and /posts/ideas.
+  that exist in /posts/explained and /posts/ideas.
 #>
 
 $ErrorActionPreference = 'Stop'
@@ -65,7 +65,7 @@ function Get-PostEntryFromFile {
   $typeDirectory = $pathParts[1]
   $language = $pathParts[2]
   $slug = [System.IO.Path]::GetFileNameWithoutExtension($File.Name)
-  $type = if ($typeDirectory -eq 'interviews') { 'interview' } else { 'learned' }
+  $type = if ($typeDirectory -eq 'explained') { 'explained' } else { 'learned' }
   $html = Get-Content -Path $File.FullName -Raw
   $existingEntry = $ExistingManifestLookup["$language|$slug"]
 
@@ -73,6 +73,11 @@ function Get-PostEntryFromFile {
   $title = $title -replace '\s+\|\s+INSPIRE\s*$', ''
   $excerpt = Get-RegexValue -InputText $html -Pattern '<meta[^>]+name="description"[^>]+content="([^"]+)"'
   $image = Get-RegexValue -InputText $html -Pattern '<div class="article-cover">\s*<img[^>]+src="([^"]+)"'
+  if ($image -like '../../../*') {
+    # Article pages sit 3 folders deep and use a relative path to the locally
+    # downloaded image; posts.json is read from the repo root, so drop that prefix.
+    $image = $image.Substring('../../../'.Length)
+  }
   $sourceUrl = Get-RegexValue -InputText $html -Pattern '<a class="article-source-link"[^>]+href="([^"]+)"'
   $pubDate = Get-RegexValue -InputText $html -Pattern '<time class="article-date-line" datetime="([^"]+)"'
   $readTime = Get-RegexValue -InputText $html -Pattern '<span class="article-readtime-line">([^<]+)</span>'
@@ -100,10 +105,10 @@ function Get-PostEntryFromFile {
   }
 }
 
-function Get-InterviewNumber {
+function Get-ExplainedNumber {
   param($Entry)
 
-  if ($Entry.type -ne 'interview') {
+  if ($Entry.type -ne 'explained') {
     return $null
   }
 
@@ -134,7 +139,7 @@ $sortedEntries = @(
       Expression = 'updatedAt'
       Descending = $true
     }, @{
-      Expression = { Get-InterviewNumber $_ }
+      Expression = { Get-ExplainedNumber $_ }
       Descending = $true
     }, @{
       Expression = 'title'
