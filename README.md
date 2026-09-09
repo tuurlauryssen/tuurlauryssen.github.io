@@ -8,9 +8,11 @@ Public site for INSPIRE. This repo serves the homepage, archive, bilingual artic
 - `blog.html`: archive
 - `nl/`: Dutch entry pages
 - `assets/css/style.css`: shared styles
+- `assets/js/site-config.js`: public backend endpoint URLs and other runtime config (`window.INSPIRE_SITE_CONFIG`) — public values only, no secrets
 - `assets/js/main.js`: shared UI, forms, analytics, contact, and article community behavior
 - `assets/js/beehiiv.js`: Beehiiv-related archive rendering
 - `assets/data/posts.json`: post manifest used by the site
+- `assets/data/posts-data.js`: same manifest inlined as `window.INSPIRE_LOCAL_POSTS` for a faster initial load
 - `assets/data/authors.json`: author metadata
 - `components/`: shared content fragments
 - `posts/`: generated article pages and raw imports
@@ -24,7 +26,7 @@ Public site for INSPIRE. This repo serves the homepage, archive, bilingual artic
 4. Rebuild the manifest with `scripts/sync-posts-manifest.cmd` if files were added or removed manually.
 5. Push and verify the homepage, archive, and article page.
 
-See [`POST_WORKFLOW.md`](/c:/Users/tuurl/Projects/Blog/tuurlauryssen.github.io/POST_WORKFLOW.md) for the short step-by-step version.
+See [`POST_WORKFLOW.md`](POST_WORKFLOW.md) for the short step-by-step version.
 
 ## Runtime Notes
 
@@ -34,4 +36,4 @@ See [`POST_WORKFLOW.md`](/c:/Users/tuurl/Projects/Blog/tuurlauryssen.github.io/P
 
 ## Backend
 
-The private backend lives in [`../inspire-backend`](/c:/Users/tuurl/Projects/Blog/inspire-backend/README.md).
+The private backend lives in a separate repository, `inspire-backend`, and is not part of this repo.
