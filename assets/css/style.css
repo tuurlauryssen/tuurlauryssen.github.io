@@ -1687,12 +1687,20 @@ nav {
 
 .beehiiv-article-shell .typedream.content {
   font-family: var(--wt-body-font, Inter, sans-serif);
+  /* Beehiiv/Typedream exports embed their own `.typedream.content` rule
+     (font-size: 16px; line-height: 1.5) in every imported post. It has
+     lower specificity than this selector, so declaring these here
+     reclaims the inheritance chain for all body text without having to
+     fight every inline style the import bakes in. */
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .article-body > * + * {
   margin-top: 24px;
 }
 
+.article-body h1,
 .article-body h2,
 .article-body h3 {
   font-family: 'Cormorant Garamond', serif;
@@ -1701,12 +1709,21 @@ nav {
   margin-top: 48px;
 }
 
+.article-body h1,
 .article-body h2 {
-  font-size: 38px;
+  font-size: 38px !important;
 }
 
 .article-body h3 {
-  font-size: 30px;
+  font-size: 30px !important;
+}
+
+.article-body h4,
+.article-body h5,
+.article-body h6 {
+  font-size: 22px !important;
+  line-height: 1.3 !important;
+  margin-top: 40px;
 }
 
 .article-body p,
@@ -1714,6 +1731,28 @@ nav {
 .article-body ol,
 .article-body blockquote {
   max-width: 760px;
+}
+
+/*
+ * Beehiiv/Typedream imports set their own font-size/line-height deep inside
+ * the DOM (e.g. a hashed class consuming an inline `--wt-paragraph-font-size:
+ * 16px` custom property on some ancestor). Those hashes churn between export
+ * sessions, so rather than chase each one, force real reading text back onto
+ * the site's own type scale directly on the semantic tags, and have every
+ * inline wrapper (span/em/strong/a/br the import adds) simply inherit from
+ * its block parent. This is what makes body text render at a normal,
+ * comfortable size with no pinch-zoom needed, on every current and future post.
+ */
+.article-body p,
+.article-body li {
+  font-size: 18px !important;
+  line-height: 1.9 !important;
+}
+
+.article-body p *,
+.article-body li * {
+  font-size: inherit !important;
+  line-height: inherit !important;
 }
 
 .article-body ul,
@@ -1733,10 +1772,15 @@ nav {
   border-left: 2px solid var(--line);
   padding-left: 22px;
   font-family: 'Cormorant Garamond', serif;
-  font-size: 30px;
-  line-height: 1.35;
+  font-size: 30px !important;
+  line-height: 1.35 !important;
   font-style: italic;
   color: var(--navy);
+}
+
+.article-body blockquote * {
+  font-size: inherit !important;
+  line-height: inherit !important;
 }
 
 .article-endcap {
@@ -2840,8 +2884,30 @@ footer {
     font-size: 17px;
   }
 
+  .article-body p,
+  .article-body li {
+    font-size: 17px !important;
+    line-height: 1.75 !important;
+  }
+
+  .article-body h1,
+  .article-body h2 {
+    font-size: 30px !important;
+  }
+
+  .article-body h3 {
+    font-size: 25px !important;
+  }
+
+  .article-body h4,
+  .article-body h5,
+  .article-body h6 {
+    font-size: 19px !important;
+  }
+
   .article-body blockquote {
-    font-size: 24px;
+    font-size: 24px !important;
+    line-height: 1.4 !important;
   }
 
   .consent-banner,
