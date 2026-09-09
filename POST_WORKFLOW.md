@@ -1,7 +1,7 @@
 # Post Workflow
 
 1. Run `scripts/import-beehiiv-post.cmd`.
-2. Choose the post type, language, and visibility.
+2. Choose the post type (`interview`, `learned` for Columns, or `explained` for informative/explainer pieces), language, and visibility.
 3. Paste the raw Beehiiv HTML and finish with `ENDHTML`.
 4. Review the generated files under `posts/...`.
 5. Update `assets/data/authors.json` if needed.

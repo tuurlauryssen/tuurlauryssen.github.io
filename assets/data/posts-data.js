@@ -19,7 +19,7 @@ window.INSPIRE_LOCAL_POSTS = [
         "likes":  32,
         "reads":  "1.2k",
         "path":  "posts/interviews/en/1-ai-might-get-you-noticed-but-people-skills-get-you-hired.html",
-        "visibility":  "public",
+        "visibility":  "hidden",
         "categories":  [
 
                        ]
