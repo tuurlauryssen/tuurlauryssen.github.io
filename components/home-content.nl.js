@@ -2,23 +2,23 @@ window.INSPIRE_HOME_CONTENT = {
   hero: {
     est: 'Newsletter &middot; Est. 2026',
     taglineHtml: 'Jouw aandacht waard.',
-    description: 'Twee formats. Ik interview mensen die het waard zijn om over te horen, en schrijf columns over wat ik maar niet uit mijn hoofd kan zetten. In het Nederlands en Engels.',
+    description: 'Twee formats. Ik leg idee&euml;n uit die het waard zijn om te begrijpen, en schrijf columns over wat ik maar niet uit mijn hoofd kan zetten. In het Nederlands en Engels.',
     editions: '1',
     languages: '2'
   },
   subscribe: {
     title: 'Ontvang de volgende editie in je inbox.',
-    text: 'Sluit je aan bij lezers die interviews en inzichten ontvangen die het waard zijn om te begrijpen.',
+    text: 'Sluit je aan bij lezers die uitleg en inzichten ontvangen die het waard zijn om te begrijpen.',
     note: 'Geen spam. Alleen de nieuwsbrief. Uitschrijven kan altijd.'
   },
   about: {
     description: 'Een newsletter over mensen en idee&euml;n die je tijd waard zijn.',
-    what: 'Interviews en columns. Mensen met wie ik heb gesproken, dingen waar ik over nagedacht heb.',
+    what: 'Uitleg en columns. Idee&euml;n die ik heb uitgeplozen, dingen waar ik over nagedacht heb.',
     why: 'Nieuwsgierigheid. Dat is alles.',
     who: 'Als het mij aan het denken zette, zet het jou misschien ook aan het denken.'
   },
   formats: {
-    description: 'Interviews en columns. E&eacute;n waarbij ik luister, e&eacute;n waarbij ik praat.'
+    description: 'Heldere uitleg over idee&euml;n die het waard zijn om te begrijpen, en korte columns over wat me maar niet loslaat.'
   },
   quote: {
     quotes: [
