@@ -52,6 +52,7 @@ window.INSPIRE_PAGE_CONFIG = {
     daysAgo: '{count} dagen geleden',
     interview: 'Interview',
     thingsILearned: 'Columns',
+    curiosity: 'Curiosity',
     readEdition: 'Lees editie',
     metricReadTime: 'Leestijd',
     metricLikes: 'Likes',
@@ -60,6 +61,8 @@ window.INSPIRE_PAGE_CONFIG = {
     noInterviewsDesc: 'Kom binnenkort terug voor het volgende gesprek.',
     noEssaysTitle: 'Nog geen columns gevonden.',
     noEssaysDesc: 'Kom binnenkort terug voor het volgende inzicht.',
+    noCuriosityTitle: 'Nog geen Curiosity-artikelen gevonden.',
+    noCuriosityDesc: 'Kom binnenkort terug voor de volgende ontdekking.',
     noPostsTitle: 'Geen posts gevonden',
     noPostsDesc: 'Kom binnenkort terug voor nieuwe edities.'
   }
