@@ -10,7 +10,7 @@ param(
   [string]$Title,
   [ValidateSet('en', 'nl')]
   [string]$Language,
-  [ValidateSet('interview', 'learned')]
+  [ValidateSet('interview', 'learned', 'explained')]
   [string]$Type,
   [string]$Date,
   [string]$Excerpt,
@@ -45,6 +45,10 @@ function Get-TypeDirectoryName {
 
   if ($Type -eq 'interview') {
     return 'interviews'
+  }
+
+  if ($Type -eq 'explained') {
+    return 'explained'
   }
 
   return 'ideas'
@@ -177,7 +181,7 @@ function Get-LocalizedArticleCopy {
     return @{
       Home = 'Home'
       Archive = 'Alle edities'
-      TypeLabel = if ($Type -eq 'interview') { 'Interview' } else { 'Columns' }
+      TypeLabel = if ($Type -eq 'interview') { 'Interview' } elseif ($Type -eq 'explained') { 'Explained' } else { 'Columns' }
       SourceLabel = 'Originele bron'
       EndcapTitle = 'Lees verder op INSPIRE'
       EndcapText = 'Ga terug naar de homepage of blader door alle edities.'
@@ -188,7 +192,7 @@ function Get-LocalizedArticleCopy {
   return @{
     Home = 'Home'
     Archive = 'All Editions'
-    TypeLabel = if ($Type -eq 'interview') { 'Interview' } else { 'Columns' }
+    TypeLabel = if ($Type -eq 'interview') { 'Interview' } elseif ($Type -eq 'explained') { 'Explained' } else { 'Columns' }
     SourceLabel = 'Original source'
     EndcapTitle = 'Continue reading on INSPIRE'
     EndcapText = 'Go back to the homepage or browse all editions.'
@@ -853,7 +857,7 @@ if ([string]::IsNullOrWhiteSpace($Visibility)) {
 $Visibility = $Visibility.ToLowerInvariant()
 
 if ([string]::IsNullOrWhiteSpace($Type)) {
-  $Type = Prompt-Value 'Type (interview/learned)' 'learned'
+  $Type = Prompt-Value 'Type (interview/learned/explained)' 'learned'
 }
 $Type = $Type.ToLowerInvariant()
 

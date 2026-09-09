@@ -16,6 +16,7 @@ const PAGE_STRINGS = {
   daysAgo: '{count} days ago',
   interview: 'Interview',
   thingsILearned: 'Columns',
+  explained: 'Explained',
   readEdition: 'Read edition',
   metricReadTime: 'Read',
   metricLikes: 'Likes',
@@ -24,6 +25,8 @@ const PAGE_STRINGS = {
   noInterviewsDesc: 'Check back soon for the next conversation.',
   noEssaysTitle: 'No columns found yet.',
   noEssaysDesc: 'Check back soon for the next idea worth understanding.',
+  noExplainedTitle: 'Nothing explained yet.',
+  noExplainedDesc: 'Check back soon for the next question worth answering.',
   noPostsTitle: 'No posts found',
   noPostsDesc: 'Check back soon for new editions!'
 };
@@ -109,7 +112,7 @@ function mapLocalPost(entry) {
     return null;
   }
 
-  const typeDirectory = entry.type === 'interview' ? 'interviews' : 'ideas';
+  const typeDirectory = entry.type === 'interview' ? 'interviews' : entry.type === 'explained' ? 'explained' : 'ideas';
   const path = resolvePostLink(entry.path || `posts/${typeDirectory}/${entry.language}/${entry.slug}.html`);
   const categories = Array.isArray(entry.categories) ? entry.categories : [];
   const normalizedCategories = [...new Set([entry.language, ...categories])];
@@ -421,7 +424,7 @@ function comparePosts(a, b) {
 // =========================================
 
 function getPostType(post) {
-  if (post.type === 'interview' || post.type === 'learned') {
+  if (post.type === 'interview' || post.type === 'learned' || post.type === 'explained') {
     return post.type;
   }
 
@@ -589,7 +592,13 @@ function extractTags(post) {
     }
   }
 
-  return getPostType(post) === 'interview' ? PAGE_STRINGS.interview : PAGE_STRINGS.thingsILearned;
+  return getBadgeLabel(getPostType(post));
+}
+
+function getBadgeLabel(type) {
+  if (type === 'interview') return PAGE_STRINGS.interview;
+  if (type === 'explained') return PAGE_STRINGS.explained;
+  return PAGE_STRINGS.thingsILearned;
 }
 
 // =========================================
@@ -603,9 +612,8 @@ function createPostCard(post) {
   const formattedDate = formatDate(post.pubDate);
   const tags = extractTags(post);
 
-  const badge = type === 'interview'
-    ? { class: 's-badge-i', label: PAGE_STRINGS.interview }
-    : { class: 's-badge-l', label: PAGE_STRINGS.thingsILearned };
+  const badgeClass = type === 'interview' ? 's-badge-i' : type === 'explained' ? 's-badge-e' : 's-badge-l';
+  const badge = { class: badgeClass, label: getBadgeLabel(type) };
 
   return `
     <a class="s-card" data-type="${type}" data-date="${post.pubDate}" href="${post.link}">
@@ -638,7 +646,7 @@ function createHomepageSplitCard(post, variant = 'featured') {
   const excerpt = cleanHTML(post.description).substring(0, excerptLength) + '...';
   const formattedDate = formatDate(post.pubDate);
   const tags = extractTags(post);
-  const badgeLabel = type === 'interview' ? PAGE_STRINGS.interview : PAGE_STRINGS.thingsILearned;
+  const badgeLabel = getBadgeLabel(type);
 
   return `
     <a class="ih-post-card ${variant}" href="${post.link}">
@@ -661,10 +669,10 @@ function createHomepageSplitCard(post, variant = 'featured') {
 }
 
 function renderHomepageSplitPosts(posts) {
-  const interviewsContainer = document.getElementById('latestInterviews');
+  const explainedContainer = document.getElementById('latestExplained');
   const learnedContainer = document.getElementById('latestLearned');
 
-  if (!interviewsContainer || !learnedContainer) {
+  if (!explainedContainer || !learnedContainer) {
     return false;
   }
 
@@ -672,17 +680,17 @@ function renderHomepageSplitPosts(posts) {
     .slice()
     .sort(comparePosts);
 
-  const interviews = sortPostsForDisplay(posts.filter((post) => getPostType(post) === 'interview'));
+  const explained = sortPostsForDisplay(posts.filter((post) => getPostType(post) === 'explained'));
   const learned = sortPostsForDisplay(posts.filter((post) => getPostType(post) === 'learned'));
 
-  const interviewPreview = interviews.slice(0, 2);
+  const explainedPreview = explained.slice(0, 2);
   const learnedPreview = learned.slice(0, 2);
 
-  interviewsContainer.innerHTML = interviewPreview.length > 0
-    ? interviewPreview.map((post) => createHomepageSplitCard(post, 'compact')).join('')
+  explainedContainer.innerHTML = explainedPreview.length > 0
+    ? explainedPreview.map((post) => createHomepageSplitCard(post, 'compact')).join('')
     : `
       <div class="ih-latest-empty">
-        ${PAGE_STRINGS.noInterviewsTitle} ${PAGE_STRINGS.noInterviewsDesc}
+        ${PAGE_STRINGS.noExplainedTitle} ${PAGE_STRINGS.noExplainedDesc}
       </div>
     `;
 
@@ -694,7 +702,7 @@ function renderHomepageSplitPosts(posts) {
       </div>
     `;
 
-  hydratePostMetrics(interviewsContainer);
+  hydratePostMetrics(explainedContainer);
   hydratePostMetrics(learnedContainer);
   return true;
 }
@@ -814,7 +822,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // AUTO-INITIALIZE ON HOMEPAGE
 // =========================================
 
-if (document.getElementById('latestPosts') || document.getElementById('latestInterviews')) {
+if (document.getElementById('latestPosts') || document.getElementById('latestExplained')) {
   document.addEventListener('DOMContentLoaded', () => {
     loadLatestPosts();
   });
