@@ -9,7 +9,7 @@ window.INSPIRE_LOCAL_POSTS = [
         "title":  "1. AI might get you noticed, but people skills get you hired",
         "slug":  "1-ai-might-get-you-noticed-but-people-skills-get-you-hired",
         "language":  "en",
-        "type":  "explained",
+        "type":  "interview",
         "pubDate":  "2026-03-22",
         "updatedAt":  "2026-03-18T09:39:13.2829527Z",
         "excerpt":  "Networking, AI in the job market, and why attitude may become the most valuable skill of all",
@@ -19,7 +19,7 @@ window.INSPIRE_LOCAL_POSTS = [
         "likes":  32,
         "reads":  "1.2k",
         "path":  "posts/interviews/en/1-ai-might-get-you-noticed-but-people-skills-get-you-hired.html",
-        "visibility":  "public",
+        "visibility":  "hidden",
         "categories":  [
 
                        ]
