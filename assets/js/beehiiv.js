@@ -14,19 +14,16 @@ const PAGE_STRINGS = {
   today: 'Today',
   yesterday: 'Yesterday',
   daysAgo: '{count} days ago',
-  interview: 'Interview',
-  thingsILearned: 'Columns',
   explained: 'Explained',
+  thingsILearned: 'Columns',
   readEdition: 'Read edition',
   metricReadTime: 'Read',
   metricLikes: 'Likes',
   metricReads: 'Reads',
-  noInterviewsTitle: 'No interviews found yet.',
-  noInterviewsDesc: 'Check back soon for the next conversation.',
+  noExplainedTitle: 'No explainers yet.',
+  noExplainedDesc: 'Check back soon for the next one.',
   noEssaysTitle: 'No columns found yet.',
   noEssaysDesc: 'Check back soon for the next idea worth understanding.',
-  noExplainedTitle: 'Nothing explained yet.',
-  noExplainedDesc: 'Check back soon for the next question worth answering.',
   noPostsTitle: 'No posts found',
   noPostsDesc: 'Check back soon for new editions!'
 };
@@ -112,7 +109,7 @@ function mapLocalPost(entry) {
     return null;
   }
 
-  const typeDirectory = entry.type === 'interview' ? 'interviews' : entry.type === 'explained' ? 'explained' : 'ideas';
+  const typeDirectory = entry.type === 'explained' ? 'explained' : 'ideas';
   const path = resolvePostLink(entry.path || `posts/${typeDirectory}/${entry.language}/${entry.slug}.html`);
   const categories = Array.isArray(entry.categories) ? entry.categories : [];
   const normalizedCategories = [...new Set([entry.language, ...categories])];
@@ -389,7 +386,7 @@ function resolvePostLink(path) {
   return `${BEEHIIV_CONFIG.postLinkPrefix}${path}`;
 }
 
-function getInterviewNumber(post) {
+function getExplainedNumber(post) {
   const title = String(post?.title || '').trim();
   const match = title.match(/^(\d+)\.\s*/);
   return match ? Number(match[1]) : null;
@@ -408,11 +405,11 @@ function comparePosts(a, b) {
 
   const aType = getPostType(a);
   const bType = getPostType(b);
-  const aInterviewNumber = aType === 'interview' ? getInterviewNumber(a) : null;
-  const bInterviewNumber = bType === 'interview' ? getInterviewNumber(b) : null;
+  const aExplainedNumber = aType === 'explained' ? getExplainedNumber(a) : null;
+  const bExplainedNumber = bType === 'explained' ? getExplainedNumber(b) : null;
 
-  if (aType === 'interview' && bType === 'interview' && aInterviewNumber !== null && bInterviewNumber !== null && aInterviewNumber !== bInterviewNumber) {
-    return bInterviewNumber - aInterviewNumber;
+  if (aType === 'explained' && bType === 'explained' && aExplainedNumber !== null && bExplainedNumber !== null && aExplainedNumber !== bExplainedNumber) {
+    return bExplainedNumber - aExplainedNumber;
   }
 
   return String(a.title || '').localeCompare(String(b.title || ''));
@@ -420,18 +417,18 @@ function comparePosts(a, b) {
 
 
 // =========================================
-// DETERMINE POST TYPE (Interview vs Learned)
+// DETERMINE POST TYPE (Explained vs Learned)
 // =========================================
 
 function getPostType(post) {
-  if (post.type === 'interview' || post.type === 'learned' || post.type === 'explained') {
+  if (post.type === 'explained' || post.type === 'learned') {
     return post.type;
   }
 
   const title = (post.title || '').trim();
 
   if (/^\d+\.\s*/.test(title)) {
-    return 'interview';
+    return 'explained';
   }
 
   return 'learned';
@@ -592,13 +589,7 @@ function extractTags(post) {
     }
   }
 
-  return getBadgeLabel(getPostType(post));
-}
-
-function getBadgeLabel(type) {
-  if (type === 'interview') return PAGE_STRINGS.interview;
-  if (type === 'explained') return PAGE_STRINGS.explained;
-  return PAGE_STRINGS.thingsILearned;
+  return getPostType(post) === 'explained' ? PAGE_STRINGS.explained : PAGE_STRINGS.thingsILearned;
 }
 
 // =========================================
@@ -612,8 +603,9 @@ function createPostCard(post) {
   const formattedDate = formatDate(post.pubDate);
   const tags = extractTags(post);
 
-  const badgeClass = type === 'interview' ? 's-badge-i' : type === 'explained' ? 's-badge-e' : 's-badge-l';
-  const badge = { class: badgeClass, label: getBadgeLabel(type) };
+  const badge = type === 'explained'
+    ? { class: 's-badge-e', label: PAGE_STRINGS.explained }
+    : { class: 's-badge-l', label: PAGE_STRINGS.thingsILearned };
 
   return `
     <a class="s-card" data-type="${type}" data-date="${post.pubDate}" href="${post.link}">
@@ -646,7 +638,7 @@ function createHomepageSplitCard(post, variant = 'featured') {
   const excerpt = cleanHTML(post.description).substring(0, excerptLength) + '...';
   const formattedDate = formatDate(post.pubDate);
   const tags = extractTags(post);
-  const badgeLabel = getBadgeLabel(type);
+  const badgeLabel = type === 'explained' ? PAGE_STRINGS.explained : PAGE_STRINGS.thingsILearned;
 
   return `
     <a class="ih-post-card ${variant}" href="${post.link}">
@@ -807,11 +799,11 @@ function setupFilters() {
 // LOAD MORE FUNCTIONALITY
 // =========================================
 
-document.addEventListener('DOMContentLoaded', () => {
-  const loadMoreBtn = document.getElementById('loadMoreBtn');
+document.addEventListener("DOMContentLoaded", () => {
+  const loadMoreBtn = document.getElementById("loadMoreBtn");
 
   if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', () => {
+    loadMoreBtn.addEventListener("click", () => {
       displayedCount += 9;
       displayPostsWithPagination();
     });
@@ -834,5 +826,3 @@ if (document.getElementById('allPosts')) {
     setupFilters();
   });
 }
-
-

@@ -2,10 +2,10 @@
 setlocal
 
 set "SCRIPT_DIR=%~dp0"
-set "PS_SCRIPT=%SCRIPT_DIR%import-beehiiv-post.ps1"
+set "PS_SCRIPT=%SCRIPT_DIR%process-new-posts.ps1"
 
 if not exist "%PS_SCRIPT%" (
-  echo Could not find import-beehiiv-post.ps1
+  echo Could not find process-new-posts.ps1
   pause
   exit /b 1
 )
@@ -20,7 +20,5 @@ if not "%EXIT_CODE%"=="0" (
   exit /b %EXIT_CODE%
 )
 
-echo.
-echo Import completed successfully.
 pause
 exit /b 0

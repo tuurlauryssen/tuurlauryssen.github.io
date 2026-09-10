@@ -14,19 +14,21 @@ Public site for INSPIRE. This repo serves the homepage, archive, bilingual artic
 - `assets/data/posts.json`: post manifest used by the site
 - `assets/data/posts-data.js`: same manifest inlined as `window.INSPIRE_LOCAL_POSTS` for a faster initial load
 - `assets/data/authors.json`: author metadata
+- `assets/img/posts/`: images downloaded from Beehiiv at import time
 - `components/`: shared content fragments
-- `posts/`: generated article pages and raw imports
+- `posts/`: generated article pages, raw archives, and the `incoming/` drop folders
 - `scripts/`: post import and manifest sync utilities
 
 ## Content Workflow
 
-1. Import a Beehiiv post with `scripts/import-beehiiv-post.cmd`.
-2. Review the generated page in `posts/...`.
-3. Update `assets/data/authors.json` if a new author is introduced.
-4. Rebuild the manifest with `scripts/sync-posts-manifest.cmd` if files were added or removed manually.
-5. Push and verify the homepage, archive, and article page.
+1. Drop a raw Beehiiv HTML export into the matching `posts/incoming/<type>/<lang>`
+   folder.
+2. Run `scripts/process-new-posts.cmd`.
+3. Review and merge the pull request it opens.
 
 See [`POST_WORKFLOW.md`](POST_WORKFLOW.md) for the short step-by-step version.
+If you ever add or remove post files by hand, run `scripts/sync-posts-manifest.cmd`
+to rebuild the manifest from what's on disk.
 
 ## Runtime Notes
 

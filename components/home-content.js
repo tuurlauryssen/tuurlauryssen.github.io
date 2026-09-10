@@ -8,7 +8,7 @@ window.INSPIRE_HOME_CONTENT = {
   hero: {
     est: 'Newsletter &middot; Est. 2026',
     taglineHtml: 'Worth your attention.',
-    description: 'Two formats. I interview people worth knowing about, and write columns on whatever I can\'t stop thinking about. In Dutch and English.',
+    description: 'Two formats. I explain ideas worth understanding, and write columns on whatever I can\'t stop thinking about. In Dutch and English.',
     editions: '1',
     languages: '2'
   },
@@ -19,12 +19,12 @@ window.INSPIRE_HOME_CONTENT = {
   },
   about: {
     description: 'A newsletter about people and ideas worth your time.',
-    what: 'Interviews and columns. People I\'ve talked to, things I\'ve thought about.',
+    what: 'Explainers and columns. Ideas I\'ve untangled, things I\'ve thought about.',
     why: 'Curiosity. That\'s it.',
     who: 'If it made me think, it might make you think too.'
   },
   formats: {
-    description: 'Interviews and columns. One where I listen, one where I talk.'
+    description: 'Clear explainers on ideas worth understanding, and short essays on whatever I can\'t stop thinking about.'
   },
   quote: {
     quotes: [

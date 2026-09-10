@@ -1,23 +1,16 @@
 <#
-  File role: Imports raw Beehiiv article HTML into local site files.
-  Project relation: Creates processed article pages in /posts, raw reference copies in
-  /posts/raw, and updates the post data files used by index.html and blog.html.
+  File role: Scans posts/incoming for freshly dropped Beehiiv HTML exports and turns
+  each one into a finished article page, with no interactive prompts.
+  Project relation: Replaces import-beehiiv-post.ps1. Type and language come from
+  which posts/incoming/<type>/<lang> folder a file was dropped into, rather than
+  being typed in. Downloads cover/inline images into the repo instead of linking to
+  Beehiiv's own URLs, strips Beehiiv's inline style/class bloat, and finishes by
+  opening a pull request instead of pushing straight to the branch GitHub Pages
+  serves.
 #>
 
 param(
-  [string]$HtmlPath,
-  [string]$RawHtml,
-  [string]$Title,
-  [ValidateSet('en', 'nl')]
-  [string]$Language,
-  [ValidateSet('interview', 'learned', 'explained')]
-  [string]$Type,
-  [string]$Date,
-  [string]$Excerpt,
-  [string]$Image,
-  [string]$SourceUrl,
-  [ValidateSet('public', 'hidden')]
-  [string]$Visibility = 'public'
+  [switch]$SkipPullRequest
 )
 
 $ErrorActionPreference = 'Stop'
@@ -25,7 +18,11 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $postsDataPath = Join-Path $repoRoot 'assets\data\posts.json'
 $authorsDataPath = Join-Path $repoRoot 'assets\data\authors.json'
+$incomingRoot = Join-Path $repoRoot 'posts\incoming'
 $syncPostsManifestScriptPath = Join-Path $PSScriptRoot 'sync-posts-manifest.ps1'
+
+$TypeDirectories = @('explained', 'ideas')
+$LanguageDirectories = @('en', 'nl')
 
 function Get-PostsManifestEntries {
   if (-not (Test-Path $postsDataPath)) {
@@ -38,69 +35,6 @@ function Get-PostsManifestEntries {
   }
 
   return @($raw | ConvertFrom-Json)
-}
-
-function Get-TypeDirectoryName {
-  param([string]$Type)
-
-  if ($Type -eq 'interview') {
-    return 'interviews'
-  }
-
-  if ($Type -eq 'explained') {
-    return 'explained'
-  }
-
-  return 'ideas'
-}
-
-function Prompt-Value {
-  param(
-    [string]$Label,
-    [string]$Default = '',
-    [switch]$AllowEmpty
-  )
-
-  if ($Default) {
-    $value = Read-Host "$Label [$Default]"
-    if ([string]::IsNullOrWhiteSpace($value)) {
-      return $Default
-    }
-
-    return $value.Trim()
-  }
-
-  if ($AllowEmpty) {
-    $value = Read-Host $Label
-    return $value.Trim()
-  }
-
-  do {
-    $value = Read-Host $Label
-  } while ([string]::IsNullOrWhiteSpace($value))
-
-  return $value.Trim()
-}
-
-function Read-MultilineInput {
-  param(
-    [string]$Label,
-    [string]$EndMarker = 'ENDHTML'
-  )
-
-  Write-Host $Label
-  Write-Host "Paste the raw HTML below. Type $EndMarker on its own line when finished."
-
-  $lines = New-Object System.Collections.Generic.List[string]
-  while ($true) {
-    $line = Read-Host
-    if ($line -eq $EndMarker) {
-      break
-    }
-    $lines.Add($line)
-  }
-
-  return ($lines -join [Environment]::NewLine).Trim()
 }
 
 function Convert-ToSlug {
@@ -125,15 +59,14 @@ function Resolve-PostSlug {
   )
 
   $baseSlug = Convert-ToSlug $Title
-  $typeDirectoryName = Get-TypeDirectoryName -Type $Type
   $posts = Get-PostsManifestEntries
 
   $candidateSlug = $baseSlug
   $suffix = 2
 
   while ($true) {
-    $postPath = Join-Path $repoRoot "posts\$typeDirectoryName\$Language\$candidateSlug.html"
-    $rawPostPath = Join-Path $repoRoot "posts\raw\$typeDirectoryName\$Language\$candidateSlug-raw.html"
+    $postPath = Join-Path $repoRoot "posts\$Type\$Language\$candidateSlug.html"
+    $rawPostPath = Join-Path $repoRoot "posts\raw\$Type\$Language\$candidateSlug-raw.html"
     $existingBySlug = $posts | Where-Object {
       $_.language -eq $Language -and $_.slug -eq $candidateSlug
     } | Select-Object -First 1
@@ -181,7 +114,7 @@ function Get-LocalizedArticleCopy {
     return @{
       Home = 'Home'
       Archive = 'Alle edities'
-      TypeLabel = if ($Type -eq 'interview') { 'Interview' } elseif ($Type -eq 'explained') { 'Explained' } else { 'Columns' }
+      TypeLabel = if ($Type -eq 'explained') { 'Uitgelegd' } else { 'Columns' }
       SourceLabel = 'Originele bron'
       EndcapTitle = 'Lees verder op INSPIRE'
       EndcapText = 'Ga terug naar de homepage of blader door alle edities.'
@@ -192,7 +125,7 @@ function Get-LocalizedArticleCopy {
   return @{
     Home = 'Home'
     Archive = 'All Editions'
-    TypeLabel = if ($Type -eq 'interview') { 'Interview' } elseif ($Type -eq 'explained') { 'Explained' } else { 'Columns' }
+    TypeLabel = if ($Type -eq 'explained') { 'Explained' } else { 'Columns' }
     SourceLabel = 'Original source'
     EndcapTitle = 'Continue reading on INSPIRE'
     EndcapText = 'Go back to the homepage or browse all editions.'
@@ -265,11 +198,14 @@ function Remove-HtmlNodes {
 function Remove-Attributes {
   param([string]$Html)
 
-  $withoutData = [regex]::Replace($Html, '\s(data-[\w-]+|aria-[\w-]+)="[^"]*"', '', 'IgnoreCase')
-  $withoutSingles = [regex]::Replace($withoutData, "\s(data-[\w-]+|aria-[\w-]+)='[^']*'", '', 'IgnoreCase')
-  $withoutEvents = [regex]::Replace($withoutSingles, '\s(on\w+)="[^"]*"', '', 'IgnoreCase')
-  $withoutSingleEvents = [regex]::Replace($withoutEvents, "\s(on\w+)='[^']*'", '', 'IgnoreCase')
-  return $withoutSingleEvents
+  # Strip Beehiiv/Typedream's inline style + class soup (the '--wt-*' custom
+  # property clutter that bloated every imported post) along with data-*/aria-*/
+  # on* attributes. The site's own .article-body CSS already styles imported
+  # articles, so none of this is needed.
+  $attributePattern = '(style|class|data-[\w-]+|aria-[\w-]+|on\w+)'
+  $withoutDouble = [regex]::Replace($Html, "\s$attributePattern=`"[^`"]*`"", '', 'IgnoreCase')
+  $withoutSingle = [regex]::Replace($withoutDouble, "\s$attributePattern='[^']*'", '', 'IgnoreCase')
+  return $withoutSingle
 }
 
 function Normalize-ArticleHtml {
@@ -347,7 +283,12 @@ function Extract-ArticleBody {
     $tagStart = $htmlWithoutScripts.LastIndexOf('<', $beehiivStartIndex)
     if ($tagStart -ge 0) {
       $endCandidates = @()
-      foreach ($marker in @('id="bh-comments"', 'recommendedPosts', '>Keep Reading<', '<footer', '</main>')) {
+      # Deliberately excludes '>Keep Reading<' here: that text sits deep inside
+      # nested spans of its own heading, so cutting the coarse fragment there
+      # truncates mid-tag. Normalize-ArticleHtml removes the Keep Reading widget
+      # afterwards by searching backward for its enclosing <div>, which needs the
+      # fragment to still include that whole block.
+      foreach ($marker in @('id="bh-comments"', 'recommendedPosts', '<footer', '</main>')) {
         $markerIndex = $htmlWithoutScripts.IndexOf($marker, $beehiivStartIndex, [System.StringComparison]::OrdinalIgnoreCase)
         if ($markerIndex -gt $beehiivStartIndex) {
           $endCandidates += $markerIndex
@@ -414,7 +355,7 @@ function Get-UniqueNonEmptyValues {
   return @($result)
 }
 
-function Extract-IntervieweeName {
+function Extract-SecondAuthorName {
   param([string]$Html)
 
   foreach ($pattern in @(
@@ -463,10 +404,10 @@ function Extract-HtmlMetadata {
     $metaAuthor = $schemaAuthor
   }
   $metaAuthors = @($metaAuthor)
-  if ($Type -eq 'interview') {
-    $intervieweeName = Extract-IntervieweeName -Html $Html
-    if ($intervieweeName) {
-      $metaAuthors += $intervieweeName
+  if ($Type -eq 'explained') {
+    $secondAuthorName = Extract-SecondAuthorName -Html $Html
+    if ($secondAuthorName) {
+      $metaAuthors += $secondAuthorName
     }
   }
   $metaAuthors = Get-UniqueNonEmptyValues -Values $metaAuthors
@@ -646,16 +587,87 @@ function Get-AuthorsMarkup {
   }
 }
 
-function Extract-EmbeddedStyles {
-  param([string]$Html)
+function Get-ImageExtension {
+  param([string]$Url)
 
-  $styleBlocks = Get-RegexValues -InputText $Html -Pattern '<style\b[^>]*>(.*?)</style>'
-  if (-not $styleBlocks.Count) {
-    return ''
+  $withoutQuery = $Url -replace '\?.*$', ''
+  $lastSegment = ($withoutQuery -split '/')[-1]
+  if ($lastSegment -match '\.([a-zA-Z0-9]{2,5})$') {
+    return ".$($matches[1].ToLowerInvariant())"
   }
 
-  $joinedStyles = ($styleBlocks -join "`n")
-  return "<style>`n$joinedStyles`n</style>"
+  return '.jpg'
+}
+
+function Save-RemoteImage {
+  param(
+    [string]$Url,
+    [string]$DestinationPath
+  )
+
+  try {
+    $destinationDirectory = Split-Path -Parent $DestinationPath
+    if (-not (Test-Path $destinationDirectory)) {
+      New-Item -ItemType Directory -Path $destinationDirectory -Force | Out-Null
+    }
+
+    Invoke-WebRequest -Uri $Url -OutFile $DestinationPath -UseBasicParsing -TimeoutSec 30
+    return $true
+  }
+  catch {
+    Write-Warning "Could not download image, leaving the original URL in place: $Url ($($_.Exception.Message))"
+    return $false
+  }
+}
+
+function Import-ArticleImages {
+  param(
+    [string]$BodyHtml,
+    [string]$CoverUrl,
+    [string]$Slug
+  )
+
+  # Downloads the cover + any inline images into assets/img/posts/<slug>/ so the
+  # article no longer depends on Beehiiv's own hosted URLs, and rewrites the body
+  # to point at the local copies. Falls back to the original URL per-image if a
+  # download fails, rather than breaking the import.
+  $imageDirectoryName = "assets/img/posts/$Slug"
+  $imageDirectory = Join-Path $repoRoot $imageDirectoryName
+  $localCoverUrl = $CoverUrl
+
+  if (-not [string]::IsNullOrWhiteSpace($CoverUrl)) {
+    $coverExtension = Get-ImageExtension -Url $CoverUrl
+    $coverDestination = Join-Path $imageDirectory "cover$coverExtension"
+    if (Save-RemoteImage -Url $CoverUrl -DestinationPath $coverDestination) {
+      $localCoverUrl = "../../../$imageDirectoryName/cover$coverExtension"
+    }
+  }
+
+  $updatedBody = $BodyHtml
+  $inlineImageMatches = [regex]::Matches($BodyHtml, '<img\b[^>]*\ssrc="([^"]+)"', 'IgnoreCase')
+  $seenUrls = @{}
+  $imageIndex = 0
+
+  foreach ($match in $inlineImageMatches) {
+    $imageUrl = $match.Groups[1].Value
+    if ([string]::IsNullOrWhiteSpace($imageUrl) -or $seenUrls.ContainsKey($imageUrl) -or $imageUrl -eq $CoverUrl) {
+      continue
+    }
+    $seenUrls[$imageUrl] = $true
+    $imageIndex += 1
+
+    $imageExtension = Get-ImageExtension -Url $imageUrl
+    $imageDestination = Join-Path $imageDirectory "img-$imageIndex$imageExtension"
+    if (Save-RemoteImage -Url $imageUrl -DestinationPath $imageDestination) {
+      $localImageUrl = "../../../$imageDirectoryName/img-$imageIndex$imageExtension"
+      $updatedBody = $updatedBody.Replace("src=`"$imageUrl`"", "src=`"$localImageUrl`"")
+    }
+  }
+
+  return @{
+    BodyHtml = $updatedBody
+    CoverUrl = $localCoverUrl
+  }
 }
 
 function Write-PostFile {
@@ -671,7 +683,6 @@ function Write-PostFile {
     [string]$BodyHtml,
     [string[]]$Authors,
     [string]$ReadTime,
-    [string]$ImportedStyles,
     [array]$AuthorProfiles,
     [string]$Visibility
   )
@@ -738,7 +749,6 @@ function Write-PostFile {
   <meta name="inspire:visibility" content="$Visibility">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="$relativeStylesheet">
-$ImportedStyles
 </head>
 <body>
   <div class="progress-bar" id="progressBar"></div>
@@ -806,142 +816,189 @@ function Write-RawPostFile {
   $RawHtml | Set-Content -Path $Path -Encoding UTF8
 }
 
-function Update-PostsManifest {
-  param(
-    [string]$Title,
-    [string]$Slug,
-    [string]$Language,
-    [string]$Type,
-    [string]$Date,
-    [string]$Excerpt,
-    [string]$Image,
-    [string]$SourceUrl,
-    [string]$ReadTime,
-    [string]$Visibility
-  )
-
-  $posts = Get-PostsManifestEntries
-
-  $filtered = @($posts | Where-Object { $_.slug -ne $Slug -or $_.language -ne $Language })
-  $entry = [PSCustomObject]@{
-    title = $Title
-    slug = $Slug
-    language = $Language
-    type = $Type
-    pubDate = $Date
-    excerpt = $Excerpt
-    image = $Image
-    sourceUrl = $SourceUrl
-    readTime = $ReadTime
-    path = "posts/$(Get-TypeDirectoryName -Type $Type)/$Language/$Slug.html"
-    visibility = if ($Visibility -eq 'hidden') { 'hidden' } else { 'public' }
-    categories = @()
-  }
-
-  $updatedPosts = @($filtered + $entry) | Sort-Object -Property pubDate -Descending
-  ConvertTo-Json -InputObject @($updatedPosts) -Depth 5 | Set-Content -Path $postsDataPath -Encoding UTF8
-}
-
 function Sync-PostsManifest {
-  if (-not (Test-Path $syncPostsManifestScriptPath)) {
-    Update-PostsManifest -Title $Title -Slug $slug -Language $Language -Type $Type -Date $Date -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl -ReadTime $metadata.ReadTime -Visibility $Visibility
-    return
+  if (Test-Path $syncPostsManifestScriptPath) {
+    & $syncPostsManifestScriptPath
   }
-
-  & $syncPostsManifestScriptPath
 }
 
-if ([string]::IsNullOrWhiteSpace($Visibility)) {
-  $Visibility = Prompt-Value 'Visibility (public/hidden)' 'public'
-}
-$Visibility = $Visibility.ToLowerInvariant()
-
-if ([string]::IsNullOrWhiteSpace($Type)) {
-  $Type = Prompt-Value 'Type (interview/learned/explained)' 'learned'
-}
-$Type = $Type.ToLowerInvariant()
-
-if ([string]::IsNullOrWhiteSpace($Language)) {
-  $Language = Prompt-Value 'Language (en/nl)' 'en'
-}
-$Language = $Language.ToLowerInvariant()
-
-if ([string]::IsNullOrWhiteSpace($RawHtml)) {
-  if (-not [string]::IsNullOrWhiteSpace($HtmlPath)) {
-    if (-not (Test-Path $HtmlPath)) {
-      throw "HTML file not found: $HtmlPath"
+function Get-NewIncomingFiles {
+  $files = @()
+  foreach ($type in $TypeDirectories) {
+    foreach ($language in $LanguageDirectories) {
+      $folder = Join-Path $incomingRoot "$type\$language"
+      if (Test-Path $folder) {
+        $files += Get-ChildItem -Path $folder -File -Filter *.html
+      }
     }
+  }
+  return @($files)
+}
 
-    $RawHtml = Get-Content -Path $HtmlPath -Raw
+function Get-TypeAndLanguageFromIncomingPath {
+  param([System.IO.FileInfo]$File)
+
+  $relativePath = $File.FullName.Substring($incomingRoot.Length).TrimStart('\').Replace('\', '/')
+  $parts = $relativePath -split '/'
+  if ($parts.Length -lt 3) {
+    throw "Could not determine type/language for $($File.FullName). Expected posts/incoming/<type>/<lang>/file.html."
+  }
+  return @{ Type = $parts[0]; Language = $parts[1] }
+}
+
+function Test-GitWorkingTreeClean {
+  $status = git -C $repoRoot status --porcelain
+  return [string]::IsNullOrWhiteSpace(($status -join ''))
+}
+
+function Get-RepoSlug {
+  $remoteUrl = git -C $repoRoot remote get-url origin
+  $remoteUrl = $remoteUrl.Trim()
+  $remoteUrl = $remoteUrl -replace '\.git$', ''
+  if ($remoteUrl -match '[:/]([^/:]+/[^/:]+)$') {
+    return $matches[1]
+  }
+  return $null
+}
+
+function Publish-ProcessedPosts {
+  param([array]$ProcessedPosts)
+
+  $branchSuffix = if ($ProcessedPosts.Count -eq 1) {
+    "$($ProcessedPosts[0].Language)-$($ProcessedPosts[0].Slug)"
   }
   else {
-    $RawHtml = Read-MultilineInput -Label 'Raw Beehiiv HTML'
+    Get-Date -Format 'yyyyMMdd-HHmmss'
+  }
+  $branchName = "post/$branchSuffix"
+
+  Write-Host "`nCreating branch $branchName from origin/main..."
+  git -C $repoRoot fetch origin main | Out-Null
+  git -C $repoRoot checkout -b $branchName origin/main | Out-Null
+
+  $pathsToStage = @('posts', 'assets/data/posts.json', 'assets/data/posts-data.js', 'assets/data/authors.json', 'assets/img/posts')
+  git -C $repoRoot add -- $pathsToStage
+
+  $commitTitle = if ($ProcessedPosts.Count -eq 1) {
+    "Add post: $($ProcessedPosts[0].Title)"
+  }
+  else {
+    "Add $($ProcessedPosts.Count) new posts"
+  }
+  $commitBody = ($ProcessedPosts | ForEach-Object { "- [$($_.Type)/$($_.Language)] $($_.Title)" }) -join "`n"
+  git -C $repoRoot commit -m $commitTitle -m $commitBody | Out-Null
+
+  Write-Host "Pushing $branchName..."
+  git -C $repoRoot push -u origin $branchName
+
+  $prTitle = $commitTitle
+  $prBody = "$commitBody`n`nGenerated by scripts/process-new-posts.ps1."
+  $ghAvailable = Get-Command gh -ErrorAction SilentlyContinue
+
+  if ($ghAvailable -and -not $SkipPullRequest) {
+    Write-Host 'Opening pull request via gh...'
+    & gh pr create --base main --head $branchName --title $prTitle --body $prBody
+  }
+  else {
+    $repoSlug = Get-RepoSlug
+    if ($repoSlug) {
+      $compareUrl = "https://github.com/$repoSlug/compare/main...$branchName?expand=1"
+      Write-Host "`ngh CLI not found. Open a pull request here:"
+      Write-Host $compareUrl
+    }
+    else {
+      Write-Host "`nCould not determine the GitHub repo URL to build a compare link. Push succeeded; open a pull request manually for branch $branchName."
+    }
+  }
+
+  git -C $repoRoot checkout main | Out-Null
+  git -C $repoRoot pull origin main | Out-Null
+}
+
+# =========================================
+# MAIN
+# =========================================
+
+if (-not (Test-GitWorkingTreeClean)) {
+  throw "Your git working tree has uncommitted changes. Commit or stash them first, then run this script again."
+}
+
+$incomingFiles = Get-NewIncomingFiles
+
+if ($incomingFiles.Count -eq 0) {
+  Write-Host "No new posts found in posts/incoming/**."
+  Write-Host "Drop a raw Beehiiv HTML export into posts/incoming/explained/en (or /nl) or posts/incoming/ideas/en (or /nl), then run this again."
+  exit 0
+}
+
+$processedPosts = @()
+
+foreach ($incomingFile in $incomingFiles) {
+  $location = Get-TypeAndLanguageFromIncomingPath -File $incomingFile
+  $type = $location.Type
+  $language = $location.Language
+
+  Write-Host "`nProcessing $($incomingFile.Name) as [$type/$language]..."
+
+  $rawHtml = Get-Content -Path $incomingFile.FullName -Raw
+  $metadata = Extract-HtmlMetadata -Html $rawHtml -Type $type
+  $bodyHtml = Extract-ArticleBody -Html $rawHtml
+  $authorProfiles = Ensure-AuthorProfiles -Authors $metadata.Authors
+
+  if ([string]::IsNullOrWhiteSpace($metadata.Title)) {
+    throw "Could not extract a title from $($incomingFile.Name)."
+  }
+  if ([string]::IsNullOrWhiteSpace($metadata.Date)) {
+    throw "Could not extract a publish date from $($incomingFile.Name)."
+  }
+  if ([string]::IsNullOrWhiteSpace($metadata.Excerpt)) {
+    throw "Could not extract an excerpt/description from $($incomingFile.Name)."
+  }
+  if ([string]::IsNullOrWhiteSpace($bodyHtml)) {
+    throw "Could not extract the article body from $($incomingFile.Name)."
+  }
+
+  $slug = Resolve-PostSlug -Title $metadata.Title -Language $language -Type $type
+
+  $localizedImages = Import-ArticleImages -BodyHtml $bodyHtml -CoverUrl $metadata.Image -Slug $slug
+  $bodyHtml = $localizedImages.BodyHtml
+  $coverUrl = $localizedImages.CoverUrl
+
+  $postDirectory = Join-Path $repoRoot "posts\$type\$language"
+  $postPath = Join-Path $postDirectory "$slug.html"
+  $rawPostDirectory = Join-Path $repoRoot "posts\raw\$type\$language"
+  $rawPostPath = Join-Path $rawPostDirectory "$slug-raw.html"
+
+  if (-not (Test-Path $postDirectory)) {
+    New-Item -ItemType Directory -Path $postDirectory -Force | Out-Null
+  }
+  if (-not (Test-Path $rawPostDirectory)) {
+    New-Item -ItemType Directory -Path $rawPostDirectory -Force | Out-Null
+  }
+
+  Write-PostFile -Path $postPath -Language $language -Type $type -Date $metadata.Date -Title $metadata.Title `
+    -Excerpt $metadata.Excerpt -Image $coverUrl -SourceUrl $metadata.SourceUrl -BodyHtml $bodyHtml `
+    -Authors $metadata.Authors -ReadTime $metadata.ReadTime -AuthorProfiles $authorProfiles -Visibility 'public'
+  Write-RawPostFile -Path $rawPostPath -RawHtml $rawHtml
+  Remove-Item -Path $incomingFile.FullName -Force
+
+  Write-Host "  -> posts/$type/$language/$slug.html"
+
+  $processedPosts += [PSCustomObject]@{
+    Title = $metadata.Title
+    Slug = $slug
+    Type = $type
+    Language = $language
   }
 }
 
-$rawHtml = $RawHtml
-$metadata = Extract-HtmlMetadata -Html $rawHtml -Type $Type
-$bodyHtml = Extract-ArticleBody -Html $rawHtml
-$importedStyles = Extract-EmbeddedStyles -Html $rawHtml
-$authorProfiles = Ensure-AuthorProfiles -Authors $metadata.Authors
-
-if ([string]::IsNullOrWhiteSpace($Title)) {
-  $Title = $metadata.Title
-}
-
-if ([string]::IsNullOrWhiteSpace($Date)) {
-  $Date = $metadata.Date
-}
-
-if ([string]::IsNullOrWhiteSpace($Excerpt)) {
-  $Excerpt = $metadata.Excerpt
-}
-
-if ([string]::IsNullOrWhiteSpace($Image)) {
-  $Image = $metadata.Image
-}
-
-if ([string]::IsNullOrWhiteSpace($SourceUrl)) {
-  $SourceUrl = $metadata.SourceUrl
-}
-
-if ([string]::IsNullOrWhiteSpace($Title)) {
-  throw 'Could not extract a title from the raw HTML.'
-}
-
-if ([string]::IsNullOrWhiteSpace($Date)) {
-  throw 'Could not extract a publish date from the raw HTML.'
-}
-
-if ([string]::IsNullOrWhiteSpace($Excerpt)) {
-  throw 'Could not extract an excerpt/description from the raw HTML.'
-}
-
-if ([string]::IsNullOrWhiteSpace($bodyHtml)) {
-  throw 'Could not extract the article body from the raw HTML.'
-}
-
-$slug = Resolve-PostSlug -Title $Title -Language $Language -Type $Type
-$typeDirectoryName = Get-TypeDirectoryName -Type $Type
-$postDirectory = Join-Path $repoRoot "posts\$typeDirectoryName\$Language"
-$postPath = Join-Path $postDirectory "$slug.html"
-$rawPostDirectory = Join-Path $repoRoot "posts\raw\$typeDirectoryName\$Language"
-$rawPostPath = Join-Path $rawPostDirectory "$slug-raw.html"
-
-if (-not (Test-Path $postDirectory)) {
-  New-Item -ItemType Directory -Path $postDirectory | Out-Null
-}
-
-if (-not (Test-Path $rawPostDirectory)) {
-  New-Item -ItemType Directory -Path $rawPostDirectory -Force | Out-Null
-}
-
-Write-PostFile -Path $postPath -Language $Language -Type $Type -Date $Date -Title $Title -Excerpt $Excerpt -Image $Image -SourceUrl $SourceUrl -BodyHtml $bodyHtml -Authors $metadata.Authors -ReadTime $metadata.ReadTime -ImportedStyles $importedStyles -AuthorProfiles $authorProfiles -Visibility $Visibility
-Write-RawPostFile -Path $rawPostPath -RawHtml $rawHtml
 Sync-PostsManifest
 
-Write-Host "Created or updated post file: $postPath"
-Write-Host "Created or updated raw import: $rawPostPath"
-Write-Host "Updated author data: $authorsDataPath"
-Write-Host "Updated manifest: $postsDataPath"
-Write-Host "Next: review the generated HTML, adjust any formatting, then commit and push."
+if ($SkipPullRequest) {
+  Write-Host "`nDone. Skipped branch/PR creation (-SkipPullRequest). Review and commit manually."
+  exit 0
+}
+
+Publish-ProcessedPosts -ProcessedPosts $processedPosts
+
+Write-Host "`nDone. $($processedPosts.Count) post(s) processed and sent up for review."
