@@ -8,9 +8,11 @@ Public site for INSPIRE. This repo serves the homepage, archive, bilingual artic
 - `blog.html`: archive
 - `nl/`: Dutch entry pages
 - `assets/css/style.css`: shared styles
+- `assets/js/site-config.js`: public backend endpoint URLs and other runtime config (`window.INSPIRE_SITE_CONFIG`) — public values only, no secrets
 - `assets/js/main.js`: shared UI, forms, analytics, contact, and article community behavior
 - `assets/js/beehiiv.js`: Beehiiv-related archive rendering
 - `assets/data/posts.json`: post manifest used by the site
+- `assets/data/posts-data.js`: same manifest inlined as `window.INSPIRE_LOCAL_POSTS` for a faster initial load
 - `assets/data/authors.json`: author metadata
 - `assets/img/posts/`: images downloaded from Beehiiv at import time
 - `components/`: shared content fragments
@@ -36,4 +38,4 @@ to rebuild the manifest from what's on disk.
 
 ## Backend
 
-The private backend lives in [`../inspire-backend`](../inspire-backend/README.md).
+The private backend lives in a separate repository, `inspire-backend`, and is not part of this repo.
