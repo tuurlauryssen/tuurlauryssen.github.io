@@ -26,7 +26,7 @@ Public site for INSPIRE. This repo serves the homepage, archive, bilingual artic
 2. Run `scripts/process-new-posts.cmd`.
 3. Review and merge the pull request it opens.
 
-See [`POST_WORKFLOW.md`](POST_WORKFLOW.md) for the full step-by-step version.
+See [`POST_WORKFLOW.md`](POST_WORKFLOW.md) for the short step-by-step version.
 If you ever add or remove post files by hand, run `scripts/sync-posts-manifest.cmd`
 to rebuild the manifest from what's on disk.
 
