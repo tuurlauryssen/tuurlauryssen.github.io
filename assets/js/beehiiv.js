@@ -602,23 +602,26 @@ function createPostCard(post) {
   const cleanExcerpt = cleanHTML(post.description).substring(0, 180) + '...';
   const formattedDate = formatDate(post.pubDate);
   const tags = extractTags(post);
+  const safeTitle = escapeHtml(post.title);
+  const safeLink = escapeHtml(post.link);
+  const safeImage = escapeHtml(image);
 
   const badge = type === 'explained'
     ? { class: 's-badge-e', label: PAGE_STRINGS.explained }
     : { class: 's-badge-l', label: PAGE_STRINGS.thingsILearned };
 
   return `
-    <a class="s-card" data-type="${type}" data-date="${post.pubDate}" href="${post.link}">
+    <a class="s-card" data-type="${type}" data-date="${post.pubDate}" href="${safeLink}">
       <div class="s-img-wrap">
         <div class="s-badge ${badge.class}">${badge.label}</div>
-        <img class="s-img" src="${image}" alt="${post.title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
+        <img class="s-img" src="${safeImage}" alt="${safeTitle}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
       </div>
       <div class="s-meta">
-        <div class="s-tag">${tags}</div>
+        <div class="s-tag">${escapeHtml(tags)}</div>
         <div class="s-date">${formattedDate}</div>
       </div>
-      <h3 class="s-title">${post.title}</h3>
-      <p class="s-excerpt">${cleanExcerpt}</p>
+      <h3 class="s-title">${safeTitle}</h3>
+      <p class="s-excerpt">${escapeHtml(cleanExcerpt)}</p>
       ${createPostMetricsHtml(post, 's')}
       <div class="s-read">
         ${PAGE_STRINGS.readEdition} &rarr;
@@ -639,20 +642,23 @@ function createHomepageSplitCard(post, variant = 'featured') {
   const formattedDate = formatDate(post.pubDate);
   const tags = extractTags(post);
   const badgeLabel = type === 'explained' ? PAGE_STRINGS.explained : PAGE_STRINGS.thingsILearned;
+  const safeTitle = escapeHtml(post.title);
+  const safeLink = escapeHtml(post.link);
+  const safeImage = escapeHtml(image);
 
   return `
-    <a class="ih-post-card ${variant}" href="${post.link}">
+    <a class="ih-post-card ${variant}" href="${safeLink}">
       <div class="ih-post-media">
-        <img src="${image}" alt="${post.title}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
+        <img src="${safeImage}" alt="${safeTitle}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
       </div>
       <div class="ih-post-copy">
         <div class="ih-post-meta">
-          <div class="ih-post-kicker">${tags}</div>
+          <div class="ih-post-kicker">${escapeHtml(tags)}</div>
           <div class="ih-post-date">${formattedDate}</div>
         </div>
         <div class="ih-post-badge ${type}">${badgeLabel}</div>
-        <h3 class="ih-post-title">${post.title}</h3>
-        <p class="ih-post-excerpt">${excerpt}</p>
+        <h3 class="ih-post-title">${safeTitle}</h3>
+        <p class="ih-post-excerpt">${escapeHtml(excerpt)}</p>
         ${createPostMetricsHtml(post, 'ih-post')}
         <div class="ih-post-read">${PAGE_STRINGS.readEdition} &rarr;</div>
       </div>
