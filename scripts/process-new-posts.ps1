@@ -283,7 +283,12 @@ function Extract-ArticleBody {
     $tagStart = $htmlWithoutScripts.LastIndexOf('<', $beehiivStartIndex)
     if ($tagStart -ge 0) {
       $endCandidates = @()
-      foreach ($marker in @('id="bh-comments"', 'recommendedPosts', '>Keep Reading<', '<footer', '</main>')) {
+      # Deliberately excludes '>Keep Reading<' here: that text sits deep inside
+      # nested spans of its own heading, so cutting the coarse fragment there
+      # truncates mid-tag. Normalize-ArticleHtml removes the Keep Reading widget
+      # afterwards by searching backward for its enclosing <div>, which needs the
+      # fragment to still include that whole block.
+      foreach ($marker in @('id="bh-comments"', 'recommendedPosts', '<footer', '</main>')) {
         $markerIndex = $htmlWithoutScripts.IndexOf($marker, $beehiivStartIndex, [System.StringComparison]::OrdinalIgnoreCase)
         if ($markerIndex -gt $beehiivStartIndex) {
           $endCandidates += $markerIndex

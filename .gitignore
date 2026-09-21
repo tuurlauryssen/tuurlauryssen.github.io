@@ -1,0 +1,19 @@
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# Local env / secrets (this is a static site with no build step,
+# but keep the door shut in case a future script reads local credentials)
+.env
+.env.*
+*.local
+
+# Logs
+*.log
+npm-debug.log*

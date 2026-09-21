@@ -53,8 +53,8 @@ function getPageStrings() {
       liked: "Liked",
       commentButton: "Comment",
       contactTitle: "Send me a private note",
-      contactIntro: "Got a thought, a disagreement, or someone I should interview next? Send it straight to me.",
-      contactPromptInterview: "Suggest a guest",
+      contactIntro: "Got a thought, a disagreement, or something you want explained? Send it straight to me.",
+      contactPromptExplained: "Suggest a topic to explain",
       contactPromptIdea: "Share an idea",
       contactPromptReply: "Reply to this article",
       namePlaceholder: "Your name",
@@ -94,9 +94,9 @@ function getArticleMetadata() {
   }
 
   const title = (document.querySelector(".article-page-title")?.textContent || "").trim();
-  const pathMatch = window.location.pathname.match(/\/posts\/(interviews|ideas|explained)\/(en|nl)\/([^/]+)\.html$/i);
+  const pathMatch = window.location.pathname.match(/\/posts\/(explained|ideas)\/(en|nl)\/([^/]+)\.html$/i);
   const typeDirectory = pathMatch ? pathMatch[1].toLowerCase() : "";
-  const articleType = typeDirectory === "interviews" ? "interview" : typeDirectory === "explained" ? "explained" : "learned";
+  const articleType = typeDirectory === "explained" ? "explained" : "learned";
   const articleLanguage = pathMatch ? pathMatch[2].toLowerCase() : ((document.documentElement.lang || "en").toLowerCase());
   const articleSlug = pathMatch ? pathMatch[3] : window.location.pathname.split("/").pop()?.replace(/\.html$/, "") || "";
 
@@ -118,9 +118,9 @@ function getSharedContactSectionCopy() {
     eyebrow: "Contact",
     leftTitleHtml: "Ken je iemand<br><em>opmerkelijks?</em>",
     description: "Heb je een tip, een onderwerp, of iemand met wie ik echt moet gaan praten? Hieronder kan je rechtstreeks een bericht sturen.",
-    interviewKicker: "Interview",
-    interviewTitle: "Stel een interviewgast voor",
-    interviewSubtitle: "Iemand die iets doet dat de moeite waard is om te kennen",
+    explainedKicker: "Uitgelegd",
+    explainedTitle: "Stel een onderwerp voor",
+    explainedSubtitle: "Een onderwerp of vraag die je helder uitgelegd wil zien",
     ideaKicker: "Idee",
     ideaTitle: "Deel een onderwerp of idee",
     ideaSubtitle: "Iets dat je wil dat ik uitdiep of helder uitleg",
@@ -139,9 +139,9 @@ function getSharedContactSectionCopy() {
     eyebrow: "Get in touch",
     leftTitleHtml: "Know someone<br><em>remarkable?</em>",
     description: "Got a tip, a topic, or someone you think I should sit down with? Use the form below and each path will open a ready-made message.",
-    interviewKicker: "Interview",
-    interviewTitle: "Suggest an interview guest",
-    interviewSubtitle: "Someone doing something worth knowing about",
+    explainedKicker: "Explained",
+    explainedTitle: "Suggest a topic to explain",
+    explainedSubtitle: "A topic or question you want broken down clearly",
     ideaKicker: "Idea",
     ideaTitle: "Share a topic or idea",
     ideaSubtitle: "Something you'd like me to explore or explain clearly",
@@ -183,10 +183,10 @@ function buildSharedContactSectionHtml(options = {}) {
     ? `Reply to article: ${escapeHtml(articleMetadata.article_title)}`
     : "";
 
-  const interviewSubject = isDutch ? "Voorstel interviewgast" : "Interview guest suggestion";
-  const interviewPrompt = isDutch
-    ? "Hallo Tuur,%0A%0AIk wil deze persoon voorstellen voor een interview:%0A%0ANaam:%0AWaarom ze het waard zijn om van te leren:%0ARelevante links:%0A"
-    : "Hi Tuur,%0A%0AI want to suggest this person for an interview:%0A%0AName:%0AWhy they are worth learning from:%0ARelevant links:%0A";
+  const explainedSubject = isDutch ? "Voorstel onderwerp om uit te leggen" : "Topic to explain suggestion";
+  const explainedPrompt = isDutch
+    ? "Hallo Tuur,%0A%0AIk wil dat je dit onderwerp uitlegt:%0A%0AOnderwerp:%0AWaarom het verwarrend of interessant is:%0ARelevante links of context:%0A"
+    : "Hi Tuur,%0A%0AI'd like you to explain this topic:%0A%0ATopic:%0AWhy it's confusing or interesting:%0ARelevant links or context:%0A";
 
   const ideaSubject = isDutch ? "Voorstel onderwerp of idee" : "Topic or idea suggestion";
   const ideaPrompt = isDutch
@@ -197,7 +197,7 @@ function buildSharedContactSectionHtml(options = {}) {
   const helloPrompt = isDutch ? "Hallo Tuur,%0A%0A" : "Hi Tuur,%0A%0A";
   const articleReplyPrompt = isDutch
     ? `Hallo Tuur,%0A%0AIk reageer op dit artikel:%0A${escapeHtml(articleMetadata?.article_title || "")}%0A${escapeHtml(window.location.pathname)}%0A%0AMijn gedachten:%0A`
-    : `Hi Tuur,%0A%0AI\'m responding to this article:%0A${escapeHtml(articleMetadata?.article_title || "")}%0A${escapeHtml(window.location.pathname)}%0A%0AMy thoughts:%0A`;
+    : `Hi Tuur,%0A%0AI'm responding to this article:%0A${escapeHtml(articleMetadata?.article_title || "")}%0A${escapeHtml(window.location.pathname)}%0A%0AMy thoughts:%0A`;
 
   return `
     <section class="ih-ct-wrap${extraClass}" id="${sectionId}">
@@ -208,10 +208,10 @@ function buildSharedContactSectionHtml(options = {}) {
           <p class="ih-ct-desc">${copy.description}</p>
 
           <div class="ih-ct-rows">
-            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="${interviewSubject}" data-contact-prompt="${buildContactPrompt(interviewPrompt, articleMetadata)}">
-              <div class="ih-ct-kicker">${copy.interviewKicker}</div>
-              <strong class="ih-ct-row-title">${copy.interviewTitle}</strong>
-              <span class="ih-ct-row-sub">${copy.interviewSubtitle}</span>
+            <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="${explainedSubject}" data-contact-prompt="${buildContactPrompt(explainedPrompt, articleMetadata)}">
+              <div class="ih-ct-kicker">${copy.explainedKicker}</div>
+              <strong class="ih-ct-row-title">${copy.explainedTitle}</strong>
+              <span class="ih-ct-row-sub">${copy.explainedSubtitle}</span>
             </button>
 
             <button class="ih-ct-row ih-contact-trigger" type="button" data-contact-trigger data-contact-subject="${ideaSubject}" data-contact-prompt="${buildContactPrompt(ideaPrompt, articleMetadata)}">
