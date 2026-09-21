@@ -381,20 +381,6 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
-function formatCommunityDate(dateString) {
-  const metaStrings = getPageStrings().meta;
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  return date.toLocaleDateString(metaStrings.locale, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
 async function postJson(url, payload) {
   const response = await fetch(url, {
     method: "POST",
