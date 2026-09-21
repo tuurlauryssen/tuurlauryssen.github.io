@@ -11,6 +11,20 @@ $postsRoot = Join-Path $repoRoot 'posts'
 $postsDataPath = Join-Path $repoRoot 'assets\data\posts.json'
 $postsDataJsPath = Join-Path $repoRoot 'assets\data\posts-data.js'
 
+function Set-ContentUtf8NoBom {
+  param(
+    [string]$Path,
+    [string]$Value
+  )
+
+  # Windows PowerShell 5.1's `Set-Content -Encoding UTF8` (what the .cmd wrappers
+  # actually invoke) always prepends a BOM, unlike pwsh Core's UTF8 default. That BOM
+  # then leaks into posts.json/posts-data.js and breaks strict JSON parsers reading
+  # them. Write via .NET directly so the file is BOM-free on either PowerShell edition.
+  $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+  [System.IO.File]::WriteAllText($Path, $Value, $utf8NoBom)
+}
+
 function Get-ExistingManifestLookup {
   if (-not (Test-Path $postsDataPath)) {
     return @{}
@@ -55,7 +69,13 @@ function Get-PostEntryFromFile {
     [hashtable]$ExistingManifestLookup
   )
 
-  $relativePath = $File.FullName.Substring($repoRoot.Length).TrimStart('\').Replace('\', '/')
+  # Normalize to forward slashes before trimming/splitting - $repoRoot's separator
+  # (and therefore $File.FullName's) is backslash on Windows but forward slash
+  # everywhere pwsh Core also runs (WSL, mac, CI). Only handling '\' here silently
+  # mis-split every path on those platforms: the leading separator survived,
+  # shifting every $pathParts index by one, which mis-detected type/language for
+  # every post and let posts/raw/... slip past the exclusion filter below.
+  $relativePath = $File.FullName.Substring($repoRoot.Length).Replace('\', '/').TrimStart('/')
   $pathParts = $relativePath -split '/'
 
   if ($pathParts.Length -lt 4) {
@@ -122,7 +142,7 @@ function Get-ExplainedNumber {
 
 $existingManifestLookup = Get-ExistingManifestLookup
 $postFiles = Get-ChildItem -Path $postsRoot -Recurse -File -Filter *.html | Where-Object {
-  $_.FullName -notmatch '\\posts\\raw\\'
+  ($_.FullName.Replace('\', '/')) -notmatch '/posts/raw/'
 }
 
 $entries = @()
@@ -147,7 +167,7 @@ $sortedEntries = @(
     }
 )
 
-ConvertTo-Json -InputObject $sortedEntries -Depth 5 | Set-Content -Path $postsDataPath -Encoding UTF8
+Set-ContentUtf8NoBom -Path $postsDataPath -Value (ConvertTo-Json -InputObject $sortedEntries -Depth 5)
 
 $postsDataJsContent = @"
 /*
@@ -159,7 +179,7 @@ $postsDataJsContent = @"
 window.INSPIRE_LOCAL_POSTS = $(ConvertTo-Json -InputObject $sortedEntries -Depth 5);
 "@
 
-$postsDataJsContent | Set-Content -Path $postsDataJsPath -Encoding UTF8
+Set-ContentUtf8NoBom -Path $postsDataJsPath -Value $postsDataJsContent
 
 Write-Host "Synced manifest with $($sortedEntries.Count) post file(s)."
 Write-Host "Updated: $postsDataPath"

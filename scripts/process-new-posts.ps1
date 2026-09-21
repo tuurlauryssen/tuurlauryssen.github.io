@@ -24,6 +24,20 @@ $syncPostsManifestScriptPath = Join-Path $PSScriptRoot 'sync-posts-manifest.ps1'
 $TypeDirectories = @('explained', 'ideas')
 $LanguageDirectories = @('en', 'nl')
 
+function Set-ContentUtf8NoBom {
+  param(
+    [string]$Path,
+    [string]$Value
+  )
+
+  # Windows PowerShell 5.1's `Set-Content -Encoding UTF8` (what process-new-posts.cmd
+  # actually invokes) always prepends a BOM, unlike pwsh Core's UTF8 default. That BOM
+  # then leaks into posts.json/posts-data.js and breaks strict JSON parsers reading
+  # them. Write via .NET directly so the file is BOM-free on either PowerShell edition.
+  $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+  [System.IO.File]::WriteAllText($Path, $Value, $utf8NoBom)
+}
+
 function Get-PostsManifestEntries {
   if (-not (Test-Path $postsDataPath)) {
     return @()
@@ -200,12 +214,63 @@ function Remove-Attributes {
 
   # Strip Beehiiv/Typedream's inline style + class soup (the '--wt-*' custom
   # property clutter that bloated every imported post) along with data-*/aria-*/
-  # on* attributes. The site's own .article-body CSS already styles imported
-  # articles, so none of this is needed.
-  $attributePattern = '(style|class|data-[\w-]+|aria-[\w-]+|on\w+)'
+  # on*/translations attributes. The site's own .article-body CSS already styles
+  # imported articles, so none of this is needed.
+  $attributePattern = '(style|class|data-[\w-]+|aria-[\w-]+|on\w+|translations)'
   $withoutDouble = [regex]::Replace($Html, "\s$attributePattern=`"[^`"]*`"", '', 'IgnoreCase')
   $withoutSingle = [regex]::Replace($withoutDouble, "\s$attributePattern='[^']*'", '', 'IgnoreCase')
   return $withoutSingle
+}
+
+function Convert-PullQuotes {
+  param([string]$Html)
+
+  # Typedream/Beehiiv renders a pull-quote as a "❝" glyph div followed by a
+  # sibling div wrapping the quote's own <p>, nested inside two
+  # 'dream-post-content-blockquoteFigure' wrappers and one
+  # 'dream-post-content-quote' wrapper. None of that survives Remove-Attributes,
+  # so without this the quote becomes a plain, unstyled paragraph with a stray
+  # ❝ character sitting next to it instead of a styled .article-body blockquote.
+  # Must run before Remove-Attributes strips the classes this pattern matches on.
+  $pattern = '(?is)<div\b[^>]*class="[^"]*dream-post-content-blockquoteFigure[^"]*"[^>]*>\s*' +
+             '<div\b[^>]*class="[^"]*dream-post-content-blockquoteFigure[^"]*"[^>]*>\s*' +
+             '<div\b[^>]*class="[^"]*dream-post-content-quote[^"]*"[^>]*>\s*' +
+             '<div\b[^>]*>\s*❝\s*</div>\s*' +
+             '<div\b[^>]*>(?<inner>.*?)</div>\s*' +
+             '</div>\s*</div>\s*</div>'
+
+  return [regex]::Replace($Html, $pattern, { param($match) '<blockquote>' + $match.Groups['inner'].Value + '</blockquote>' })
+}
+
+function Simplify-PictureElements {
+  param([string]$Html)
+
+  # Beehiiv/Typedream wraps inline photos in <picture><source srcset="...">...<img src="...">
+  # </picture> so their own CDN can serve resized variants per breakpoint. Import-ArticleImages
+  # only downloads and rewrites plain <img src>, so those <source srcset> variants were being
+  # left pointed at Beehiiv's CDN even after the "local copy" of the image was downloaded - the
+  # browser would still fetch the hotlinked one on a matching media query. We don't run our own
+  # resizing CDN, so just drop the <source> variants and keep the single fallback <img>, which
+  # Import-ArticleImages then downloads and rewrites like any other body image.
+  return [regex]::Replace($Html, '(?is)<picture\b[^>]*>.*?(<img\b[^>]*/?>).*?</picture>', '$1')
+}
+
+function Collapse-EmptyDivs {
+  param([string]$Html)
+
+  # Typedream divider/spacer widgets (e.g. <div class="_7pt7ks0"><div class="_7pt7ks1"></div></div>)
+  # carry no content of their own - all their visual effect comes from the style/class
+  # attributes Remove-Attributes strips - so once stripped they're just dead empty
+  # <div></div> wrappers left behind in the article body. Collapse them out, repeating
+  # since removing an inner empty div can leave its now-empty parent behind too.
+  $previous = $null
+  $current = $Html
+  while ($current -ne $previous) {
+    $previous = $current
+    $current = [regex]::Replace($current, '<div>\s*</div>', '', 'IgnoreCase')
+  }
+
+  return $current
 }
 
 function Normalize-ArticleHtml {
@@ -217,7 +282,10 @@ function Normalize-ArticleHtml {
 
   $cleaned = Remove-HtmlNodes -Html $Html -Tags @('script', 'noscript', 'form', 'button', 'header', 'footer', 'nav')
   $cleaned = [regex]::Replace($cleaned, '<!--.*?-->', '', 'Singleline')
+  $cleaned = Convert-PullQuotes -Html $cleaned
+  $cleaned = Simplify-PictureElements -Html $cleaned
   $cleaned = Remove-Attributes -Html $cleaned
+  $cleaned = Collapse-EmptyDivs -Html $cleaned
   $cleaned = $cleaned -replace '&nbsp;', ' '
   $cleaned = [regex]::Replace($cleaned, '(?is)<(section|div)\b[^>]*>\s*<h[2-4][^>]*>\s*Keep Reading\s*</h[2-4]>\s*.*?</\1>', '')
   $cleaned = [regex]::Replace($cleaned, '(?is)<(section|div)\b[^>]*(recommendedPosts|postComments|comments?)[^>]*>.*?</\1>', '')
@@ -445,7 +513,7 @@ function Load-AuthorProfiles {
 function Save-AuthorProfiles {
   param([array]$Profiles)
 
-  ConvertTo-Json -InputObject @($Profiles) -Depth 6 | Set-Content -Path $authorsDataPath -Encoding UTF8
+  Set-ContentUtf8NoBom -Path $authorsDataPath -Value (ConvertTo-Json -InputObject @($Profiles) -Depth 6)
 }
 
 function Ensure-AuthorProfiles {
@@ -800,7 +868,7 @@ ${pageConfigScriptHtml}
 </html>
 "@
 
-  $html | Set-Content -Path $Path -Encoding UTF8
+  Set-ContentUtf8NoBom -Path $Path -Value $html
 }
 
 function Write-RawPostFile {
@@ -813,12 +881,28 @@ function Write-RawPostFile {
     throw 'Raw HTML is empty, so the raw reference file could not be written.'
   }
 
-  $RawHtml | Set-Content -Path $Path -Encoding UTF8
+  Set-ContentUtf8NoBom -Path $Path -Value $RawHtml
 }
 
 function Sync-PostsManifest {
   if (Test-Path $syncPostsManifestScriptPath) {
     & $syncPostsManifestScriptPath
+  }
+}
+
+function Assert-NotDraftPreview {
+  param(
+    [string]$Html,
+    [string]$FileName
+  )
+
+  # POST_WORKFLOW.md step 1 explicitly warns against exporting the draft preview
+  # (its "Draft Preview" banner and different page structure end up duplicating the
+  # post's own title/excerpt/byline as a stray block inside the article body). That
+  # warning was already missed once and shipped a corrupted post, so enforce it here
+  # instead of relying purely on the human remembering to re-check before pasting.
+  if ($Html -match 'private preview of your draft site' -or $Html -match '>\s*Draft Preview\s*<') {
+    throw "$FileName looks like a Beehiiv DRAFT PREVIEW export (it contains the 'Draft Preview' banner), not the live published page. Publish the post in Beehiiv first, then copy the raw HTML of the live page - see POST_WORKFLOW.md step 1."
   }
 }
 
@@ -838,7 +922,9 @@ function Get-NewIncomingFiles {
 function Get-TypeAndLanguageFromIncomingPath {
   param([System.IO.FileInfo]$File)
 
-  $relativePath = $File.FullName.Substring($incomingRoot.Length).TrimStart('\').Replace('\', '/')
+  # See the matching note in sync-posts-manifest.ps1: normalize to forward slashes
+  # before trimming, so this also works under pwsh Core on non-Windows.
+  $relativePath = $File.FullName.Substring($incomingRoot.Length).Replace('\', '/').TrimStart('/')
   $parts = $relativePath -split '/'
   if ($parts.Length -lt 3) {
     throw "Could not determine type/language for $($File.FullName). Expected posts/incoming/<type>/<lang>/file.html."
@@ -941,6 +1027,7 @@ foreach ($incomingFile in $incomingFiles) {
   Write-Host "`nProcessing $($incomingFile.Name) as [$type/$language]..."
 
   $rawHtml = Get-Content -Path $incomingFile.FullName -Raw
+  Assert-NotDraftPreview -Html $rawHtml -FileName $incomingFile.Name
   $metadata = Extract-HtmlMetadata -Html $rawHtml -Type $type
   $bodyHtml = Extract-ArticleBody -Html $rawHtml
   $authorProfiles = Ensure-AuthorProfiles -Authors $metadata.Authors
