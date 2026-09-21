@@ -1668,6 +1668,23 @@ nav {
   line-height: inherit !important;
 }
 
+/*
+ * Beehiiv/Typedream imports carry inline images (e.g. an "Inspired by" portrait)
+ * with their own sizing baked into style/class attributes. Remove-Attributes in
+ * process-new-posts.ps1 strips that inline styling as clutter, so without a rule
+ * here those images fall back to native pixel dimensions and blow up huge in the
+ * article column - this constrains any image/picture in the body to the column
+ * width, matching the .article-cover treatment above.
+ */
+.article-body img,
+.article-body picture {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 12px;
+}
+
 .article-endcap {
   max-width: 670px;
   margin: 56px auto 0;
