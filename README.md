@@ -34,7 +34,7 @@ to rebuild the manifest from what's on disk.
 
 - The site is static and intended for GitHub Pages.
 - Public endpoints are read from `window.INSPIRE_SITE_CONFIG`.
-- Article pages can render private responses, likes, and comment submission through the backend project.
+- Article pages render community likes and a private note form (routed to the contact backend) through the backend project. The backend also exposes public comment submission/listing endpoints, but no UI currently calls them.
 
 ## Backend
 
