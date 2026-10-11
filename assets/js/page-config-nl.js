@@ -28,20 +28,9 @@ window.INSPIRE_PAGE_CONFIG = {
       lastUpdatedPrefix: 'Laatst bijgewerkt op'
     },
     community: {
-      heading: 'Praat mee',
-      intro: 'Geef anoniem een like of stuur me rechtstreeks een privéreactie over dit artikel.',
       like: 'Like dit artikel',
       liked: 'Geliked',
       commentButton: 'Reageer',
-      contactTitle: 'Stuur me een privénotitie',
-      contactIntro: 'Heb je een gedachte, een bezwaar, of iets dat je uitgelegd wil zien? Stuur het rechtstreeks naar mij.',
-      contactPromptExplained: 'Stel een onderwerp voor',
-      contactPromptIdea: 'Deel een idee',
-      contactPromptReply: 'Reageer op dit artikel',
-      namePlaceholder: 'Je naam',
-      emailPlaceholder: 'Je e-mailadres',
-      contactMessagePlaceholder: 'Schrijf je bericht...',
-      contactNote: 'Dit komt rechtstreeks in mijn inbox terecht via de website-backend.',
       likeError: 'Je like kon nu niet worden bijgewerkt.',
     }
   },

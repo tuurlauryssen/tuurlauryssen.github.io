@@ -39,6 +39,10 @@ const BEEHIIV_CONFIG = {
   }
 };
 
+// Resolved with the page's postLinkPrefix so it also works from nested
+// pages (e.g. /nl/) where a root-relative "assets/..." path would 404.
+const PLACEHOLDER_IMAGE_PATH = resolvePostLink('assets/images/post-placeholder.jpg');
+
 // =========================================
 // CACHE CONFIGURATION
 // =========================================
@@ -522,7 +526,7 @@ function extractFeaturedImage(post) {
     return match[1];
   }
 
-  return 'assets/images/post-placeholder.jpg';
+  return PLACEHOLDER_IMAGE_PATH;
 }
 
 // =========================================
@@ -614,7 +618,7 @@ function createPostCard(post) {
     <a class="s-card" data-type="${type}" data-date="${post.pubDate}" href="${safeLink}">
       <div class="s-img-wrap">
         <div class="s-badge ${badge.class}">${badge.label}</div>
-        <img class="s-img" src="${safeImage}" alt="${safeTitle}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
+        <img class="s-img" src="${safeImage}" alt="${safeTitle}" loading="lazy" onerror="this.src='${PLACEHOLDER_IMAGE_PATH}'">
       </div>
       <div class="s-meta">
         <div class="s-tag">${escapeHtml(tags)}</div>
@@ -649,7 +653,7 @@ function createHomepageSplitCard(post, variant = 'featured') {
   return `
     <a class="ih-post-card ${variant}" href="${safeLink}">
       <div class="ih-post-media">
-        <img src="${safeImage}" alt="${safeTitle}" loading="lazy" onerror="this.src='assets/images/post-placeholder.jpg'">
+        <img src="${safeImage}" alt="${safeTitle}" loading="lazy" onerror="this.src='${PLACEHOLDER_IMAGE_PATH}'">
       </div>
       <div class="ih-post-copy">
         <div class="ih-post-meta">
