@@ -17,6 +17,14 @@ const INSPIRE_TRACKED_SCROLL_THRESHOLDS = [25, 50, 75, 90];
 const INSPIRE_READ_COMPLETE_SCROLL_THRESHOLD = 90;
 const INSPIRE_READ_COMPLETE_MIN_ACTIVE_SECONDS = 30;
 
+// Client-side length caps. These are a UX guard (fail fast, keep payloads
+// sane before they hit the network) — not a substitute for server-side
+// validation, which the backend is responsible for enforcing.
+const INSPIRE_MAX_EMAIL_LENGTH = 200;
+const INSPIRE_MAX_NAME_LENGTH = 100;
+const INSPIRE_MAX_SUBJECT_LENGTH = 200;
+const INSPIRE_MAX_MESSAGE_LENGTH = 5000;
+
 function getSiteConfig() {
   return window.INSPIRE_SITE_CONFIG || {};
 }
@@ -26,6 +34,7 @@ function getPageStrings() {
     subscribe: {
       missingEmail: "Please enter your email address.",
       invalidEmail: "Please enter a valid email address.",
+      emailTooLong: "Please use a shorter email address.",
       endpointMissing: "Subscription endpoint is not configured yet.",
       submitting: "Saving your subscription...",
       failed: "Subscription failed. Please try again.",
@@ -34,8 +43,11 @@ function getPageStrings() {
     },
     contact: {
       missingName: "Please enter your name.",
+      nameTooLong: "Please use a shorter name.",
       invalidEmail: "Please enter a valid email address.",
+      emailTooLong: "Please use a shorter email address.",
       shortMessage: "Please enter a message with a bit more detail.",
+      messageTooLong: "Please keep your message under 5000 characters.",
       endpointMissing: "Contact endpoint is not configured yet.",
       submitting: "Sending your message...",
       failed: "Message failed to send. Please try again.",
@@ -234,11 +246,11 @@ function buildSharedContactSectionHtml(options = {}) {
             <h2 class="ih-ct-title">${copy.rightTitleHtml}</h2>
             <form class="ih-contact-form" data-contact-form>
               <div class="ih-contact-form-grid">
-                <input type="text" name="name" placeholder="${copy.namePlaceholder}" required>
-                <input type="email" name="email" placeholder="${copy.emailPlaceholder}" required>
+                <input type="text" name="name" placeholder="${copy.namePlaceholder}" maxlength="${INSPIRE_MAX_NAME_LENGTH}" required>
+                <input type="email" name="email" placeholder="${copy.emailPlaceholder}" maxlength="${INSPIRE_MAX_EMAIL_LENGTH}" required>
               </div>
-              <input type="text" name="subject" placeholder="${copy.subjectPlaceholder}" value="${subjectValue}" ${articleMetadata ? "" : "required"}>
-              <textarea name="message" placeholder="${copy.messagePlaceholder}" required></textarea>
+              <input type="text" name="subject" placeholder="${copy.subjectPlaceholder}" value="${subjectValue}" maxlength="${INSPIRE_MAX_SUBJECT_LENGTH}" ${articleMetadata ? "" : "required"}>
+              <textarea name="message" placeholder="${copy.messagePlaceholder}" maxlength="${INSPIRE_MAX_MESSAGE_LENGTH}" required></textarea>
               <div class="ih-contact-form-actions">
                 <div>
                   <div class="ih-contact-form-note">${copy.note}</div>
@@ -915,8 +927,8 @@ function initSubscribeForms() {
         return;
       }
 
-      if (!emailPattern.test(email)) {
-        setSubscribeFeedback(form, strings.invalidEmail, true);
+      if (!emailPattern.test(email) || email.length > INSPIRE_MAX_EMAIL_LENGTH) {
+        setSubscribeFeedback(form, email.length > INSPIRE_MAX_EMAIL_LENGTH ? strings.emailTooLong : strings.invalidEmail, true);
         if (emailInput) emailInput.focus();
         return;
       }
@@ -1020,14 +1032,26 @@ function initContactForm() {
       return;
     }
 
-    if (!emailPattern.test(email)) {
-      setContactFeedback(form, strings.invalidEmail, true);
+    if (name.length > INSPIRE_MAX_NAME_LENGTH) {
+      setContactFeedback(form, strings.nameTooLong, true);
+      if (currentNameInput) currentNameInput.focus();
+      return;
+    }
+
+    if (!emailPattern.test(email) || email.length > INSPIRE_MAX_EMAIL_LENGTH) {
+      setContactFeedback(form, email.length > INSPIRE_MAX_EMAIL_LENGTH ? strings.emailTooLong : strings.invalidEmail, true);
       if (emailInput) emailInput.focus();
       return;
     }
 
     if (message.length < 10) {
       setContactFeedback(form, strings.shortMessage, true);
+      if (currentMessageInput) currentMessageInput.focus();
+      return;
+    }
+
+    if (message.length > INSPIRE_MAX_MESSAGE_LENGTH) {
+      setContactFeedback(form, strings.messageTooLong, true);
       if (currentMessageInput) currentMessageInput.focus();
       return;
     }

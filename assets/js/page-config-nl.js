@@ -7,6 +7,7 @@ window.INSPIRE_PAGE_CONFIG = {
     subscribe: {
       missingEmail: 'Voer je e-mailadres in.',
       invalidEmail: 'Voer een geldig e-mailadres in.',
+      emailTooLong: 'Gebruik een korter e-mailadres.',
       endpointMissing: 'Het inschrijvingsendpoint is nog niet ingesteld.',
       submitting: 'Je inschrijving wordt opgeslagen...',
       failed: 'Inschrijven mislukt. Probeer het opnieuw.',
@@ -15,8 +16,11 @@ window.INSPIRE_PAGE_CONFIG = {
     },
     contact: {
       missingName: 'Voer je naam in.',
+      nameTooLong: 'Gebruik een kortere naam.',
       invalidEmail: 'Voer een geldig e-mailadres in.',
+      emailTooLong: 'Gebruik een korter e-mailadres.',
       shortMessage: 'Voer een bericht met iets meer detail in.',
+      messageTooLong: 'Houd je bericht onder de 5000 tekens.',
       endpointMissing: 'Het contactendpoint is nog niet ingesteld.',
       submitting: 'Je bericht wordt verzonden...',
       failed: 'Bericht verzenden mislukt. Probeer het opnieuw.',
