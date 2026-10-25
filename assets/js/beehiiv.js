@@ -175,7 +175,7 @@ function createPostMetricsHtml(post, classNamePrefix) {
   const articleTitle = typeof post.articleTitle === 'string' ? post.articleTitle.trim() : '';
 
   if (metrics.readTime) {
-    items.push(`<div class="${classNamePrefix}-stat"><span>${PAGE_STRINGS.metricReadTime}</span> <strong>${metrics.readTime}</strong></div>`);
+    items.push(`<div class="${classNamePrefix}-stat"><span>${PAGE_STRINGS.metricReadTime}</span> <strong>${escapeHtml(metrics.readTime)}</strong></div>`);
   }
 
   if (post.slug) {
