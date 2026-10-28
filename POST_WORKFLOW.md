@@ -24,5 +24,11 @@
 If you ever add or remove post files by hand, run `scripts/sync-posts-manifest.cmd`
 to rebuild `assets/data/posts.json` from what's actually on disk.
 
+Note: posts published before this pipeline existed (e.g. the "Explained" post
+migrated from the old interviews format) were never run through step 3, so
+they may still hotlink Beehiiv/AWS image URLs instead of using
+`assets/img/posts/<slug>/`. Re-run them through the pipeline if you want them
+brought in line.
+
 `hidden` posts remain available by direct URL but stay out of the homepage and
 archive until their `visibility` is set to `public` in `assets/data/posts.json`.
