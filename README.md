@@ -18,6 +18,7 @@ Public site for INSPIRE. This repo serves the homepage, archive, bilingual artic
 - `components/`: shared content fragments
 - `posts/`: generated article pages, raw archives, and the `incoming/` drop folders
 - `scripts/`: post import and manifest sync utilities
+- `robots.txt`, `sitemap.xml`: crawler hints; add new article URLs to `sitemap.xml` by hand when publishing (the import script does not update it)
 
 ## Content Workflow
 

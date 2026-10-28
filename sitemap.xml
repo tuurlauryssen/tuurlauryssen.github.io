@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://tuurlauryssen.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tuurlauryssen.com/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://tuurlauryssen.com/nl/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tuurlauryssen.com/"/>
+  </url>
+  <url>
+    <loc>https://tuurlauryssen.com/nl/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tuurlauryssen.com/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://tuurlauryssen.com/nl/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tuurlauryssen.com/"/>
+  </url>
+  <url>
+    <loc>https://tuurlauryssen.com/blog.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tuurlauryssen.com/blog.html"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://tuurlauryssen.com/nl/blog.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tuurlauryssen.com/blog.html"/>
+  </url>
+  <url>
+    <loc>https://tuurlauryssen.com/nl/blog.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tuurlauryssen.com/blog.html"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://tuurlauryssen.com/nl/blog.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tuurlauryssen.com/blog.html"/>
+  </url>
+  <url>
+    <loc>https://tuurlauryssen.com/posts/explained/en/1-ai-might-get-you-noticed-but-people-skills-get-you-hired.html</loc>
+    <lastmod>2026-09-15</lastmod>
+  </url>
+</urlset>

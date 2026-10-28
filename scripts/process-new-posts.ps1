@@ -757,6 +757,7 @@ function Write-PostFile {
 
   $escapedTitle = [System.Security.SecurityElement]::Escape($Title)
   $escapedExcerpt = [System.Security.SecurityElement]::Escape($Excerpt)
+  $canonicalUrl = "https://tuurlauryssen.com/posts/$Type/$Language/$([System.IO.Path]::GetFileName($Path))"
   $relativeStylesheet = '../../../assets/css/style.css'
   $relativeNlPageConfigJs = '../../../assets/js/page-config-nl.js'
   $relativeSiteConfigJs = '../../../assets/js/site-config.js'
@@ -814,6 +815,11 @@ function Write-PostFile {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$escapedTitle | INSPIRE</title>
   <meta name="description" content="$escapedExcerpt">
+  <link rel="canonical" href="$canonicalUrl">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="$escapedTitle">
+  <meta property="og:description" content="$escapedExcerpt">
+  <meta property="og:url" content="$canonicalUrl">
   <meta name="inspire:visibility" content="$Visibility">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="$relativeStylesheet">
