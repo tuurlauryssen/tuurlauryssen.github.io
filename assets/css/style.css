@@ -2070,3 +2070,35 @@ footer {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Touch tap targets: at least 44x44px on coarse pointers */
+@media (pointer: coarse) {
+  .ftab,
+  .article-action-link,
+  .article-community__like,
+  .article-community__comment-button,
+  .article-source-link,
+  .footer-links a,
+  .nl-link {
+    min-height: 44px;
+  }
+
+  .article-community__like,
+  .article-community__comment-button {
+    min-width: 44px;
+    justify-content: center;
+  }
+
+  .ftab,
+  .footer-links a,
+  .article-source-link,
+  .nl-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nl-link {
+    min-width: 44px;
+  }
+}
