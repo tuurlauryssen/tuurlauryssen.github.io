@@ -536,13 +536,12 @@ function extractFeaturedImage(post) {
 function cleanHTML(html) {
   if (!html) return '';
 
-  const tmp = document.createElement('div');
-  tmp.innerHTML = html;
+  const doc = new DOMParser().parseFromString(String(html), 'text/html');
 
-  const scripts = tmp.querySelectorAll('script, style');
+  const scripts = doc.querySelectorAll('script, style');
   scripts.forEach((el) => el.remove());
 
-  let text = tmp.textContent || tmp.innerText || '';
+  let text = doc.body.textContent || '';
   text = text.replace(/\s+/g, ' ').trim();
 
   return text;
@@ -615,7 +614,7 @@ function createPostCard(post) {
     : { class: 's-badge-l', label: PAGE_STRINGS.thingsILearned };
 
   return `
-    <a class="s-card" data-type="${type}" data-date="${post.pubDate}" href="${safeLink}">
+    <a class="s-card" data-type="${type}" data-date="${escapeHtml(String(post.pubDate))}" href="${safeLink}">
       <div class="s-img-wrap">
         <div class="s-badge ${badge.class}">${badge.label}</div>
         <img class="s-img" src="${safeImage}" alt="${safeTitle}" loading="lazy" onerror="this.src='${PLACEHOLDER_IMAGE_PATH}'">
