@@ -35,9 +35,9 @@
   </g>
   <g>
     <rect x="960" y="96" width="280" height="78" rx="12" class="box"/>
-    <text x="978" y="122" class="h">🤖 Scheduled agents</text>
-    <text x="978" y="142" class="s">"analytics" + "inbox" agents that</text>
-    <text x="978" y="158" class="s">read the weekly report (outside repos)</text>
+    <text x="978" y="122" class="h">🤖 Scheduled jobs</text>
+    <text x="978" y="142" class="s">read-only reporting</text>
+    <text x="978" y="158" class="s">(outside these repos)</text>
   </g>
 
   <!-- ============ GITHUB ZONE ============ -->
@@ -59,7 +59,7 @@
 
   <rect x="60" y="566" width="330" height="92" rx="10" class="box"/>
   <text x="76" y="590" class="t" font-weight="700">GitHub Actions</text>
-  <text x="76" y="608" class="s">backup.yml · Sun 03:00 UTC · pg_dump</text>
+  <text x="76" y="608" class="s">backup.yml · weekly database backup</text>
   <text x="76" y="624" class="s">keepalive.yml · Mon+Thu 06:00 UTC · ping</text>
   <text x="76" y="642" class="s">→ backup.sql artifact, kept 30 days</text>
 
@@ -92,10 +92,10 @@
   <text x="516" y="469" class="s">article-comments-list</text>
   <rect x="694" y="344" width="172" height="134" rx="8" fill="#F5E2DF" stroke="#E2B8B1"/>
   <text x="704" y="362" class="lbl" fill="#A23B3B">TOKEN REQUIRED 🔒</text>
-  <text x="704" y="381" class="s">list-subscribers</text>
-  <text x="704" y="396" class="s">  ↳ INSPIRE_ADMIN_TOKEN</text>
-  <text x="704" y="418" class="s">weekly-report (read-only)</text>
-  <text x="704" y="433" class="s">  ↳ INSPIRE_REPORT_TOKEN</text>
+  <text x="704" y="381" class="s">subscriber export</text>
+  <text x="704" y="396" class="s">  ↳ admin token</text>
+  <text x="704" y="418" class="s">activity report (read-only)</text>
+  <text x="704" y="433" class="s">  ↳ report token</text>
   <text x="704" y="458" class="s">Bearer token, compared</text>
   <text x="704" y="472" class="s">in constant time</text>
 
@@ -117,7 +117,7 @@
 
   <rect x="980" y="276" width="240" height="56" rx="10" class="box"/>
   <text x="996" y="299" class="t" font-weight="700">✉️ Resend</text>
-  <text x="996" y="318" class="s">Email API (RESEND_API_KEY)</text>
+  <text x="996" y="318" class="s">Email API (secret key)</text>
 
   <rect x="980" y="352" width="240" height="56" rx="10" class="box"/>
   <text x="996" y="375" class="t" font-weight="700">📥 Tuur's inbox</text>
@@ -138,8 +138,8 @@
   <text x="996" y="664" class="s">Cormorant Garamond + DM Sans</text>
 
   <rect x="980" y="698" width="240" height="56" rx="10" class="box"/>
-  <text x="996" y="721" class="t" font-weight="700">📦 esm.sh CDN</text>
-  <text x="996" y="740" class="s">supabase-js 2.112.4 (at deploy)</text>
+  <text x="996" y="721" class="t" font-weight="700">📦 Package registry</text>
+  <text x="996" y="740" class="s">client library (at deploy)</text>
 
   <rect x="980" y="774" width="240" height="62" rx="10" class="box"/>
   <text x="996" y="797" class="t" font-weight="700">🤖 AI writing assistants</text>
@@ -188,15 +188,15 @@
   <rect x="806" y="134" width="118" height="16" rx="4" class="lbg"/>
   <text x="810" y="146" class="lbl" fill="#B8752E">⑦ write + export HTML</text>
 
-  <!-- 8 agents -> weekly-report -->
+  <!-- 8 reporting -> report endpoint -->
   <path d="M1000,174 L1000,206 L850,206 L850,272" fill="none" stroke="#A23B3B" stroke-width="2" stroke-dasharray="7 4" marker-end="url(#a-red)"/>
   <rect x="862" y="186" width="130" height="18" rx="4" class="lbg"/>
-  <text x="866" y="199" class="lbl" fill="#A23B3B">⑧ GET weekly-report</text>
+  <text x="866" y="199" class="lbl" fill="#A23B3B">⑧ GET report</text>
 
   <!-- 9 actions -> postgres (backup) -->
   <path d="M390,620 L486,620" fill="none" stroke="#A23B3B" stroke-width="2" stroke-dasharray="7 4" marker-end="url(#a-red)"/>
   <rect x="398" y="600" width="80" height="16" rx="4" class="lbg"/>
-  <text x="402" y="612" class="lbl" fill="#A23B3B">⑨ pg_dump</text>
+  <text x="402" y="612" class="lbl" fill="#A23B3B">⑨ backup</text>
   <!-- 10 actions -> edge (keepalive) -->
   <path d="M390,592 L440,592 L440,420 L486,420" fill="none" stroke="#B8752E" stroke-width="2" marker-end="url(#a-amber)"/>
   <rect x="416" y="448" width="50" height="32" rx="4" class="lbg"/>
@@ -217,9 +217,9 @@
   <text x="58" y="768" class="s">② Page JS calls Supabase Edge Functions; URLs are in site-config.js.</text>
   <text x="500" y="768" class="s">⑦ Posts are written in Beehiiv first (tuurlauryssen.beehiiv.com).</text>
   <text x="58" y="788" class="s">③ Pages also load GA, Google Fonts and Beehiiv-hosted images.</text>
-  <text x="500" y="788" class="s">⑧ Agents use a separate, read-only report token.</text>
+  <text x="500" y="788" class="s">⑧ Reporting uses a separate, read-only token.</text>
   <text x="58" y="808" class="s">④ Subscribe + contact send you an alert email via Resend.</text>
-  <text x="500" y="808" class="s">⑨ Weekly full DB dump via the pooler (SUPABASE_DB_URL secret).</text>
+  <text x="500" y="808" class="s">⑨ Weekly database backup (secret stored in GitHub Actions).</text>
   <text x="58" y="828" class="s">⑤ process-new-posts.ps1 turns a Beehiiv export into a PR; merge = live.</text>
   <text x="500" y="828" class="s">(10) Twice-weekly ping keeps the free tier from pausing.</text>
 </svg>
