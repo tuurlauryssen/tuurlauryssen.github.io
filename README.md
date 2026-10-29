@@ -2,6 +2,12 @@
 
 Public site for INSPIRE. This repo serves the homepage, archive, bilingual article pages, and the client-side integrations for subscriptions, contact, and article community actions.
 
+## Architecture map
+
+📐 **How it all fits together:** see [`docs/architecture/`](docs/architecture/README.md). It has diagrams of the site, its connection to the private backend, the content pipeline, every outside platform, and a security summary.
+
+[![INSPIRE system map](docs/architecture/images/system-map.svg)](docs/architecture/README.md)
+
 ## Structure
 
 - `index.html`: homepage
@@ -18,6 +24,7 @@ Public site for INSPIRE. This repo serves the homepage, archive, bilingual artic
 - `components/`: shared content fragments
 - `posts/`: generated article pages, raw archives, and the `incoming/` drop folders
 - `scripts/`: post import and manifest sync utilities
+- `docs/architecture/`: architecture map with diagrams
 - `robots.txt`, `sitemap.xml`: crawler hints; add new article URLs to `sitemap.xml` by hand when publishing (the import script does not update it)
 
 ## Content Workflow
