@@ -6,8 +6,10 @@
 #   <script> tags and platform config, which would run on this domain.
 # - posts/incoming: import drop folders.
 # - scripts: local import tooling.
-# - Markdown docs/prompts: internal workflow notes, not site pages.
+# - Markdown docs/prompts and docs/: internal notes, not site pages. (GitHub
+#   Pages renders .md files even without front matter.)
 exclude:
+  - docs
   - posts/raw
   - posts/incoming
   - posts/README.md
