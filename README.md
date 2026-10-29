@@ -18,6 +18,8 @@ Public site for INSPIRE. This repo serves the homepage, archive, bilingual artic
 - `components/`: shared content fragments
 - `posts/`: generated article pages, raw archives, and the `incoming/` drop folders
 - `scripts/`: post import and manifest sync utilities
+- `_config.yml`: GitHub Pages build settings; keeps raw exports, import scripts, and internal docs off the public site
+- `SECURITY_AUDIT_PROMPT.md`: reusable prompt for a periodic security review of the site and backend
 - `robots.txt`, `sitemap.xml`: crawler hints; add new article URLs to `sitemap.xml` by hand when publishing (the import script does not update it)
 
 ## Content Workflow
@@ -35,6 +37,7 @@ to rebuild the manifest from what's on disk.
 
 - The site is static and intended for GitHub Pages.
 - Public endpoints are read from `window.INSPIRE_SITE_CONFIG`.
+- Every page (and the article template in `scripts/process-new-posts.ps1`) carries a Content-Security-Policy `<meta>` tag. If you add a new third-party script, font, or API origin, add it to the policy on all pages, or the browser will block it.
 - Article pages render community likes and a private note form (routed to the contact backend) through the backend project. The backend also exposes public comment submission/listing endpoints, but no UI currently calls them.
 
 ## Backend

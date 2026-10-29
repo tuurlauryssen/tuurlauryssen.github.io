@@ -194,8 +194,8 @@ function createPostMetricsHtml(post, classNamePrefix) {
     return '';
   }
 
-  const slugAttribute = post.slug ? ` data-post-slug="${post.slug}"` : '';
-  const pathAttribute = articlePath ? ` data-post-path="${articlePath}"` : '';
+  const slugAttribute = post.slug ? ` data-post-slug="${escapeHtml(post.slug)}"` : '';
+  const pathAttribute = articlePath ? ` data-post-path="${escapeHtml(articlePath)}"` : '';
   const titleAttribute = articleTitle ? ` data-post-title="${escapeHtml(articleTitle)}"` : '';
   return `<div class="${classNamePrefix}-stats" aria-label="Article metrics"${slugAttribute}${pathAttribute}${titleAttribute}>${items.join('')}</div>`;
 }
@@ -388,6 +388,20 @@ function resolvePostLink(path) {
   }
 
   return `${BEEHIIV_CONFIG.postLinkPrefix}${path}`;
+}
+
+// Only http(s) and relative URLs may reach an href/src; a manifest value like
+// "javascript:..." would otherwise become a clickable script URL.
+function safeUrl(url, fallback = '') {
+  const value = String(url || '').trim();
+  if (!value) return fallback;
+
+  try {
+    const { protocol } = new URL(value, window.location.href);
+    return protocol === 'http:' || protocol === 'https:' ? value : fallback;
+  } catch (error) {
+    return fallback;
+  }
 }
 
 function getExplainedNumber(post) {
@@ -606,8 +620,8 @@ function createPostCard(post) {
   const formattedDate = formatDate(post.pubDate);
   const tags = extractTags(post);
   const safeTitle = escapeHtml(post.title);
-  const safeLink = escapeHtml(post.link);
-  const safeImage = escapeHtml(image);
+  const safeLink = escapeHtml(safeUrl(post.link, '#'));
+  const safeImage = escapeHtml(safeUrl(image, PLACEHOLDER_IMAGE_PATH));
 
   const badge = type === 'explained'
     ? { class: 's-badge-e', label: PAGE_STRINGS.explained }
@@ -646,8 +660,8 @@ function createHomepageSplitCard(post, variant = 'featured') {
   const tags = extractTags(post);
   const badgeLabel = type === 'explained' ? PAGE_STRINGS.explained : PAGE_STRINGS.thingsILearned;
   const safeTitle = escapeHtml(post.title);
-  const safeLink = escapeHtml(post.link);
-  const safeImage = escapeHtml(image);
+  const safeLink = escapeHtml(safeUrl(post.link, '#'));
+  const safeImage = escapeHtml(safeUrl(image, PLACEHOLDER_IMAGE_PATH));
 
   return `
     <a class="ih-post-card ${variant}" href="${safeLink}">

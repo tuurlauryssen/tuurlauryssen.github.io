@@ -222,6 +222,58 @@ function Remove-Attributes {
   return $withoutSingle
 }
 
+function Test-UnsafeUrl {
+  param([string]$Value)
+
+  # Decode entities and drop whitespace/control characters first: browsers
+  # ignore them inside a URL scheme, so "jav&#x61;script:" or "java<TAB>script:"
+  # would otherwise slip past the check. Inline raster data: images are fine.
+  $decoded = [System.Net.WebUtility]::HtmlDecode([string]$Value)
+  $compact = [regex]::Replace($decoded, '[\x00-\x20]', '').ToLowerInvariant()
+  if ($compact -match '^data:image/(png|jpe?g|gif|webp|avif)[;,]') {
+    return $false
+  }
+
+  return $compact -match '^(javascript|vbscript|data):'
+}
+
+function Remove-UnsafeMarkup {
+  param([string]$Html)
+
+  # Security pass over the imported body, separate from the cosmetic
+  # Remove-Attributes cleanup. Runs per tag, and each pattern consumes quoted
+  # attribute values as a unit first (group 1, returned untouched), so text
+  # inside an alt or a URL is never mistaken for an attribute.
+  $quoted = '"[^"]*"|''[^'']*'''
+  $attrValue = '(?:"[^"]*"|''[^'']*''|[^\s"''=<>`]+)'
+  $tagPattern = '<[a-zA-Z][^\s/>]*(?:"[^"]*"|''[^'']*''|[^''">])*>'
+
+  # Any leftover opening/closing tag of an element that can run script, load
+  # other documents, or restyle/redirect the page - including unclosed ones the
+  # paired Remove-HtmlNodes pass can't match.
+  $cleaned = [regex]::Replace($Html, '(?i)</?(script|noscript|iframe|object|embed|style|template|svg|math|frameset|frame|applet|link|meta|base|form|input|button|textarea|select)\b(?:"[^"]*"|''[^'']*''|[^''">])*>', '')
+
+  return [regex]::Replace($cleaned, $tagPattern, {
+    param($tagMatch)
+
+    # Event handlers in every form: quoted, unquoted, spaced around "=", or
+    # separated from the tag name by "/" instead of whitespace.
+    $tag = [regex]::Replace($tagMatch.Value, '(?i)(' + $quoted + ')|[\s/]+on\w+(?:\s*=\s*' + $attrValue + ')?', {
+      param($match)
+      if ($match.Groups[1].Success) { return $match.Value }
+      return ' '
+    })
+
+    # javascript:/vbscript:/data: URLs in anything that navigates or loads.
+    return [regex]::Replace($tag, '(?i)(' + $quoted + ')|[\s/]+(?:href|src|srcset|action|formaction|xlink:href|poster|background)\s*=\s*(' + $attrValue + ')', {
+      param($match)
+      if ($match.Groups[1].Success) { return $match.Value }
+      if (Test-UnsafeUrl ($match.Groups[2].Value.Trim('"', "'"))) { return ' ' }
+      return $match.Value
+    })
+  })
+}
+
 function Convert-PullQuotes {
   param([string]$Html)
 
@@ -280,11 +332,12 @@ function Normalize-ArticleHtml {
     return ''
   }
 
-  $cleaned = Remove-HtmlNodes -Html $Html -Tags @('script', 'noscript', 'form', 'button', 'header', 'footer', 'nav')
+  $cleaned = Remove-HtmlNodes -Html $Html -Tags @('script', 'noscript', 'form', 'button', 'header', 'footer', 'nav', 'iframe', 'object', 'style', 'template', 'svg', 'math', 'frameset', 'applet')
   $cleaned = [regex]::Replace($cleaned, '<!--.*?-->', '', 'Singleline')
   $cleaned = Convert-PullQuotes -Html $cleaned
   $cleaned = Simplify-PictureElements -Html $cleaned
   $cleaned = Remove-Attributes -Html $cleaned
+  $cleaned = Remove-UnsafeMarkup -Html $cleaned
   $cleaned = Collapse-EmptyDivs -Html $cleaned
   $cleaned = $cleaned -replace '&nbsp;', ' '
   $cleaned = [regex]::Replace($cleaned, '(?is)<(section|div)\b[^>]*>\s*<h[2-4][^>]*>\s*Keep Reading\s*</h[2-4]>\s*.*?</\1>', '')
@@ -660,7 +713,10 @@ function Get-ImageExtension {
 
   $withoutQuery = $Url -replace '\?.*$', ''
   $lastSegment = ($withoutQuery -split '/')[-1]
-  if ($lastSegment -match '\.([a-zA-Z0-9]{2,5})$') {
+  # Allowlist: whatever extension lands here is what GitHub Pages serves the
+  # file as, so an ".html" or ".svg" "image" would become a script-capable page
+  # on this domain.
+  if ($lastSegment -match '\.(jpe?g|png|gif|webp|avif)$') {
     return ".$($matches[1].ToLowerInvariant())"
   }
 
@@ -672,6 +728,13 @@ function Save-RemoteImage {
     [string]$Url,
     [string]$DestinationPath
   )
+
+  # Only fetch from the web. Windows PowerShell's Invoke-WebRequest also accepts
+  # file:// URIs, which would copy a local file into the published repo.
+  if ($Url -notmatch '^https?://') {
+    Write-Warning "Skipping non-http(s) image URL, leaving it in place: $Url"
+    return $false
+  }
 
   try {
     $destinationDirectory = Split-Path -Parent $DestinationPath
@@ -765,6 +828,9 @@ function Write-PostFile {
   $displayDate = Format-DisplayDate -Value $Date -Language $Language
   $escapedDisplayDate = [System.Security.SecurityElement]::Escape($displayDate)
   $escapedReadTime = [System.Security.SecurityElement]::Escape($ReadTime)
+  if (Test-UnsafeUrl $SourceUrl) {
+    $SourceUrl = ''
+  }
   $escapedSourceUrl = [System.Security.SecurityElement]::Escape($SourceUrl)
   $authorsMarkup = Get-AuthorsMarkup -Authors $Authors -Profiles $AuthorProfiles
   $copy = Get-LocalizedArticleCopy -Language $Language -Type $Type
@@ -813,6 +879,7 @@ function Write-PostFile {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://jnhygvustbwwzfqrpklr.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://www.google.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
   <title>$escapedTitle | INSPIRE</title>
   <meta name="description" content="$escapedExcerpt">
   <link rel="canonical" href="$canonicalUrl">
