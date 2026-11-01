@@ -941,6 +941,20 @@ nav {
   margin-top: 24px;
 }
 
+/* Beehiiv exports wrap every paragraph in its own <div>, so the sibling rule
+   above never reaches them and paragraphs ran together with no gap. Give each
+   paragraph its own bottom margin (collapses with heading top margins). */
+.article-body p {
+  margin: 0 0 20px;
+}
+
+.article-body h1,
+.article-body h2,
+.article-body h3,
+.article-body h4 {
+  margin-bottom: 16px;
+}
+
 .article-body h1,
 .article-body h2,
 .article-body h3 {
