@@ -131,7 +131,9 @@ function mapLocalPost(entry) {
   const categories = Array.isArray(entry.categories) ? entry.categories : [];
   const normalizedCategories = [...new Set([entry.language, ...categories])];
   const excerpt = entry.excerpt || entry.description || '';
-  const image = entry.image || '';
+  // Local images are stored root-relative ("assets/img/..."), so resolve them like
+  // post links; otherwise they break on pages one folder down, such as /nl/.
+  const image = entry.image ? resolvePostLink(entry.image) : '';
   const visibility = normalizePostVisibility(entry);
 
   return {

@@ -888,7 +888,7 @@ function Write-PostFile {
   <meta property="og:description" content="$escapedExcerpt">
   <meta property="og:url" content="$canonicalUrl">
   <meta name="inspire:visibility" content="$Visibility">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&family=Inter:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="$relativeStylesheet">
 </head>
 <body>
