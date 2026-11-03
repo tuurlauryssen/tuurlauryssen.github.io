@@ -828,12 +828,20 @@ function Write-PostFile {
   $displayDate = Format-DisplayDate -Value $Date -Language $Language
   $escapedDisplayDate = [System.Security.SecurityElement]::Escape($displayDate)
   $escapedReadTime = [System.Security.SecurityElement]::Escape($ReadTime)
-  if (Test-UnsafeUrl $SourceUrl) {
-    $SourceUrl = ''
-  }
-  $escapedSourceUrl = [System.Security.SecurityElement]::Escape($SourceUrl)
   $authorsMarkup = Get-AuthorsMarkup -Authors $Authors -Profiles $AuthorProfiles
   $copy = Get-LocalizedArticleCopy -Language $Language -Type $Type
+
+  # Link-preview image (WhatsApp, LinkedIn, ...): crawlers need an absolute URL,
+  # so turn the local cover path back into one on the live domain.
+  $ogImageHtml = ''
+  if (-not [string]::IsNullOrWhiteSpace($Image)) {
+    $absoluteImage = $Image
+    if ($absoluteImage.StartsWith('../../../')) {
+      $absoluteImage = 'https://tuurlauryssen.com/' + $absoluteImage.Substring('../../../'.Length)
+    }
+    $escapedAbsoluteImage = [System.Security.SecurityElement]::Escape($absoluteImage)
+    $ogImageHtml = "`n  <meta property=`"og:image`" content=`"$escapedAbsoluteImage`">`n  <meta name=`"twitter:card`" content=`"summary_large_image`">"
+  }
 
   $coverHtml = ''
   if (-not [string]::IsNullOrWhiteSpace($Image)) {
@@ -868,10 +876,8 @@ function Write-PostFile {
   $homeLink = if ($Language -eq 'nl') { '../../../nl/index.html' } else { '../../../index.html' }
   $archiveLink = if ($Language -eq 'nl') { '../../../nl/blog.html' } else { '../../../blog.html' }
   $typeLabel = $copy.TypeLabel
-  $sourceHtml = ''
-  if (-not [string]::IsNullOrWhiteSpace($SourceUrl)) {
-    $sourceHtml = '<a class="article-source-link" href="' + $escapedSourceUrl + '" target="_blank" rel="noopener noreferrer">' + $copy.SourceLabel + '</a>'
-  }
+  # No "Original source" link: articles keep readers on this site instead of
+  # sending them to the Beehiiv copy, so $SourceUrl is accepted but not used.
 
   $html = @"
 <!DOCTYPE html>
@@ -886,7 +892,7 @@ function Write-PostFile {
   <meta property="og:type" content="article">
   <meta property="og:title" content="$escapedTitle">
   <meta property="og:description" content="$escapedExcerpt">
-  <meta property="og:url" content="$canonicalUrl">
+  <meta property="og:url" content="$canonicalUrl">$ogImageHtml
   <meta name="inspire:visibility" content="$Visibility">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&family=DM+Sans:wght@200;300;400;500&family=Inter:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="$relativeStylesheet">
@@ -925,7 +931,6 @@ $BodyHtml
       <div class="article-endcap-copy">
         <div class="article-endcap-title">$($copy.EndcapTitle)</div>
         <div class="article-endcap-text">$($copy.EndcapText)<span class="article-updated" data-last-updated></span></div>
-        $sourceHtml
       </div>
       <div class="article-endcap-actions">
         <a class="article-action-link" href="$homeLink">$($copy.Home)</a>

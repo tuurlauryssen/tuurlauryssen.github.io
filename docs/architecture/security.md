@@ -50,7 +50,6 @@ flowchart LR
 | Note | Why | Possible improvement |
 |------|-----|----------------------|
 | No clickjacking header | `frame-ancestors` only works as a response header, which GitHub Pages can't send | Fine for a site with no logged-in actions |
-| `sandbox/` previews are public (marked `noindex`) and still allow inline scripts | Old preview pages kept as-is | Remove them when they're no longer needed |
 | Some images still load from Beehiiv's CDN | The first post predates the image-download step | Re-run it through the import script |
 | GA4 still sends (anonymised) visitor data to Google | Analytics needs it | Make sure the site's privacy wording mentions Google Analytics |
 | Like and read counts are approximate | Privacy-first design: a new token on every page load means repeat visits count again | Fine for a vanity metric |

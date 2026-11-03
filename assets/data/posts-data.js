@@ -14,7 +14,7 @@ window.INSPIRE_LOCAL_POSTS = [
     "updatedAt": "2026-09-15T20:33:38.2328382Z",
     "excerpt": "Networking, AI in the job market, and why attitude may become the most valuable skill of all",
     "image": "assets/img/posts/1-ai-might-get-you-noticed-but-people-skills-get-you-hired/cover-1340.webp",
-    "sourceUrl": "https://tuurlauryssen.beehiiv.com/p/1-ai-might-get-you-noticed-but-people-skills-get-you-hired",
+    "sourceUrl": "",
     "readTime": "11 minutes",
     "likes": 32,
     "reads": "1.2k",
