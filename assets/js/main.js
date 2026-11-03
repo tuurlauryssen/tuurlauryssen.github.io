@@ -840,6 +840,18 @@ function initMobileMenu() {
 
 
 
+// Buttons that navigate (e.g. the nav "Subscribe" CTA) carry their target in
+// data-href instead of an inline onclick, so the CSP can forbid inline script.
+function initNavButtons() {
+  document.querySelectorAll("button[data-href]").forEach((button) => {
+    if (button.dataset.hrefBound === "true") return;
+    button.dataset.hrefBound = "true";
+    button.addEventListener("click", () => {
+      window.location.href = button.dataset.href;
+    });
+  });
+}
+
 function initExternalLinks() {
   const links = document.querySelectorAll('a[href^="http"]');
 
@@ -1294,6 +1306,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initSmoothScroll();
   initNavbarScroll();
   initMobileMenu();
+  initNavButtons();
   initSubscribeForms();
   initContactForm();
   initBrandLogos();
@@ -1320,6 +1333,7 @@ document.addEventListener("components:loaded", () => {
   initParallax();
   initSmoothScroll();
   initNavbarScroll();
+  initNavButtons();
   initSubscribeForms();
   initContactForm();
   initBrandLogos();

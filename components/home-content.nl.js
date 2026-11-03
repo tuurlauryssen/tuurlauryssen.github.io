@@ -4,7 +4,8 @@ window.INSPIRE_HOME_CONTENT = {
     taglineHtml: 'Jouw aandacht waard.',
     description: 'Twee formats. Ik leg idee&euml;n uit die het waard zijn om te begrijpen, en schrijf columns over wat ik maar niet uit mijn hoofd kan zetten. In het Nederlands en Engels.',
     editions: '1',
-    languages: '2'
+    languages: '2',
+    wordplayWords: ['leiders.', 'makers.', 'bouwers.', 'denkers.', 'oprichters.', 'docenten.', 'jij.']
   },
   subscribe: {
     title: 'Ontvang de volgende editie in je inbox.',
