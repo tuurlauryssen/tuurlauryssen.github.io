@@ -1107,6 +1107,23 @@ nav {
   gap: 10px;
 }
 
+/* Let the endcap reflow instead of pushing past the screen edge when a reader
+   has their phone's text size turned up: the buttons drop below the copy,
+   and a button's label may wrap rather than overflow. */
+.article-endcap {
+  flex-wrap: wrap;
+}
+
+.article-endcap-copy {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.article-endcap .article-action-link {
+  white-space: normal;
+  text-align: center;
+}
+
 .article-endcap .article-action-link {
   border-color: rgba(245,240,232,0.2);
   background: rgba(245,240,232,0.08);
