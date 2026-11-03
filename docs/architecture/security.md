@@ -38,7 +38,7 @@ flowchart LR
 | Nothing stored in the browser for likes/reads. The visitor token lives in memory only, and the backend stores only its SHA-256 hash. | `main.js` → `getVisitorToken()` |
 | Post titles, links and excerpts are HTML-escaped before rendering; counters use `textContent`. | `assets/js/beehiiv.js`, `main.js` |
 | Imported Beehiiv HTML is sanitized: scripts, forms, frames, styles, event handlers and `javascript:` URLs are stripped, and only raster images are downloaded. | `scripts/process-new-posts.ps1` |
-| A Content-Security-Policy `<meta>` tag on every page limits where scripts may load from and where data may be sent. | every page + the article template |
+| A Content-Security-Policy `<meta>` tag on every page limits where scripts may load from and where data may be sent, and forbids inline scripts on all live pages, so injected markup can't run code. | every page + the article template |
 | Raw Beehiiv exports, import scripts and internal docs are kept off the published site. | `_config.yml` |
 | External links open with `rel="noopener noreferrer"`. | `main.js` → `initExternalLinks()` |
 | No public email address on the site, only the contact form. | homepage contact section |
@@ -49,9 +49,8 @@ flowchart LR
 
 | Note | Why | Possible improvement |
 |------|-----|----------------------|
-| The CSP still allows inline scripts | The pages use inline scripts and `onerror` handlers | Move inline scripts into files, then drop `'unsafe-inline'` from `script-src` |
 | No clickjacking header | `frame-ancestors` only works as a response header, which GitHub Pages can't send | Fine for a site with no logged-in actions |
-| `sandbox/` is public and indexable | Everything in a public Pages repo is served unless excluded | Add `<meta name="robots" content="noindex">` to sandbox pages, or remove them |
+| `sandbox/` previews are public (marked `noindex`) and still allow inline scripts | Old preview pages kept as-is | Remove them when they're no longer needed |
 | Some images still load from Beehiiv's CDN | The first post predates the image-download step | Re-run it through the import script |
 | GA4 still sends (anonymised) visitor data to Google | Analytics needs it | Make sure the site's privacy wording mentions Google Analytics |
 | Like and read counts are approximate | Privacy-first design: a new token on every page load means repeat visits count again | Fine for a vanity metric |

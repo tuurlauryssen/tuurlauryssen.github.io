@@ -8,7 +8,7 @@
 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://jnhygvustbwwzfqrpklr.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://www.google.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://jnhygvustbwwzfqrpklr.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://www.google.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <title>All Editions — INSPIRE</title>
 <link rel="canonical" href="https://tuurlauryssen.com/blog.html">
 <link rel="alternate" hreflang="en" href="https://tuurlauryssen.com/blog.html">
@@ -44,7 +44,7 @@
   </div>
   <div class="nav-right">
     <a class="nl-link" href="nl/blog.html">NL</a>
-    <button class="nav-cta" onclick="window.location.href='index.html#subscribe'">Subscribe Free</button>
+    <button class="nav-cta" data-href="index.html#subscribe">Subscribe Free</button>
   </div>
 </nav>
 
@@ -122,45 +122,8 @@
 <script src="assets/js/main.js"></script>
 <script src="assets/data/posts-data.js"></script>
 <script src="assets/js/beehiiv.js"></script>
-<script>
-  (function () {
-    var quotes = [
-      '"I spent five years studying engineering. Nobody warned me that understanding people would be harder."',
-      '"The more I learn, the more I realise how much I still don\'t know. That used to bother me. Now it\'s the whole point."',
-      '"Everyone is fighting for my attention. Almost nobody is asking me to think."',
-      '"Some people call it luck. I call it serendipity. The kind of thing that happens when you\'re genuinely curious about the people around you."'
-    ];
-    var el = document.querySelector('[data-quote-rotate]');
-    if (!el || quotes.length < 2) return;
-    var index = 0;
-
-    function typeQuote(text, onDone) {
-      el.textContent = '';
-      var i = 0;
-      function next() {
-        if (i < text.length) {
-          el.textContent += text[i];
-          i++;
-          setTimeout(next, 32);
-        } else if (onDone) {
-          onDone();
-        }
-      }
-      next();
-    }
-
-    function cycle() {
-      index = (index + 1) % quotes.length;
-      typeQuote(quotes[index], function () {
-        setTimeout(cycle, 5000);
-      });
-    }
-
-    typeQuote(quotes[0], function () {
-      setTimeout(cycle, 5000);
-    });
-  })();
-</script>
+<script src="assets/js/blog-quotes.js"></script>
+<script src="assets/js/quote-rotate.js"></script>
 
 
 </body>

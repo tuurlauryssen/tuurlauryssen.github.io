@@ -43,6 +43,19 @@ const BEEHIIV_CONFIG = {
 // pages (e.g. /nl/) where a root-relative "assets/..." path would 404.
 const PLACEHOLDER_IMAGE_PATH = resolvePostLink('assets/images/post-placeholder.jpg');
 
+// Broken post images fall back to the placeholder. A capturing listener
+// replaces the old inline onerror attributes (error events don't bubble), so
+// the CSP can forbid inline script. Swaps at most once per image.
+document.addEventListener('error', (event) => {
+  const img = event.target;
+  if (!(img instanceof HTMLImageElement) || !img.dataset.fallbackSrc || img.dataset.fallbackApplied === 'true') {
+    return;
+  }
+
+  img.dataset.fallbackApplied = 'true';
+  img.src = img.dataset.fallbackSrc;
+}, true);
+
 // =========================================
 // CACHE CONFIGURATION
 // =========================================
@@ -631,7 +644,7 @@ function createPostCard(post) {
     <a class="s-card" data-type="${type}" data-date="${escapeHtml(String(post.pubDate))}" href="${safeLink}">
       <div class="s-img-wrap">
         <div class="s-badge ${badge.class}">${badge.label}</div>
-        <img class="s-img" src="${safeImage}" alt="${safeTitle}" loading="lazy" onerror="this.src='${PLACEHOLDER_IMAGE_PATH}'">
+        <img class="s-img" src="${safeImage}" alt="${safeTitle}" loading="lazy" data-fallback-src="${escapeHtml(PLACEHOLDER_IMAGE_PATH)}">
       </div>
       <div class="s-meta">
         <div class="s-tag">${escapeHtml(tags)}</div>
@@ -666,7 +679,7 @@ function createHomepageSplitCard(post, variant = 'featured') {
   return `
     <a class="ih-post-card ${variant}" href="${safeLink}">
       <div class="ih-post-media">
-        <img src="${safeImage}" alt="${safeTitle}" loading="lazy" onerror="this.src='${PLACEHOLDER_IMAGE_PATH}'">
+        <img src="${safeImage}" alt="${safeTitle}" loading="lazy" data-fallback-src="${escapeHtml(PLACEHOLDER_IMAGE_PATH)}">
       </div>
       <div class="ih-post-copy">
         <div class="ih-post-meta">

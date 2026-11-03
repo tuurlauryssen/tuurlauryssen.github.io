@@ -10,7 +10,8 @@ window.INSPIRE_HOME_CONTENT = {
     taglineHtml: 'Worth your attention.',
     description: 'Two formats. I explain ideas worth understanding, and write columns on whatever I can\'t stop thinking about. In Dutch and English.',
     editions: '1',
-    languages: '2'
+    languages: '2',
+    wordplayWords: ['leaders.', 'creators.', 'builders.', 'thinkers.', 'founders.', 'teachers.', 'you.']
   },
   subscribe: {
     title: 'Don\'t miss the next one.',
