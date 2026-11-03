@@ -828,10 +828,6 @@ function Write-PostFile {
   $displayDate = Format-DisplayDate -Value $Date -Language $Language
   $escapedDisplayDate = [System.Security.SecurityElement]::Escape($displayDate)
   $escapedReadTime = [System.Security.SecurityElement]::Escape($ReadTime)
-  if (Test-UnsafeUrl $SourceUrl) {
-    $SourceUrl = ''
-  }
-  $escapedSourceUrl = [System.Security.SecurityElement]::Escape($SourceUrl)
   $authorsMarkup = Get-AuthorsMarkup -Authors $Authors -Profiles $AuthorProfiles
   $copy = Get-LocalizedArticleCopy -Language $Language -Type $Type
 
@@ -880,10 +876,8 @@ function Write-PostFile {
   $homeLink = if ($Language -eq 'nl') { '../../../nl/index.html' } else { '../../../index.html' }
   $archiveLink = if ($Language -eq 'nl') { '../../../nl/blog.html' } else { '../../../blog.html' }
   $typeLabel = $copy.TypeLabel
-  $sourceHtml = ''
-  if (-not [string]::IsNullOrWhiteSpace($SourceUrl)) {
-    $sourceHtml = '<a class="article-source-link" href="' + $escapedSourceUrl + '" target="_blank" rel="noopener noreferrer">' + $copy.SourceLabel + '</a>'
-  }
+  # No "Original source" link: articles keep readers on this site instead of
+  # sending them to the Beehiiv copy, so $SourceUrl is accepted but not used.
 
   $html = @"
 <!DOCTYPE html>
@@ -937,7 +931,6 @@ $BodyHtml
       <div class="article-endcap-copy">
         <div class="article-endcap-title">$($copy.EndcapTitle)</div>
         <div class="article-endcap-text">$($copy.EndcapText)<span class="article-updated" data-last-updated></span></div>
-        $sourceHtml
       </div>
       <div class="article-endcap-actions">
         <a class="article-action-link" href="$homeLink">$($copy.Home)</a>

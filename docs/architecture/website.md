@@ -17,7 +17,6 @@ flowchart LR
   R --> P1["index.html · blog.html<br/>EN pages"]:::page
   R --> P2["nl/index.html · nl/blog.html<br/>NL pages"]:::page
   R --> P3["posts/explained|ideas/en|nl/*.html<br/>article pages"]:::page
-  R --> P4["sandbox/<br/>layout experiments"]:::page
   R --> J1["assets/js/site-config.js<br/>endpoint URLs + GA ID"]:::js
   R --> J2["assets/js/main.js<br/>forms, analytics, likes, reads, UI"]:::js
   R --> J3["assets/js/beehiiv.js<br/>post cards + counters"]:::js
@@ -180,6 +179,5 @@ flowchart LR
 ## 2.8 Small things worth knowing
 
 - **`components:loaded` listener** in `main.js` is left over from a removed `component-loader.js`, and nothing fires it any more. It's harmless dead code.
-- **`sandbox/`** is a public copy of older layouts, reachable at `tuurlauryssen.com/sandbox/`. It's not blocked by `robots.txt` and has no `noindex`, so search engines may index it.
-- **Hotlinked images.** The homepage hero image and the first article still load images from Beehiiv's CDN. Re-running that post through the import script would bring them local.
+- **No Beehiiv dependencies at runtime.** Every image is served from this repo (`assets/img/`), and articles don't link back to the Beehiiv copy. The name `beehiiv.js` is historical: it only reads the local post manifest.
 - **Static like/read numbers in `posts.json`** (`"likes": 32, "reads": "1.2k"`) come from Beehiiv at import time. The live counters on cards come from Supabase instead, so the two can differ.
