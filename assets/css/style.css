@@ -24,7 +24,7 @@
   --beige2: #EAE3D5;
   --beige3: #DDD4C0;
   --ink:    #141210;
-  --muted:  #6B7280;
+  --muted:  #575E6B;
   --line:   rgba(27,44,69,0.12);
   --line2:  rgba(27,44,69,0.06);
 }
@@ -377,7 +377,7 @@ nav {
   text-transform: uppercase;
   color: var(--navy);
   font-weight: 500;
-  opacity: 0.65;
+  opacity: 0.85;
 }
 
 .s-title {
@@ -439,7 +439,7 @@ nav {
   text-decoration: none;
   border-bottom: 1px solid var(--navy);
   padding-bottom: 2px;
-  opacity: 0.55;
+  opacity: 0.8;
   transition: opacity 0.2s;
 }
 
@@ -1211,7 +1211,7 @@ nav {
   font-family: 'DM Sans', sans-serif;
   font-size: 15px;
   line-height: 1.8;
-  color: #6B7280;
+  color: #575E6B;
   font-weight: 300;
   max-width: 380px;
   margin: 0 0 40px;
@@ -1303,7 +1303,7 @@ nav {
 .ih-ct-row-sub {
   font-family: 'DM Sans', sans-serif;
   font-size: 13px;
-  color: #6B7280;
+  color: #575E6B;
   font-weight: 300;
   display: block;
   line-height: 1.6;
@@ -1445,7 +1445,7 @@ nav {
 .ih-contact-form-feedback {
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
-  color: #6B7280;
+  color: #575E6B;
   line-height: 1.5;
   min-height: 18px;
 }
@@ -1470,7 +1470,7 @@ nav {
   padding: 0;
   border: 0;
   background: transparent;
-  color: #6B7280;
+  color: #575E6B;
   cursor: pointer;
   transition: color 0.18s ease, opacity 0.18s ease;
 }
@@ -1484,7 +1484,7 @@ nav {
   padding: 0;
   border: 0;
   background: transparent;
-  color: #6B7280;
+  color: #575E6B;
   cursor: pointer;
   transition: color 0.18s ease, opacity 0.18s ease;
 }
@@ -1511,7 +1511,7 @@ nav {
   align-items: center;
   justify-content: center;
   min-width: 18px;
-  color: #6B7280;
+  color: #575E6B;
   font-weight: 600;
 }
 
@@ -1648,7 +1648,7 @@ footer {
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(245,240,232,0.4);
+  color: rgba(245,240,232,0.62);
   text-decoration: none;
   transition: color 0.2s;
 }
@@ -1659,7 +1659,7 @@ footer {
 
 .footer-copy {
   font-size: 11px;
-  color: rgba(245,240,232,0.28);
+  color: rgba(245,240,232,0.62);
   letter-spacing: 0.06em;
   line-height: 1.5;
 }
