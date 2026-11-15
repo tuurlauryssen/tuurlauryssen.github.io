@@ -866,6 +866,12 @@ nav {
   margin: 0 2px;
 }
 
+/* The ", " between co-authors loses its trailing space inside the flex row
+   ("Tuur Lauryssen,Emilia Konttinen"), so restore it as a margin. */
+.article-author-names .article-meta-separator {
+  margin: 0 5px 0 0;
+}
+
 .article-page-title {
   font-family: 'Inter', 'DM Sans', sans-serif;
   font-size: clamp(40px, 5vw, 54px);
@@ -2038,6 +2044,13 @@ footer {
     line-height: 1.4 !important;
   }
 
+  /* The .article-body p rule above would otherwise shrink pull-quotes back
+     to body size; keep them at the blockquote's own size. */
+  .article-body blockquote p {
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+
   .article-community__actions {
     flex-direction: row;
     align-items: center;
@@ -2141,5 +2154,40 @@ footer {
 
   .nl-link {
     min-width: 44px;
+  }
+
+  /* Header controls sit at 30-42px tall on phones (and index.html's inline
+     styles cap .nav-cta/.nl-link at 42px), so raise them to a full 44px. */
+  nav .nav-cta,
+  nav .nl-link,
+  .nav-logo.brand-lockup,
+  .article-brand.brand-lockup,
+  .ih-latest-link,
+  .ih-latest-more,
+  .ih-ct-button {
+    min-height: 44px;
+  }
+
+  .footer-links a {
+    min-width: 44px;
+  }
+}
+
+/* Respect the OS "reduce motion" setting: stop the ticker, drifting orbs,
+   grid/mesh backgrounds and entrance animations, and skip smooth scrolling.
+   Animations jump straight to their end state so nothing stays hidden. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
   }
 }

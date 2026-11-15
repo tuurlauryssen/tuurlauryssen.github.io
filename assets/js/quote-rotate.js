@@ -14,8 +14,15 @@
   var el = document.querySelector('[data-quote-rotate]');
   if (!el) return;
   var index = 0;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function typeQuote(text, onDone) {
+    if (reduceMotion) {
+      // No letter-by-letter typing for visitors who asked for less motion.
+      el.textContent = text;
+      if (onDone) onDone();
+      return;
+    }
     el.textContent = '';
     var i = 0;
     function next() {

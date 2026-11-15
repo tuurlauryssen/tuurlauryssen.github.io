@@ -204,6 +204,11 @@ function initIndexPage() {
 
     flipword.dataset.flipReady = 'true';
 
+    // Keep the first word still for visitors who asked for less motion.
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
     window.setInterval(() => {
       flipword.style.transition = 'transform 0.3s cubic-bezier(.4,0,.2,1), opacity 0.3s';
       flipword.style.transform = 'translateY(-110%)';
