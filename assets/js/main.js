@@ -235,11 +235,11 @@ function buildSharedContactSectionHtml(options = {}) {
             <h2 class="ih-ct-title">${copy.rightTitleHtml}</h2>
             <form class="ih-contact-form" data-contact-form>
               <div class="ih-contact-form-grid">
-                <input type="text" name="name" placeholder="${copy.namePlaceholder}" maxlength="${INSPIRE_MAX_NAME_LENGTH}" required>
-                <input type="email" name="email" placeholder="${copy.emailPlaceholder}" maxlength="${INSPIRE_MAX_EMAIL_LENGTH}" required>
+                <input type="text" name="name" placeholder="${copy.namePlaceholder}" aria-label="${copy.namePlaceholder}" autocomplete="name" maxlength="${INSPIRE_MAX_NAME_LENGTH}" required>
+                <input type="email" name="email" placeholder="${copy.emailPlaceholder}" aria-label="${copy.emailPlaceholder}" autocomplete="email" maxlength="${INSPIRE_MAX_EMAIL_LENGTH}" required>
               </div>
-              <input type="text" name="subject" placeholder="${copy.subjectPlaceholder}" value="${subjectValue}" maxlength="${INSPIRE_MAX_SUBJECT_LENGTH}" ${articleMetadata ? "" : "required"}>
-              <textarea name="message" placeholder="${copy.messagePlaceholder}" maxlength="${INSPIRE_MAX_MESSAGE_LENGTH}" required></textarea>
+              <input type="text" name="subject" placeholder="${copy.subjectPlaceholder}" aria-label="${copy.subjectPlaceholder}" value="${subjectValue}" maxlength="${INSPIRE_MAX_SUBJECT_LENGTH}" ${articleMetadata ? "" : "required"}>
+              <textarea name="message" placeholder="${copy.messagePlaceholder}" aria-label="${copy.messagePlaceholder}" maxlength="${INSPIRE_MAX_MESSAGE_LENGTH}" required></textarea>
               <div class="ih-contact-form-actions">
                 <div>
                   <div class="ih-contact-form-note">${copy.note}</div>
