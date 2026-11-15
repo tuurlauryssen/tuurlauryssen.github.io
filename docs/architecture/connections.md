@@ -9,7 +9,7 @@
 | **GitHub Pages** | Hosts this repo | `tuurlauryssen.com` (from `CNAME`) |
 | **Supabase** | Backend API (Edge Functions) + database, in the private `inspire-backend` repo | Project ref `jnhygvustbwwzfqrpklr` |
 | **Resend** | Sends alert emails (called by the backend, never by the site) | — |
-| **Beehiiv** | Where newsletter editions are written; image CDN | `tuurlauryssen.beehiiv.com`, `media.beehiiv.com` |
+| **Beehiiv** | Where newsletter editions are written (publishing only; the site loads nothing from it) | `tuurlauryssen.beehiiv.com` |
 | **Google Analytics 4** | Cookie-free analytics | `G-06BN0LL37Q` |
 | **Google Fonts** | Cormorant Garamond + DM Sans | `fonts.googleapis.com` |
 | **GitHub + `gh` CLI** | Used by the import script to push a branch and open a PR | — |
@@ -30,8 +30,7 @@ flowchart LR
   EF --> RS["Resend → inbox"]:::ext
   V -->|"events, no cookies"| GA["Google Analytics"]:::ext
   V -->|"fonts"| GF["Google Fonts"]:::ext
-  V -->|"some images"| BH["Beehiiv CDN"]:::ext
-  T -->|"write + export HTML"| BH
+  T -->|"write + export HTML"| BH["Beehiiv"]:::ext
   T -->|"process-new-posts → PR"| REPO
 ```
 
@@ -80,7 +79,7 @@ flowchart TB
 | GitHub Pages | ❌ | ❌ | ❌ | ⚠️ waits |
 | Supabase | ✅ | ❌ error shown | ⚠️ counters hidden | ✅ |
 | Resend | ✅ | ✅ still saved | ✅ | ✅ |
-| Beehiiv | ⚠️ hotlinked images missing | ✅ | ✅ | ❌ |
+| Beehiiv | ✅ | ✅ | ✅ | ❌ |
 | Google Analytics / Fonts | ✅ (no stats / fallback font) | ✅ | ✅ | ✅ |
 
 The core reading experience depends only on GitHub Pages. Everything from Supabase is an extra layer on top, so the site still works when the backend is down.
