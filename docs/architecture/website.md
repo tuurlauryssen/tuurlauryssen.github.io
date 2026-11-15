@@ -42,11 +42,11 @@ flowchart TB
 
   subgraph Home["🏠 index.html / nl/index.html"]
     direction LR
-    h0["home-content(.nl).js"]:::data --> h1["site-config.js"]:::cfg --> h1b["page-config-nl.js<br/>(NL only)"]:::cfg --> h2["main.js"]:::core --> h3["posts-data.js"]:::data --> h4["beehiiv.js"]:::core --> h5["inline: copy, hero logo<br/>canvas, rotating quotes"]:::core
+    h0["home-content(.nl).js"]:::data --> h1b["page-config-nl.js<br/>(NL only)"]:::cfg --> h1["site-config.js"]:::cfg --> h2["main.js"]:::core --> h3["posts-data.js"]:::data --> h4["beehiiv.js"]:::core --> h5["home.js<br/>copy, hero logo canvas"]:::core --> h6["quote-rotate.js"]:::core
   end
   subgraph Blog["🗂️ blog.html / nl/blog.html"]
     direction LR
-    b1["site-config.js"]:::cfg --> b1b["page-config-nl.js<br/>(NL only)"]:::cfg --> b2["main.js"]:::core --> b3["posts-data.js"]:::data --> b4["beehiiv.js"]:::core --> b5["inline: quotes"]:::core
+    b1b["page-config-nl.js<br/>(NL only)"]:::cfg --> b1["site-config.js"]:::cfg --> b2["main.js"]:::core --> b3["posts-data.js"]:::data --> b4["beehiiv.js"]:::core --> b5["blog-quotes(.nl).js"]:::data --> b6["quote-rotate.js"]:::core
   end
   subgraph Article["📄 posts/…/slug.html"]
     direction LR
